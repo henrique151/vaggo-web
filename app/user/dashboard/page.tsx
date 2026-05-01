@@ -3,9 +3,9 @@
 import Header from "@/component/header"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import * as api from "@/app/api"
 import { VehicleResponse } from "@/interface/api/vehicle"
-import { UserResponse } from "@/interface/api/user"
+import { User, UserDAO } from "@/entity/user"
+import { Vehicle, VehicleDAO } from "@/entity/vehicle"
 
 function VehicleCard({ raw_data }: any) {
   const data: VehicleResponse = raw_data
@@ -36,25 +36,31 @@ function VehicleCard({ raw_data }: any) {
 }
 
 export default function Page() {
-  const [carData, setCarData] = useState<VehicleResponse | undefined>()
-  const [userData, setUserData] = useState<UserResponse | undefined>()
+  const [carData, setCarData] = useState<Vehicle | undefined>()
+  // const [userData, setUserData] = useState<UserResponse | undefined>()
+  const [userData, setUserData] = useState<User | undefined>()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function loadData() {
       try {
-        const vehicle = await api.call("vehicles/1", true, {
-          dataOnly: true
-        })
 
-        const user = await api.call(
-          `users/${localStorage.getItem("userId")}`,
-          true,
-          { dataOnly: true }
-        )
+        // const vehicle = await api.call("vehicles/1", true, {
+          // dataOnly: true
+        // })
+        const vehicle = await VehicleDAO.get(1)
 
-        setCarData(vehicle as VehicleResponse)
-        setUserData(user as UserResponse)
+        // const user = await api.call(
+          // `users/${localStorage.getItem("userId")}`,
+          // true,
+          // { dataOnly: true }
+        // )
+        const user = await UserDAO.get(Number(localStorage.getItem("userId")))
+        
+
+        setCarData(vehicle)
+        // setUserData(user as UserResponse)
+        setUserData(user)
       } catch (error) {
         console.log(error)
       } finally {
@@ -100,11 +106,21 @@ export default function Page() {
 
           <div>
             <h1 className="text-4xl font-semibold text-gray-900">
-              Olá, {userData.person.name}
+              Olá, {userData.person.name}!
             </h1>
 
             <p className="text-gray-500 mt-2 text-lg">
-              Bem-vindo ao seu painel Vaggo
+              { 
+                (
+                  () => {
+                    let currentTime = new Date().getHours()
+                    if (currentTime >= 0 && currentTime <= 12 ) return <>Bom dia!</>
+                    else if (currentTime >= 13 && currentTime <= 17 ) return <>Boa Tarde!</>
+                    else if (currentTime >= 18 && currentTime <= 23 ) return <>Boa noite!</>
+                    else {return <>Bom dia!</>}
+                  }
+                )()
+              }
             </p>
           </div>
 
