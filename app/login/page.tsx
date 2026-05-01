@@ -50,9 +50,9 @@ export default function Page() {
       <div className="flex flex-1 items-center justify-center bg-[var(--background-soft)] px-4">
         {/* Usando o componente LoginCard */}
         <LoginCard
-  onSubmit={handle}
-  loading={loading}
-  hasBlur={true}
+          onSubmit={handle}
+          loading={loading}
+          hasBlur={true}
         />
       </div>
     </main>
