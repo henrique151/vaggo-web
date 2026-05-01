@@ -57,6 +57,8 @@ export async function call(uri:string, useToken:boolean = true, params?:IcallPar
     requestHeader = isEmpty(requestHeader) ? {mode: "no-cors"} : requestHeader
     requestBody = isEmpty(requestBody) ? undefined : requestBody
 
+    console.log(`header: ${JSON.stringify(requestHeader)}. body: ${JSON.stringify(requestBody)}`)
+
     const res = await fetch(`${API_ADDRESS}${uri}`, {headers: requestHeader, body: requestBody, method:requestMethod})
     
     // console.log(res)

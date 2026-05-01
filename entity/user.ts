@@ -25,6 +25,18 @@ export class UserDAO {
         if (res) {
             console.log("<OMEGA> from entity/user.ts.")
             console.log(res)
+
+            let person = new Person(
+                res.person.id,
+                res.person.name,
+                res.person.cpf,
+                res.person.gender,
+                res.person.phone,
+                res.person.birthDate,
+                res.person.registrationDate,
+                res.person.isActive
+            )
+
             let user = new User(
                 res.id,
                 res.email,
@@ -33,7 +45,7 @@ export class UserDAO {
                 res.isBlocked,
                 res.isAdmin,
                 res.permissionLevel,
-                res.person // convert to Person Object
+                person // convert to Person Object
             )
 
             console.log("<OMEGA> below here, this is the user it created:")
@@ -53,7 +65,13 @@ export class UserDAO {
 
     }
 
-    static async login(email:string, pass:string) {
+    /**
+     * Authenticates user to access full functionality by providing credentials.
+     * @param email user's email
+     * @param pass user's password
+     * @returns 
+     */
+    static async authenticate(email:string, pass:string) {
         let reqBody = JSON.stringify({email: email, password: pass})
         let res = await api.call("users/login", true, {dataOnly:true, body: reqBody, method: "POST", contentType: "json"})
 

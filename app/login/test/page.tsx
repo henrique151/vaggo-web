@@ -11,55 +11,68 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handle = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+  // const handle = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const values = Object.fromEntries(formData) as { email: string; pass: string };
+  //   const formData = new FormData(e.currentTarget);
+  //   const values = Object.fromEntries(formData) as { email: string; pass: string };
 
-    // remove qualquer campo desnecessário
-    delete (values as any).passConfirm;
-    // delete values.passConfirm;
+  //   // remove qualquer campo desnecessário
+  //   delete (values as any).passConfirm;
+  //   // delete values.passConfirm;
 
-    try {
-      const res = await fetch("http://localhost:3000/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
+  //   try {
+  //     const res = await fetch("http://localhost:3000/users/login", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(values),
+  //     });
 
-      const data = await res.json();
+  //     const data = await res.json();
 
-      if (res.ok) {
-        localStorage.setItem("token", data.data.token);
-        localStorage.setItem("userId", data.data.user.id);
-        console.log("Login bem-sucedido:", data);
-        // router.push("/user/dashboard");
-      } else {
-        console.error("Erro ao logar:", data);
-      }
-    } catch (err) {
-      console.error("Erro na requisição:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     if (res.ok) {
+  //       localStorage.setItem("token", data.data.token);
+  //       localStorage.setItem("userId", data.data.user.id);
+  //       console.log("Login bem-sucedido:", data);
+  //       // router.push("/user/dashboard");
+  //     } else {
+  //       console.error("Erro ao logar:", data);
+  //     }
+  //   } catch (err) {
+  //     console.error("Erro na requisição:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const test = async (e:any) => {
-    e.preventDefault();
-    setLoading(true)
+  // const authenticate = async (e:any) => {
+  //   e.preventDefault();
+  //   setLoading(true)
 
-    const formData = new FormData(e.currentTarget);
-    const values = Object.fromEntries(formData) as { email: string; password: string };
+  //   const formData = new FormData(e.currentTarget);
+  //   const values = Object.fromEntries(formData) as { email: string; password: string };
     
-    console.log("<OMEGA> i'm talking through the code that the page provided.")
-    let res = await UserDAO.login(values.email, values.password) as {token: string, user: {id: string}}
+  //   console.log("<OMEGA> i'm talking through the code that the page provided.")
+  //   let res = await UserDAO.authenticate(values.email, values.password) as {token: string, user: {id: string}} | undefined
 
+  //   if (res) { //user logged in
+  //     console.log("<OMEGA> you're in.")
+  //     localStorage.setItem("token", res.token)
+  //     localStorage.setItem("userId", res.user.id)
+  //   } else { //api response returned error due to user-error or smth else
+  //     console.log("<OMEGA> are you dumb for inserting your password or what?")
+  //   }
+  // }
+
+  const handleAuthenticate = async (res:any) => {
     if (res) { //user logged in
       console.log("<OMEGA> you're in.")
+      // console.log(res)
       localStorage.setItem("token", res.token)
       localStorage.setItem("userId", res.user.id)
+      
+      router.push("/user/dashboard");
     } else { //api response returned error due to user-error or smth else
       console.log("<OMEGA> are you dumb for inserting your password or what?")
     }
@@ -95,7 +108,7 @@ export default function Page() {
         </div>
         
         {/*  */}
-        <FormCard endpoint="users/login" onSubmit={test}>
+        <FormCard endpoint="users/login" useToken={false} content="json" method="POST" postSubmit={handleAuthenticate}>
           <div className="flex flex-col gap-1">
             <label className="text-sm text-gray-600">
               Email
