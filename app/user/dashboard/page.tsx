@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import Header from "@/component/header"
-import Link from "next/link"
-import { useEffect, useState } from "react"
-import { VehicleResponse } from "@/interface/api/vehicle"
-import { User, UserDAO } from "@/entity/user"
-import { Vehicle, VehicleDAO } from "@/entity/vehicle"
+import Header from "@/component/header";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+// import { VehicleResponse } from "@/interface/api/vehicle"
+import { User, UserDAO } from "@/entity/user";
+import { Vehicle, VehicleDAO } from "@/entity/vehicle";
 
 function VehicleCard({ raw_data }: any) {
-  const data: VehicleResponse = raw_data
+  const data: Vehicle = raw_data;
 
-  if (!data) return null
+  if (!data) return null;
 
   return (
     <div
@@ -28,48 +28,46 @@ function VehicleCard({ raw_data }: any) {
         {data.brand} {data.model}
       </h3>
 
-      <p className="text-sm text-gray-500 mt-2">
-        Placa: {data.licensePlate}
-      </p>
+      <p className="text-sm text-gray-500 mt-2">Placa: {data.licensePlate}</p>
     </div>
-  )
+  );
 }
 
 export default function Page() {
-  const [carData, setCarData] = useState<Vehicle | undefined>()
+  const [carData, setCarData] = useState<Vehicle | undefined>();
   // const [userData, setUserData] = useState<UserResponse | undefined>()
-  const [userData, setUserData] = useState<User | undefined>()
-  const [loading, setLoading] = useState(true)
+  const [userData, setUserData] = useState<User | undefined>();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-
         // const vehicle = await api.call("vehicles/1", true, {
-          // dataOnly: true
+        // dataOnly: true
         // })
-        const vehicle = await VehicleDAO.get(1)
+        const vehicle = await VehicleDAO.get(1);
 
         // const user = await api.call(
-          // `users/${localStorage.getItem("userId")}`,
-          // true,
-          // { dataOnly: true }
+        // `users/${localStorage.getItem("userId")}`,
+        // true,
+        // { dataOnly: true }
         // )
-        const user = await UserDAO.get(Number(localStorage.getItem("userId")))
-        
 
-        setCarData(vehicle)
+        //began testing with ! expression mark (i guess this one ignores the warning about it. possibly, it's better if wrapping around try-catch for better error management)
+        const user = await UserDAO.get(localStorage.getItem("userId")!);
+
+        setCarData(vehicle);
         // setUserData(user as UserResponse)
-        setUserData(user)
+        setUserData(user);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    loadData()
-  }, [])
+    loadData();
+  }, []);
 
   if (loading) {
     return (
@@ -80,7 +78,7 @@ export default function Page() {
           Carregando painel...
         </div>
       </main>
-    )
+    );
   }
 
   if (!carData || !userData) {
@@ -92,7 +90,7 @@ export default function Page() {
           Não foi possível carregar os dados.
         </div>
       </main>
-    )
+    );
   }
 
   return (
@@ -100,27 +98,25 @@ export default function Page() {
       <Header />
 
       <section className="max-w-7xl mx-auto px-6 py-10">
-
         {/* TOPO */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
-
           <div>
             <h1 className="text-4xl font-semibold text-gray-900">
               Olá, {userData.person.name}!
             </h1>
 
             <p className="text-gray-500 mt-2 text-lg">
-              { 
-                (
-                  () => {
-                    let currentTime = new Date().getHours()
-                    if (currentTime >= 0 && currentTime <= 12 ) return <>Bom dia!</>
-                    else if (currentTime >= 13 && currentTime <= 17 ) return <>Boa Tarde!</>
-                    else if (currentTime >= 18 && currentTime <= 23 ) return <>Boa noite!</>
-                    else {return <>Bom dia!</>}
-                  }
-                )()
-              }
+              {(() => {
+                const currentTime = new Date().getHours();
+                if (currentTime >= 0 && currentTime <= 12) return <>Bom dia!</>;
+                else if (currentTime >= 13 && currentTime <= 17)
+                  return <>Boa Tarde!</>;
+                else if (currentTime >= 18 && currentTime <= 23)
+                  return <>Boa noite!</>;
+                else {
+                  return <>Bom dia!</>;
+                }
+              })()}
             </p>
           </div>
 
@@ -139,23 +135,16 @@ export default function Page() {
           >
             Registrar veículo
           </Link>
-
         </div>
 
         {/* GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
           {/* ESQUERDA */}
           <div className="lg:col-span-2 space-y-8">
-
             <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-              <h2 className="text-2xl font-semibold mb-6">
-                Próximas reservas
-              </h2>
+              <h2 className="text-2xl font-semibold mb-6">Próximas reservas</h2>
 
-              <div className="text-gray-500">
-                Nenhuma reserva agendada.
-              </div>
+              <div className="text-gray-500">Nenhuma reserva agendada.</div>
             </section>
 
             <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
@@ -163,43 +152,29 @@ export default function Page() {
                 Reservas anteriores
               </h2>
 
-              <div className="text-gray-500">
-                Histórico aparecerá aqui.
-              </div>
+              <div className="text-gray-500">Histórico aparecerá aqui.</div>
             </section>
-
           </div>
 
           {/* DIREITA */}
           <div className="space-y-8">
-
             <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-              <h2 className="text-2xl font-semibold mb-6">
-                Seu veículo
-              </h2>
+              <h2 className="text-2xl font-semibold mb-6">Seu veículo</h2>
 
               <VehicleCard raw_data={carData} />
             </section>
 
             <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-              <h2 className="text-2xl font-semibold mb-6">
-                Mensagens
-              </h2>
+              <h2 className="text-2xl font-semibold mb-6">Mensagens</h2>
 
-              <div className="text-gray-500">
-                Nenhuma mensagem recente.
-              </div>
+              <div className="text-gray-500">Nenhuma mensagem recente.</div>
             </section>
-
           </div>
-
         </div>
-
       </section>
     </main>
-  )
+  );
 }
-
 
 /*
 'use client'
@@ -218,7 +193,7 @@ function VehicleCard({raw_data}:any) {
     const data:VehicleResponse = raw_data
     // setData(raw_data)
     // console.log(data)
-    
+
     if (data != null)
     return (
         <section>
@@ -233,7 +208,7 @@ function VehicleCard({raw_data}:any) {
 export default function Page() {
     const [carData, setCarData] = useState<VehicleResponse | undefined>(undefined)
     const [userData, setUserData] = useState<UserResponse | undefined>(undefined)
-    
+
     useEffect(() => {
         try {
             api.call("vehicles/1", true, {dataOnly: true})
@@ -243,12 +218,12 @@ export default function Page() {
             .then(data => setUserData(data as UserResponse))
             // .then(data => console.log(data as api.UserResponse))
 
-        
+
             // fetch(http://localhost:3000/vehicles/${localStorage.getItem('userId')}, {
             // fetch(http://localhost:3000/vehicles/5, {
-            // headers: { 
+            // headers: {
             //     'Authorization': Bearer ${localStorage.getItem('token')},
-            //     "Content-Type": "application/json" 
+            //     "Content-Type": "application/json"
             // },
             // })
             // .then((res) => res.json())
@@ -258,9 +233,9 @@ export default function Page() {
             // })
 
             // fetch(http://localhost:3000/users/${localStorage.getItem('userId')}, {
-            // headers: { 
+            // headers: {
             //     'Authorization': Bearer ${localStorage.getItem('token')},
-            //     "Content-Type": "application/json" 
+            //     "Content-Type": "application/json"
             // },
             // })
             // .then((res) => res.json())
@@ -271,14 +246,14 @@ export default function Page() {
 
             // api.fetch('')
 
-    
+
         } catch (error) {
             console.log(error)
         }
 
         // api.fetch('')
     }, [])
-    
+
     if ((carData != undefined && userData != undefined))
     return (
         <main>

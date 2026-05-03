@@ -1,4 +1,3 @@
-// app/account/page.tsx
 "use client";
 
 import Header from "@/component/header";
@@ -9,7 +8,6 @@ import TabContainer from "@/component/container/TabContainer/tabContainer";
 import TabPage from "@/component/container/TabContainer/tabPage";
 import TabSidebar from "@/component/container/TabContainer/tabSidebar";
 
-import EntityCard from "@/component/entity_card";
 import EditCard from "@/component/edit_card";
 
 import { UserResponse } from "@/interface/api/user";
@@ -20,6 +18,7 @@ import * as api from "@/app/api";
 import { VehicleResponse } from "@/interface/api/vehicle";
 
 import FormCard from "@/component/form_card";
+import EntityCard, { DefaultEntityFrame } from "@/component/entityCard";
 
 import { User, UserDAO } from "@/entity/user";
 
@@ -69,6 +68,7 @@ export default function Page() {
       // );
       setUser(userData);
 
+      //turn everything below as true objects, not ApiResponses
       const vehicleData = await api.call(`vehicles/my-vehicles`, true, {
         dataOnly: true,
       });
@@ -162,18 +162,22 @@ export default function Page() {
           {vehicles.map((vehicle) => {
             return (
               <EntityCard
-                type="vehicle"
                 key={vehicle.id}
-                editHref="/user/vehicle/register"
-                data={{
-                  id: vehicle.id,
-                  brand: vehicle.brand,
-                  model: vehicle.model,
-                  color: vehicle.color,
-                  licensePlate: vehicle.licensePlate,
-                  manufactureYear: vehicle.manufactureYear,
-                }}
-              />
+                // data={{
+                //   id: vehicle.id,
+                //   brand: vehicle.brand,
+                //   model: vehicle.model,
+                //   color: vehicle.color,
+                //   licensePlate: vehicle.licensePlate,
+                //   manufactureYear: vehicle.manufactureYear,
+                // }}
+              >
+                <DefaultEntityFrame
+                  title={`${vehicle.brand} ${vehicle.model}`}
+                  description={vehicle.manufactureYear}
+                  tagList={[vehicle.color, vehicle.licensePlate]}
+                />
+              </EntityCard>
             );
           })}
         </div>
@@ -198,17 +202,26 @@ export default function Page() {
             return (
               <EntityCard
                 key={property.id}
-                type="property"
-                editHref="/property/register"
-                data={{
-                  id: property.id,
-                  name: property.name,
-                  type: property.type,
-                  description: property.description,
-                  totalCapacity: property.totalCapacity,
-                  zipCode: property.zipCode,
-                }}
-              />
+                // // type="property"
+                // // editHref="/property/register"
+                // // data={{
+                // //   id: property.id,
+                // //   name: property.name,
+                // //   type: property.type,
+                // //   description: property.description,
+                // //   totalCapacity: property.totalCapacity,
+                // //   zipCode: property.zipCode,
+                // }}
+              >
+                <DefaultEntityFrame
+                  title={`${property.name}`}
+                  description={property.type}
+                  tagList={[
+                    `${property.totalCapacity} Vagas`,
+                    `CEP: ${property.zipCode}`,
+                  ]}
+                />
+              </EntityCard>
             );
           })}
         </div>
@@ -232,20 +245,25 @@ export default function Page() {
           {spots.map((spot) => {
             return (
               <EntityCard
-                type="spot"
+                // type="spot"
                 key={spot.id}
-                editHref="/spot/register"
-                data={{
-                  id: spot.id,
-                  size: spot.size,
-                  status: spot.status,
-                  identifier: spot.identifier,
-                  isCovered: spot.isCovered,
-                  approvalStatus: spot.approvalStatus,
-                  allowedVehicles: spot.allowedVehicles,
-                  operatingHours: spot.operatingHours,
-                }}
-              />
+                // editHref="/spot/register"
+                // data={{
+                //   id: spot.id,
+                //   size: spot.size,
+                //   status: spot.status,
+                //   identifier: spot.identifier,
+                //   isCovered: spot.isCovered,
+                //   approvalStatus: spot.approvalStatus,
+                //   allowedVehicles: spot.allowedVehicles,
+                //   operatingHours: spot.operatingHours,
+                // }}
+              >
+                <DefaultEntityFrame
+                  title={spot.identifier}
+                  description={spot.status}
+                />
+              </EntityCard>
             );
           })}
           {/* <EntityCard
