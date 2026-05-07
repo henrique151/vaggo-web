@@ -1,26 +1,29 @@
+import { Image } from "./media";
+
 export interface User {
-    id: number;
-    email: string;
-    password: string; // hashed password
-    lastLogin: string; // ISO datetime string
-    isBlocked: boolean;
-    isAdmin: boolean;
-    permissionLevel: number;
-    // personId?: number;
-    person: Person;
+  id: number;
+  email: string;
+  password: string; // hashed password
+  lastLogin: string; // ISO datetime string
+  isBlocked: boolean;
+  isAdmin: boolean;
+  permissionLevel: number;
+  // personId?: number;
+  userPicture: Image;
+  person: Person;
 }
 
-export type UserPreview = Pick<User, "id" | "email" >
+export type UserPreview = Pick<User, "id" | "email">;
 
 export interface Person {
-    id: number,
-    name: string,
-    cpf: string,
-    gender: string | "M" | "F",
-    phone: string,
-    birthDate: string, //yyyy-mm-dd
-    registrationDate: string, //yyyy-mm-dd
-    isActive: boolean
+  id: number;
+  name: string;
+  cpf: string;
+  gender: string | "M" | "F";
+  phone: string;
+  birthDate: string; //yyyy-mm-dd
+  registrationDate: string; //yyyy-mm-dd
+  isActive: boolean;
 }
 
 // OLD

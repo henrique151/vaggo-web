@@ -3,6 +3,8 @@ import { Spot as ISpot, OperatingHours } from "@/interface/spot";
 import * as api from "@/entity/api";
 // import { UserResponse } from "@/interface/api/user";
 import { VehicleTypes } from "@/interface/vehicle";
+import { Property } from "@/interface/property";
+import { PropertyDAO } from "./property";
 
 export class Spot implements ISpot {
   constructor(
@@ -13,34 +15,74 @@ export class Spot implements ISpot {
     public isCovered: boolean,
     public approvalStatus: string,
     public allowedVehicles: VehicleTypes[],
-    public operatingHours: OperatingHours,
+    // public operatingHours: OperatingHours,
     public isActive: boolean,
-    public propertyId: number,
+    public property?: Property,
+    //TODO insert Availability properties here, and check an efficient way of putting mass variables in a single way
   ) {}
+
+  // public static create(data: ISpot): Spot;
+  public static create(data: ISpot, property?: Property): Spot {
+    let spot: Spot | undefined;
+
+    if (property) {
+      spot = new Spot(
+        data.id,
+        data.size,
+        data.status,
+        data.identifier,
+        data.isCovered,
+        data.approvalStatus,
+        data.allowedVehicles,
+        // data.operatingHours,
+        data.isActive,
+        property,
+      );
+    } else {
+      spot = new Spot(
+        data.id,
+        data.size,
+        data.status,
+        data.identifier,
+        data.isCovered,
+        data.approvalStatus,
+        data.allowedVehicles,
+        // data.operatingHours,
+        data.isActive,
+      );
+    }
+
+    return spot;
+  }
 }
 
 export class SpotDAO {
   static async get(id: number | string): Promise<Spot | undefined> {
     const res = (await api.call(`spots/${id}`, true, {
       dataOnly: true,
-    })) as ISpot;
+    })) as ISpot & { propertyId: number };
 
     if (res) {
       console.log("from entity/spot.ts.");
       console.log(res);
 
-      const spot = new Spot(
-        res.id,
-        res.size,
-        res.status,
-        res.identifier,
-        res.isCovered,
-        res.approvalStatus,
-        res.allowedVehicles,
-        res.operatingHours,
-        res.isActive,
-        res.propertyId,
-      );
+      const property = await PropertyDAO.get(res.propertyId);
+
+      if (!property) return undefined;
+
+      const spot = Spot.create(res, property);
+      // const spot = new Spot(
+      //   res.id,
+      //   res.size,
+      //   res.status,
+      //   res.identifier,
+      //   res.isCovered,
+      //   res.approvalStatus,
+      //   res.allowedVehicles,
+      //   res.operatingHours,
+      //   res.isActive,
+      //   property,
+      // );
 
       // let user = new User(
       //   res.id,
@@ -60,6 +102,28 @@ export class SpotDAO {
     }
 
     return undefined;
+  }
+
+  static async listFromProperty(id: number): Promise<Spot[]> {
+    const res = (await api.call(`spots/properties/${id}/spots`, true, {
+      dataOnly: true,
+    })) as ISpot[] & { propertyId: number };
+
+    const spots: Spot[] | [] = [];
+    if (!res) return spots;
+
+    console.log("from entity/spot.ts.");
+    console.log(res);
+
+    const property = await PropertyDAO.get(res.propertyId);
+
+    if (!property) return spots;
+
+    for (const spot of res) {
+      spots.push(Spot.create(spot, property)); //what?
+    }
+
+    return spots;
   }
 
   static register(obj: Spot) {}

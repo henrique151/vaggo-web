@@ -1,6 +1,7 @@
 import { User as IUser, Person as IPerson } from "@/interface/user";
 import * as api from "@/entity/api";
 import { UserResponse } from "@/interface/api/user";
+import { Image } from "@/interface/media";
 
 export class User implements IUser {
   constructor(
@@ -12,6 +13,7 @@ export class User implements IUser {
     public isAdmin: boolean,
     public permissionLevel: number,
     public person: Person,
+    public userPicture: Image,
   ) {}
 }
 
@@ -19,7 +21,7 @@ export class UserDAO {
   static async get(id: number | string): Promise<User | undefined> {
     const res = (await api.call(`users/${id}`, true, {
       dataOnly: true,
-    })) as IUser;
+    })) as IUser & { avatarUrl: string };
 
     if (res) {
       console.log("from entity/user.ts.");
@@ -36,6 +38,8 @@ export class UserDAO {
         res.person.isActive,
       );
 
+      const image = new Image(res.avatarUrl);
+
       const user = new User(
         res.id,
         res.email,
@@ -45,10 +49,11 @@ export class UserDAO {
         res.isAdmin,
         res.permissionLevel,
         person, // convert to Person Object
+        image,
       );
 
-      console.log("below here, this is the user it created:");
-      console.log(user);
+      // console.log("below here, this is the user it created:");
+      // console.log(user);
 
       return user;
     }

@@ -58,7 +58,7 @@ export class VehicleDAO {
    * Returns a list of all vehicles registered by the current user. Requires Authentication
    * @returns An Array of all vehicles registered by the user
    */
-  static async getFromUser(): Promise<Vehicle[] | undefined> {
+  static async getFromUser(): Promise<Vehicle[] | []> {
     const res = (await api.call(`vehicles/my-vehicles`, true, {
       dataOnly: true,
     })) as IVehicle[];
@@ -68,7 +68,7 @@ export class VehicleDAO {
       res.forEach(async (rawData: IVehicle) => {
         const user = await UserDAO.get(rawData.userId!);
 
-        if (!user) return undefined;
+        if (!user) return []; //Throw error instead of returning empty. smth wrong happened
 
         const obj = new Vehicle(
           rawData.id,
@@ -88,7 +88,7 @@ export class VehicleDAO {
       return data;
     }
 
-    return undefined;
+    return [];
   }
 
   static register(obj: Vehicle) {}
