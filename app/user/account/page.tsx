@@ -22,6 +22,9 @@ import { VehicleResponse } from "@/interface/api/vehicle";
 import FormCard from "@/component/form_card";
 
 import { User, UserDAO } from "@/entity/user";
+import { Vehicle, VehicleDAO } from "@/entity/vehicle";
+import Property, { PropertyDAO } from "@/entity/property";
+import { Spot } from "@/entity/spot";
 
 function ProfileItem({ label, value }: { label: string; value: string }) {
   return (
@@ -37,15 +40,11 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState("Perfil");
   const [isEditing, setIsEditing] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
-  const [vehicles, setVehicles] = useState<VehicleResponse[] | undefined>(
+  const [vehicles, setVehicles] = useState<Vehicle[] | []>([]);
+  const [properties, setProperties] = useState<Property[] | undefined>(
     undefined,
   );
-  const [properties, setProperties] = useState<PropertyResponse[] | undefined>(
-    undefined,
-  );
-  const [spots, setSpots] = useState<ParkingSpotResponse[] | undefined>(
-    undefined,
-  );
+  const [spots, setSpots] = useState<Spot | undefined>(undefined);
 
   // const user = {
   //   email: "galvian@email.com",
@@ -69,29 +68,34 @@ export default function Page() {
       // );
       setUser(userData);
 
-      const vehicleData = await api.call(`vehicles/my-vehicles`, true, {
-        dataOnly: true,
-      });
-      setVehicles(vehicleData as VehicleResponse[]);
+      // const vehicleData = await api.call(`vehicles/my-vehicles`, true, {
+      // dataOnly: true,
+      // });
+      const vehicleData = await VehicleDAO.getFromUser();
+      setVehicles(vehicleData);
 
-      const propertyData = await api.call(`properties/my-properties`, true, {
-        dataOnly: true,
-      });
-      setProperties(propertyData as PropertyResponse[]);
+      // const propertyData = await api.call(`properties/my-properties`, true, {
+      //   dataOnly: true,
+      // });
+      const propertyData = await PropertyDAO.getFromUser();
+      setProperties(propertyData ? propertyData : []);
 
       // TODO check API's response on spot data. change if necessary
       const spotData = await api.call(`properties/my-properties`, true, {
         dataOnly: true,
       });
-      setSpots(spotData as ParkingSpotResponse[]);
+      setSpots(spotData);
     };
     query();
   }, []);
 
-  if (!user) return <></>;
-  if (!vehicles) return <></>;
-  if (!properties) return <></>;
-  if (!spots) return <></>;
+  const querySuccess = user && vehicles && properties && spots;
+
+  // if (!user) return <></>;
+  // if (!vehicles) return <></>;
+  // if (!properties) return <></>;
+  // if (!spots) return <></>;
+  if (!querySuccess) return <></>;
   const subPages = {
     Perfil: (
       <TabPage label="Perfil">

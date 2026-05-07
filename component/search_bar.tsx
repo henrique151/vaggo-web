@@ -1,9 +1,11 @@
-'use client'
+"use client";
+
+// TODO allow search bar to redirect user on the search page
+// TODO implement searching parameters on search's url
 
 export default function SearchBar() {
   return (
     <div className="w-full">
-
       <div
         className="
           w-full
@@ -18,12 +20,9 @@ export default function SearchBar() {
           overflow-hidden
         "
       >
-
         {/* Onde */}
         <div className="flex-1 min-w-0 px-4">
-          <p className="text-[11px] font-semibold text-gray-900">
-            Onde
-          </p>
+          <p className="text-[11px] font-semibold text-gray-900">Onde</p>
 
           <input
             type="text"
@@ -69,9 +68,7 @@ export default function SearchBar() {
 
         {/* Veículo */}
         <div className="flex-1 min-w-0 px-4">
-          <p className="text-[11px] font-semibold text-gray-900">
-            Tipo
-          </p>
+          <p className="text-[11px] font-semibold text-gray-900">Tipo</p>
 
           <input
             type="text"
@@ -103,9 +100,7 @@ export default function SearchBar() {
         >
           🔍
         </button>
-
       </div>
-
     </div>
-  )
+  );
 }

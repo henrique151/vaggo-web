@@ -76,3 +76,7 @@ export default function FormCard({
     </form>
   );
 }
+
+export function GenericFormLayout({ title, subtitle, backlink, children }) {
+  return <></>;
+}

@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 // import { VehicleResponse } from "@/interface/api/vehicle"
 import { User, UserDAO } from "@/entity/user";
 import { Vehicle, VehicleDAO } from "@/entity/vehicle";
+import Image from "next/image";
 
-function VehicleCard({ raw_data }: any) {
+function VehicleCard({ raw_data }: { raw_data: Vehicle }) {
   const data: Vehicle = raw_data;
 
   if (!data) return null;
@@ -34,7 +35,8 @@ function VehicleCard({ raw_data }: any) {
 }
 
 export default function Page() {
-  const [carData, setCarData] = useState<Vehicle | undefined>();
+  // const [carData, setCarData] = useState<Vehicle | undefined>();
+  const [carsData, setCarsData] = useState<Vehicle[] | []>([]);
   // const [userData, setUserData] = useState<UserResponse | undefined>()
   const [userData, setUserData] = useState<User | undefined>();
   const [loading, setLoading] = useState(true);
@@ -42,22 +44,17 @@ export default function Page() {
   useEffect(() => {
     async function loadData() {
       try {
-        // const vehicle = await api.call("vehicles/1", true, {
-        // dataOnly: true
-        // })
-        const vehicle = await VehicleDAO.get(1);
-
-        // const user = await api.call(
-        // `users/${localStorage.getItem("userId")}`,
-        // true,
-        // { dataOnly: true }
-        // )
+        // const vehicle = await VehicleDAO.get(1);
+        const vehicles = await VehicleDAO.getFromUser();
+        // console.log("Below here, vehicles;");
+        // console.log(vehicles);
 
         //began testing with ! expression mark (i guess this one ignores the warning about it. possibly, it's better if wrapping around try-catch for better error management)
         const user = await UserDAO.get(localStorage.getItem("userId")!);
 
-        setCarData(vehicle);
-        // setUserData(user as UserResponse)
+        // setCarData(vehicle);
+        setCarsData(vehicles ? vehicles : []);
+
         setUserData(user);
       } catch (error) {
         console.log(error);
@@ -81,7 +78,7 @@ export default function Page() {
     );
   }
 
-  if (!carData || !userData) {
+  if (!carsData || !userData) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
         <Header />
@@ -100,24 +97,35 @@ export default function Page() {
       <section className="max-w-7xl mx-auto px-6 py-10">
         {/* TOPO */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
-          <div>
-            <h1 className="text-4xl font-semibold text-gray-900">
-              Olá, {userData.person.name}!
-            </h1>
+          <div className="flex flex-row">
+            <Image
+              alt="Foto de Perfil do Usuário"
+              width={128}
+              height={128}
+              src={userData.userPicture.url}
+              className="mr-6 rounded-4xl"
+            />
 
-            <p className="text-gray-500 mt-2 text-lg">
-              {(() => {
-                const currentTime = new Date().getHours();
-                if (currentTime >= 0 && currentTime <= 12) return <>Bom dia!</>;
-                else if (currentTime >= 13 && currentTime <= 17)
-                  return <>Boa Tarde!</>;
-                else if (currentTime >= 18 && currentTime <= 23)
-                  return <>Boa noite!</>;
-                else {
-                  return <>Bom dia!</>;
-                }
-              })()}
-            </p>
+            <div className="flex-col">
+              <h1 className="text-4xl font-semibold text-gray-900">
+                Olá, {userData.person.name}!
+              </h1>
+
+              <p className="text-gray-500 mt-2 text-lg">
+                {(() => {
+                  const currentTime = new Date().getHours();
+                  if (currentTime >= 0 && currentTime <= 12)
+                    return <>Bom dia!</>;
+                  else if (currentTime >= 13 && currentTime <= 17)
+                    return <>Boa Tarde!</>;
+                  else if (currentTime >= 18 && currentTime <= 23)
+                    return <>Boa noite!</>;
+                  else {
+                    return <>Bom dia!</>;
+                  }
+                })()}
+              </p>
+            </div>
           </div>
 
           <Link
@@ -159,9 +167,13 @@ export default function Page() {
           {/* DIREITA */}
           <div className="space-y-8">
             <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-              <h2 className="text-2xl font-semibold mb-6">Seu veículo</h2>
+              <h2 className="text-2xl font-semibold mb-6">
+                Seu(s) veículo(os)
+              </h2>
 
-              <VehicleCard raw_data={carData} />
+              {carsData.map((car) => {
+                return <VehicleCard key={car.id} raw_data={car} />;
+              })}
             </section>
 
             <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
