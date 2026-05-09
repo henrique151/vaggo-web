@@ -2,11 +2,12 @@ import { ApiResponse, DataResponse } from "@/interface/api/api";
 
 const API_ADDRESS = "http://localhost:3000/";
 
-export type contentTypeSupport = "json";
+export type contentTypeSupport = "json" | "form-data";
 export type requestTypeSupport = "GET" | "POST" | "UPDATE" | "DELETE" | "PATCH";
 
 const contentTypeTable: Record<contentTypeSupport, string> = {
   json: "application/json",
+  "form-data": "multipart/form-data",
 };
 
 interface IcallParams {
@@ -73,9 +74,9 @@ export async function call(
   requestHeader = isEmpty(requestHeader) ? { mode: "no-cors" } : requestHeader;
   requestBody = isEmpty(requestBody) ? undefined : requestBody;
 
-  console.log(
-    `header: ${JSON.stringify(requestHeader)}. body: ${JSON.stringify(requestBody)}`,
-  );
+  // console.log(
+  // `header: ${JSON.stringify(requestHeader)}. body: ${JSON.stringify(requestBody)}`,
+  // );
 
   const res = await fetch(`${API_ADDRESS}${uri}`, {
     headers: requestHeader,

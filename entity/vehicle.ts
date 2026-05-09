@@ -58,17 +58,19 @@ export class VehicleDAO {
    * Returns a list of all vehicles registered by the current user. Requires Authentication
    * @returns An Array of all vehicles registered by the user
    */
-  static async getFromUser(): Promise<Vehicle[] | []> {
+  static async getFromUser(): Promise<Vehicle[]> {
     const res = (await api.call(`vehicles/my-vehicles`, true, {
       dataOnly: true,
     })) as IVehicle[];
     const data: Vehicle[] = [];
+    let user: User | undefined;
 
     if (res) {
+      if (res.length > 0) {
+        user = await UserDAO.get(res[0].userId!);
+      }
       res.forEach(async (rawData: IVehicle) => {
-        const user = await UserDAO.get(rawData.userId!);
-
-        if (!user) return []; //Throw error instead of returning empty. smth wrong happened
+        if (!user) return data; //Throw error instead of returning empty. smth wrong happened
 
         const obj = new Vehicle(
           rawData.id,
@@ -88,7 +90,7 @@ export class VehicleDAO {
       return data;
     }
 
-    return [];
+    return data;
   }
 
   static register(obj: Vehicle) {}

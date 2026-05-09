@@ -1,7 +1,7 @@
 // // component/entity_card.tsx
 // 'use client'
 
-import { createContext, useState } from "react";
+import { useState } from "react";
 
 // import { useState } from "react"
 // import Link from "next/link"
@@ -46,7 +46,7 @@ import { createContext, useState } from "react";
 //   editHref?: string
 // }
 
-const Context = createContext(null);
+// const Context = createContext(null);
 
 interface EntityCardProps {
   children: React.ReactNode;

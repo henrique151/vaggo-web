@@ -2,11 +2,91 @@
 
 import Header from "@/component/header";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { HTMLAttributes, useEffect, useState } from "react";
 // import { VehicleResponse } from "@/interface/api/vehicle"
 import { User, UserDAO } from "@/entity/user";
 import { Vehicle, VehicleDAO } from "@/entity/vehicle";
 import Image from "next/image";
+import { Booking, BookingDAO } from "@/entity/booking";
+import SpotCard from "@/component/spot_card";
+
+interface CardCarousel {
+  title: string;
+  // children: React.ReactNode;
+  cards: React.ReactNode[];
+}
+
+function CardCarousel({ title, cards = [] }: CardCarousel) {
+  const [index, setIndex] = useState(0);
+
+  const CARD_WIDTH = 260;
+  const GAP = 12;
+  const STEP = CARD_WIDTH + GAP;
+
+  const visibleCards = 3;
+  const maxIndex = cards.length - visibleCards;
+
+  const next = () => index < maxIndex && setIndex(index + 1);
+  const prev = () => index > 0 && setIndex(index - 1);
+
+  // if (!spots) return <></>
+  return (
+    <section className="w-full">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
+
+        <div className="flex gap-2">
+          <button
+            onClick={prev}
+            disabled={index === 0}
+            className="
+              w-8 h-8
+              rounded-full
+              bg-white
+              border border-gray-200
+              shadow-sm
+              hover:bg-gray-50
+              disabled:opacity-30
+            "
+          >
+            ‹
+          </button>
+
+          <button
+            onClick={next}
+            disabled={index === maxIndex}
+            className="
+              w-8 h-8
+              rounded-full
+              bg-white
+              border border-gray-200
+              shadow-sm
+              hover:bg-gray-50
+              disabled:opacity-30
+            "
+          >
+            ›
+          </button>
+        </div>
+      </div>
+
+      {/* Slides */}
+      <div className="overflow-hidden">
+        <div
+          className="flex gap-3 transition-transform duration-300"
+          style={{
+            transform: `translateX(-${index * STEP}px)`,
+          }}
+        >
+          {cards.map((card) => {
+            return <>{card}</>;
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function VehicleCard({ raw_data }: { raw_data: Vehicle }) {
   const data: Vehicle = raw_data;
@@ -34,28 +114,128 @@ function VehicleCard({ raw_data }: { raw_data: Vehicle }) {
   );
 }
 
+function DashboardTile({
+  title,
+  notFoundMessage,
+  children,
+}: {
+  title: string;
+  notFoundMessage: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+      <h2 className="text-2xl font-semibold mb-6">{title}</h2>
+
+      <section>{children}</section>
+      {/*<div className="text-gray-500">{notFoundMessage}</div>*/}
+    </section>
+  );
+}
+
+function DashboardEntityCard({
+  title,
+  description = "",
+  className,
+  children,
+}: {
+  title: string;
+  description: string;
+  // className: HTMLAttributes<HTMLElement>.className;
+  className: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`
+        bg-white
+        border border-gray-200
+        rounded-2xl
+        shadow-sm
+        p-5
+        hover:shadow-md
+        transition
+        ${className}
+      `}
+    >
+      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      <p className="text-sm text-gray-500 mt-2">{description}</p>
+      <section>{children}</section>
+    </div>
+  );
+}
+
 export default function Page() {
-  // const [carData, setCarData] = useState<Vehicle | undefined>();
-  const [carsData, setCarsData] = useState<Vehicle[] | []>([]);
-  // const [userData, setUserData] = useState<UserResponse | undefined>()
+  const [carsData, setCarsData] = useState<Vehicle[]>([]);
   const [userData, setUserData] = useState<User | undefined>();
+  const [bookingSolicitations, setBookingSolicitations] = useState<
+    Booking[] | undefined
+  >([]);
+  const [nextBookings, setnextBookings] = useState<Booking[] | undefined>([]);
+  const [nextBookingsCards, setnextBookingsCards] = useState<
+    (typeof DashboardEntityCard)[] | undefined
+  >([]);
   const [loading, setLoading] = useState(true);
+
+  const handleSolicitation = async (id: number, accept: boolean) => {
+    const status = accept ? "approve" : "reject";
+    const res = await fetch(
+      `http://localhost:3000/reservations/${id}/${status}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        method: "PATCH",
+      },
+    );
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log(
+        `This solicitation has been ${status}. The following data is from api`,
+      );
+      console.log(data);
+      return true;
+    }
+    return false;
+  };
 
   useEffect(() => {
     async function loadData() {
       try {
-        // const vehicle = await VehicleDAO.get(1);
         const vehicles = await VehicleDAO.getFromUser();
-        // console.log("Below here, vehicles;");
-        // console.log(vehicles);
-
         //began testing with ! expression mark (i guess this one ignores the warning about it. possibly, it's better if wrapping around try-catch for better error management)
         const user = await UserDAO.get(localStorage.getItem("userId")!);
+        const bSolicitations = await BookingDAO.listSolicitations();
+        const nextBookings = await BookingDAO.list();
+
+        if (nextBookings) {
+          const cards = [];
+          for (const booking of nextBookings) {
+            cards.push(
+              <DashboardEntityCard
+                key={`next_booking_${booking.id}`}
+                // id={`booking_solicitation_${booking.id}`}
+                title={booking.spot.identifier}
+                description={`Data: ${booking.datePeriod.start.toLocaleDateString()}, Status: ${booking.status}`}
+                className="mb-3"
+              >
+                <div className="flex flex-row"></div>
+              </DashboardEntityCard>,
+            );
+          }
+          setnextBookingsCards(cards);
+        }
+        // const user = await UserDAO.get(localStorage.getItem("userId")!);
+
+        console.log(nextBookings);
 
         // setCarData(vehicle);
         setCarsData(vehicles ? vehicles : []);
-
         setUserData(user);
+        setBookingSolicitations(bSolicitations);
+        setnextBookings(nextBookings);
       } catch (error) {
         console.log(error);
       } finally {
@@ -78,7 +258,9 @@ export default function Page() {
     );
   }
 
-  if (!carsData || !userData) {
+  const loadCondition = !carsData || !userData || !bookingSolicitations;
+
+  if (loadCondition) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
         <Header />
@@ -149,24 +331,155 @@ export default function Page() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* ESQUERDA */}
           <div className="lg:col-span-2 space-y-8">
-            <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+            <DashboardTile
+              title={"Próximas Reservas"}
+              notFoundMessage={"Nenhuma reserva Agendada"}
+            >
+              <CardCarousel title={""} cards={nextBookingsCards}></CardCarousel>
+              {/*{nextBookings?.map((booking) => {
+                return (
+                  <section
+                    key={`next_booking_${booking.id}`}
+                    id={`next_booking_${booking.id}`}
+                  >
+                    <DashboardEntityCard
+                      key={`next_booking_${booking.id}`}
+                      // id={`booking_solicitation_${booking.id}`}
+                      title={booking.spot.identifier}
+                      description={`Data: ${booking.datePeriod.start.toLocaleDateString()}, Status: ${booking.status}`}
+                      className="mb-3"
+                    >
+                      <div className="flex flex-row"></div>
+                    </DashboardEntityCard>
+                  </section>
+                );
+              })}*/}
+              {/*<p>Nenhuma reserva Agendada</p>*/}
+            </DashboardTile>
+
+            <DashboardTile
+              title={"Reservas anteriores"}
+              notFoundMessage={"Histórico aparecerá aqui."}
+            >
+              <p>Histórico aparecerá aqui</p>
+            </DashboardTile>
+
+            <DashboardTile
+              title={"Solicitações de Reservas"}
+              notFoundMessage={"Nenhuma mensagem recente."}
+            >
+              {bookingSolicitations?.map((booking) => {
+                return (
+                  <section
+                    key={`booking_solicitation_${booking.id}`}
+                    id={`booking_solicitation_${booking.id}`}
+                  >
+                    <DashboardEntityCard
+                      key={`booking_solicitation_${booking.id}`}
+                      // id={`booking_solicitation_${booking.id}`}
+                      title={booking.spot.identifier}
+                      description={`Solicitante: ${booking.user?.person.name}`}
+                      className="mb-3"
+                    >
+                      <div className="flex flex-row">
+                        <button
+                          onClick={async (e) => {
+                            const res = await handleSolicitation(
+                              booking.id,
+                              true,
+                            );
+                            if (res) {
+                              console.log("operação executada com sucesso");
+                              // BUG element cant get hidden for some reason
+                              console.log(
+                                document.getElementById(
+                                  `booking_solicitation_${booking.id}`,
+                                ),
+                              );
+                              document.getElementById(
+                                `booking_solicitation_${booking.id}`,
+                              )!.style.visibility = "hidden";
+                            }
+                          }}
+                          className="
+                            mt-4
+                            py-3
+                            rounded-lg
+                            font-medium
+                            text-white
+                            bg-gray-900
+                            hover:bg-black
+                            transition
+                            disabled:opacity-60
+                            w-full
+                            mr-2
+                          "
+                        >
+                          Aceitar
+                        </button>
+                        <button
+                          onClick={async () => {
+                            const res = await handleSolicitation(
+                              booking.id,
+                              false,
+                            );
+                          }}
+                          className="
+                            mt-4
+                            py-3
+                            rounded-lg
+                            font-medium
+                            text-white
+                            bg-gray-900
+                            hover:bg-black
+                            transition
+                            disabled:opacity-60
+                            w-full
+                          "
+                        >
+                          Recusar
+                        </button>
+                      </div>
+                    </DashboardEntityCard>
+                  </section>
+                );
+              })}
+              {/*<p>Nenhuma solicitação Recente</p>*/}
+            </DashboardTile>
+
+            {/*<section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
               <h2 className="text-2xl font-semibold mb-6">Próximas reservas</h2>
 
               <div className="text-gray-500">Nenhuma reserva agendada.</div>
-            </section>
+            </section>*/}
 
-            <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+            {/*<section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
               <h2 className="text-2xl font-semibold mb-6">
                 Reservas anteriores
               </h2>
 
               <div className="text-gray-500">Histórico aparecerá aqui.</div>
-            </section>
+            </section>*/}
           </div>
 
           {/* DIREITA */}
           <div className="space-y-8">
-            <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+            <DashboardTile
+              title={"Seu(s) veículo(os)"}
+              notFoundMessage={"Nenhum Veículo Cadastrado"}
+            >
+              {carsData.map((car) => {
+                return <VehicleCard key={car.id} raw_data={car} />;
+              })}
+            </DashboardTile>
+            <DashboardTile
+              title={"Mensagens"}
+              notFoundMessage={"Nenhuma mensagem recente."}
+            >
+              <p>Nenhuma mensagem recente</p>
+            </DashboardTile>
+
+            {/*<section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
               <h2 className="text-2xl font-semibold mb-6">
                 Seu(s) veículo(os)
               </h2>
@@ -180,7 +493,7 @@ export default function Page() {
               <h2 className="text-2xl font-semibold mb-6">Mensagens</h2>
 
               <div className="text-gray-500">Nenhuma mensagem recente.</div>
-            </section>
+            </section>*/}
           </div>
         </div>
       </section>

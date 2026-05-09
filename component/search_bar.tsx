@@ -1,9 +1,29 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
+
 // TODO allow search bar to redirect user on the search page
 // TODO implement searching parameters on search's url
 
 export default function SearchBar() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const search = () => {
+    const params = new URLSearchParams(searchParams);
+    const address = (
+      document.getElementById("search_bar_address") as HTMLInputElement
+    ).value;
+
+    if (address) params.set("address", address);
+
+    // router.push("/search");
+    router.push(`/search?${params.toString()}`);
+    router.refresh();
+    // const address = document.getElementById('seach_bar_address')!.innerText
+    // const address = document.getElementById('seach_bar_address')!.innerText
+  };
+
   return (
     <div className="w-full">
       <div
@@ -27,6 +47,7 @@ export default function SearchBar() {
           <input
             type="text"
             placeholder="Buscar vagas"
+            id="search_bar_address"
             className="
               w-full
               text-sm
@@ -87,6 +108,7 @@ export default function SearchBar() {
 
         {/* Buscar */}
         <button
+          onClick={search}
           className="
             w-10 h-10
             rounded-full

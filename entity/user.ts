@@ -3,7 +3,7 @@ import * as api from "@/entity/api";
 import { UserResponse } from "@/interface/api/user";
 import { Image } from "@/interface/media";
 
-export class User implements IUser {
+export class User implements IUser, Exportable {
   constructor(
     public id: number,
     public email: string,
@@ -15,6 +15,10 @@ export class User implements IUser {
     public person: Person,
     public userPicture: Image,
   ) {}
+
+  export(): string {
+    throw new Error("Method not implemented.");
+  }
 }
 
 export class UserDAO {
@@ -61,7 +65,82 @@ export class UserDAO {
     return undefined;
   }
 
-  static register(obj: User) {}
+  static async register(data: {
+    name: string;
+    cpf: string;
+    gender: string | "M" | "F";
+    phone: string;
+    birthDate: string;
+    email: string;
+    password: string;
+    avatarUrl: File;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  }): Promise<any> {
+    const form = new FormData();
+
+    for (const [key, value] of Object.entries(data)) {
+      console.log([key, value]);
+      form.append(key, value);
+    }
+
+    // form.set("avatarUrl", URL.createObjectURL(data.avatarUrl));
+
+    for (const [key, value] of Object.entries(form)) {
+      console.log([key, value]);
+    }
+
+    // console.log(form.get("avatarUrl"));
+    // const res = await api.call("users", false, {
+    //   contentType: "null",
+    //   method: "POST",
+    //   body: form,
+    //   dataOnly: true,
+    //   rawResponse: true,
+    // }); //Something's happening while sending the data on server here. replace later when possible
+
+    const res = await fetch("http://localhost:3000/users", {
+      method: "POST",
+      body: form,
+    });
+
+    console.log(res);
+
+    type responseData = {
+      success: boolean;
+      message: string;
+      data: {
+        id: number;
+        email: string;
+        permissionLevel: string;
+        personId: number;
+        lastLogin: Date;
+        isBlocked: boolean;
+        isAdmin: boolean;
+        avatarUrl: string;
+      };
+    };
+
+    if (res.ok) {
+      const data = (await res.json()) as responseData;
+
+      return data.data;
+    } else {
+      const data = (await res.json()) as Pick<
+        responseData,
+        "message" | "success"
+      >;
+
+      return data;
+    }
+
+    // return res;
+    // call api on POST /users/ : multipart/form-data
+    // if res.ok
+    //  return data returned by api
+    // else
+    //  show message from api
+    // api.call();
+  }
 
   static list() {}
 

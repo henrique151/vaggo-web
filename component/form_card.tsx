@@ -77,6 +77,36 @@ export default function FormCard({
   );
 }
 
-export function GenericFormLayout({ title, subtitle, backlink, children }) {
-  return <></>;
+export function GenericFormLayout({
+  title,
+  subtitle,
+  backlink,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  backlink: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      className="
+        w-full max-w-lg
+        bg-white
+        border border-gray-200
+        rounded-2xl
+        shadow-sm
+        px-8 py-8
+      "
+    >
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+
+        <p className="text-gray-500 text-sm mt-1">{subtitle}</p>
+      </div>
+
+      <section className="flex flex-col gap-4">{children}</section>
+    </section>
+  );
 }

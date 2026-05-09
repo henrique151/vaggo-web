@@ -6,6 +6,7 @@ import {
 import { Image } from "@/interface/media";
 import { Property as IProperty } from "@/interface/property";
 import * as api from "./api";
+import { Spot, SpotDAO } from "./spot";
 
 export default class Property implements IProperty {
   constructor(
@@ -20,6 +21,7 @@ export default class Property implements IProperty {
     public longitude: string,
     public zipCode: string,
     public address: IAddress,
+    public spots?: Spot[],
   ) {}
 
   public static create(
@@ -79,7 +81,10 @@ export default class Property implements IProperty {
 }
 
 export class PropertyDAO {
-  public static async get(id: number): Promise<Property | undefined> {
+  public static async get(
+    id: number,
+    withSpots?: boolean,
+  ): Promise<Property | undefined> {
     //throw error when parts get strange
     const res = (await api.call(`properties/${id}`, true, {
       dataOnly: true,
@@ -89,7 +94,14 @@ export class PropertyDAO {
       dataOnly: true,
     })) as IState[];
 
-    return Property.create(res, states);
+    const property = Property.create(res, states);
+
+    // if (!property) return undefined;
+
+    if (withSpots && property)
+      property.spots = await SpotDAO.listFromProperty(id);
+
+    return property;
 
     // const images = [];
     // let state: State | undefined;
@@ -166,6 +178,84 @@ export class PropertyDAO {
 
     return properties;
   }
+
+  public static async search(params: {
+    address?: string;
+    startDate?: string;
+    endDate?: string;
+    cep?: string;
+  }): Promise<PropertySearchResult | undefined> {
+    let mainUrl = "http://localhost:3000/reservations/search/address";
+
+    for (const [key, value] of Object.entries(params)) {
+      mainUrl += `?${key}=${value}`;
+    }
+    console.log(mainUrl);
+
+    const res = await fetch(mainUrl, {
+      method: "GET",
+    });
+
+    if (!res) return undefined;
+
+    const data = (await res.json()) as PropertySearchResult;
+
+    for (const result of data.results) {
+      const property = await PropertyDAO.get(result.propertyId);
+      if (!property) return undefined;
+      result.images = new Image(property.images[0].url);
+    }
+
+    return data;
+  }
+}
+
+export interface PropertySearchResult {
+  success: boolean;
+  searchOrigin: SearchOrigin;
+  requestedRadiusKm: number;
+  requestedPeriod: null | string | number; // Adjust based on expected period type
+  fallbackToNearest: boolean;
+  total: number;
+  results: SearchResult[];
+}
+
+export interface SearchOrigin {
+  lat: number;
+  lng: number;
+  query: string;
+  source: string;
+}
+
+export interface SearchResult {
+  spotId: number;
+  identifier: string;
+  size: string; // Keep as string if it represents a decimal/price format
+  isCovered: boolean;
+  price: string;
+  allowedVehicles: string[]; //CARRO | MOTO
+  currentStatus: "DISPONIVEL" | "OCUPADO" | string;
+  propertyId: number;
+  propertyName: string;
+  propertyLat: string;
+  propertyLng: string;
+  weekdaysBitmask: number;
+  availableFrom: string; // ISO Date format
+  availableUntil: string;
+  timeStart: string;
+  timeEnd: string;
+  distanceKm: number;
+  weekdays: string[];
+  images: any;
+  route: RouteDetails;
+  withinRequestedRadius: boolean;
+}
+
+export interface RouteDetails {
+  durationText: string;
+  distanceText: string;
+  durationMinutes: number;
+  distanceMeters: number;
 }
 
 class Address implements IAddress {

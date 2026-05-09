@@ -104,23 +104,29 @@ export class SpotDAO {
     return undefined;
   }
 
-  static async listFromProperty(id: number): Promise<Spot[]> {
+  static async listFromProperty(
+    id: number,
+    withProperty?: boolean,
+  ): Promise<Spot[]> {
     const res = (await api.call(`spots/properties/${id}/spots`, true, {
       dataOnly: true,
     })) as ISpot[] & { propertyId: number };
 
-    const spots: Spot[] | [] = [];
+    const spots: Spot[] = [];
     if (!res) return spots;
 
     console.log("from entity/spot.ts.");
     console.log(res);
+    let property: Property | undefined;
 
-    const property = await PropertyDAO.get(res.propertyId);
+    if (withProperty) property = await PropertyDAO.get(res.propertyId);
+    // error by api://properties/undefined may be lying around somewhere here
+    // find fix if withProperty on true returns that error again
 
-    if (!property) return spots;
+    // if (!property) return spots;
 
     for (const spot of res) {
-      spots.push(Spot.create(spot, property)); //what?
+      spots.push(Spot.create(spot, property));
     }
 
     return spots;

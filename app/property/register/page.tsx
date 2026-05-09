@@ -11,25 +11,20 @@ export default function Page() {
   const handleRegister = (e: any) => {
     e.preventDefault();
 
-    // validar  CPF
-    // validar e-mail
-    // validar telefone
-    // validar senha
     const formData = new FormData(e.currentTarget);
     const values = Object.fromEntries(formData);
 
     console.log(values);
     let result;
 
-    delete values.passConfirm;
+    // delete values.passConfirm;
 
-    fetch("http://localhost:3000/vehicles", {
+    fetch("http://localhost:3000/properties", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
       },
       method: "POST",
-      body: JSON.stringify(values),
+      body: formData,
     })
       .then((res) => res.json())
       .then((data) => console.log(data));

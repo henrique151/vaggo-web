@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ApiResponse, DataResponse } from "@/interface/api/api";
+import { request } from "node:https";
 
 const API_ADDRESS = "http://localhost:3000/";
 
-export type contentTypeSupport = "json";
+export type contentTypeSupport = "json" | "form-data" | "null";
 export type requestTypeSupport = "GET" | "POST" | "UPDATE" | "DELETE" | "PATCH";
 
 const contentTypeTable: Record<contentTypeSupport, string> = {
   json: "application/json",
+  "form-data": "multipart/form-data",
+  null: "",
 };
 
 interface IcallParams {
@@ -59,9 +63,13 @@ export async function call(
   }
 
   if (params) {
-    params.contentType
+    // if (params.contentType != 'null') {
+    params.contentType && params.contentType != "null"
       ? (requestHeader["Content-Type"] = contentTypeTable[params.contentType])
       : null;
+    // }
+
+    // console.log(requestHeader);
 
     params.body ? (requestBody = params.body) : null;
     params.header ? Object.assign(requestHeader, params.header) : null;
@@ -70,7 +78,7 @@ export async function call(
     // params.body ? requestBody = {...requestBody, ...params.body} : null
   }
 
-  requestHeader = isEmpty(requestHeader) ? { mode: "no-cors" } : requestHeader;
+  // requestHeader = isEmpty(requestHeader) ? { mode: "no-cors" } : requestHeader;
   requestBody = isEmpty(requestBody) ? undefined : requestBody;
 
   const res = await fetch(`${API_ADDRESS}${uri}`, {
@@ -179,39 +187,3 @@ export default class API {
     return undefined;
   }
 }
-// export async function calla(uri:string, header={}, options:fetchOptions = {contentType: 'json'}) {
-//     const requestHeader : Record<string, string> = {...header}
-
-//     requestHeader["Content-Type"] = contentTypeTable[options.contentType]
-
-//     options.useToken ? requestHeader['Authorization'] = `Bearer ${localStorage.getItem('token')}` : null
-
-//     // console.log(header)
-//     // console.log(options)
-
-//     const res = await fetch(`${API_ADDRESS}${uri}`, {
-//         headers: requestHeader
-//     })
-
-//     if (options.returnResponse) {
-//         return res
-//     }
-
-//     if (res.ok) {
-//         switch  (options.contentType) {
-//             case 'json':
-//                 const data = await res.json()
-//                 return data
-//         }
-//     }
-
-//     // check if fetch was success and return the data fetched from API
-//     // if API says that token is expired, redirects user directly to login page?
-//     // if API returns 404, tries to resolve into another ips?
-//     // if fetch returns any error, returns undefined or null
-
-//     // return fetch(`${API_ADDRESS}${uri}`, {
-//         // headers: requestHeader
-//     // })
-
-// }
