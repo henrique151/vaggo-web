@@ -98,44 +98,48 @@ export default function Header({ showSearch = false }: HeaderProps) {
                   overflow-hidden
                 "
               >
-                <button
-                  onClick={() => {
-                    setShowLogin(true);
-                    setOpen(false);
-                  }}
-                  className="
+                {!localStorage.getItem("token") ? (
+                  <button
+                    onClick={() => {
+                      setShowLogin(true);
+                      setOpen(false);
+                    }}
+                    className="
                     w-full text-left
                     px-4 py-3 text-sm
                     hover:bg-gray-100
                     transition
                   "
-                >
-                  Entrar ou Cadastrar-se
-                </button>
+                  >
+                    Entrar ou Cadastrar-se
+                  </button>
+                ) : null}
 
                 {localStorage.getItem("token") ? (
-                  <Link
-                    href="/user/dashboard"
-                    className="
+                  <>
+                    <Link
+                      href="/user/dashboard"
+                      className="
                         block px-4 py-3 text-sm
                         hover:bg-gray-100
                         transition
                       "
-                  >
-                    Dashboard
-                  </Link>
-                ) : null}
+                    >
+                      Dashboard
+                    </Link>
 
-                <Link
-                  href="/user/account"
-                  className="
+                    <Link
+                      href="/user/account"
+                      className="
                     block px-4 py-3 text-sm
                     hover:bg-gray-100
                     transition
                   "
-                >
-                  Ajustes da Conta
-                </Link>
+                    >
+                      Ajustes da Conta
+                    </Link>
+                  </>
+                ) : null}
 
                 <div className="border-t border-gray-200"></div>
 

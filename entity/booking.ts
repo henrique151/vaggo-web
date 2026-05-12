@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatePeriod } from "@/interface/entity";
 import { Spot } from "./spot";
-import { User, UserDAO } from "./user";
+import { User, UserDAO, useUser } from "./user";
 import { Vehicle } from "./vehicle";
 import * as api from "@/app/api";
+import { useApi } from "./useApi";
+import { useEffect, useState } from "react";
 
 export class Booking {
   id: number;
@@ -232,4 +234,37 @@ export class BookingDAO {
       return bookings;
     }
   }
+}
+
+export function useFetchPropertySolicitations(): [
+  vehicles: Vehicle[] | undefined,
+  loading: boolean,
+] {
+  const [data, dataLoading] = useApi({
+    uri: `reservations/owner`,
+    dataOnly: true,
+    useToken: true,
+    req: { method: "GET" },
+  });
+  const [user, userLoading] = useUser({
+    id: Number(localStorage.getItem("userId")),
+  });
+  const [loading, setLoading] = useState(true);
+  const [solicitations, setSolicitaions] = useState<Booking[] | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    if (data && user) {
+      const instances = data.map((booking) => new Booking(booking));
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSolicitaions(instances);
+      setLoading(false);
+    }
+  }, [data, user]);
+
+  // useEffect(() => {
+  // }, [data]);
+
+  return [solicitations, loading];
 }

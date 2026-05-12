@@ -4,11 +4,18 @@ import Header from "@/component/header";
 import Link from "next/link";
 import { HTMLAttributes, useEffect, useState } from "react";
 // import { VehicleResponse } from "@/interface/api/vehicle"
-import { User, UserDAO } from "@/entity/user";
-import { Vehicle, VehicleDAO } from "@/entity/vehicle";
+import { User, UserDAO, UserTest, useUser } from "@/entity/user";
+import { useUserVehicles, Vehicle, VehicleDAO } from "@/entity/vehicle";
 import Image from "next/image";
-import { Booking, BookingDAO } from "@/entity/booking";
+import {
+  Booking,
+  BookingDAO,
+  useFetchPropertySolicitations,
+} from "@/entity/booking";
 import SpotCard from "@/component/spot_card";
+import CarouselContainer from "@/component/container/CarouselContainer";
+import { EntityCard } from "@/component/container/EntityCard";
+import { useApi } from "@/entity/useApi";
 
 interface CardCarousel {
   title: string;
@@ -166,11 +173,12 @@ function DashboardEntityCard({
 }
 
 export default function Page() {
-  const [carsData, setCarsData] = useState<Vehicle[]>([]);
-  const [userData, setUserData] = useState<User | undefined>();
-  const [bookingSolicitations, setBookingSolicitations] = useState<
-    Booking[] | undefined
-  >([]);
+  const [carsData] = useUserVehicles();
+  const [userData] = useUser({
+    id: Number(localStorage.getItem("userId")),
+  });
+  const [bookingSolicitations] = useFetchPropertySolicitations();
+
   const [nextBookings, setnextBookings] = useState<Booking[] | undefined>([]);
   const [nextBookingsCards, setnextBookingsCards] = useState<
     (typeof DashboardEntityCard)[] | undefined
@@ -201,28 +209,47 @@ export default function Page() {
     return false;
   };
 
+  // const [data, success] = useApi({
+  //   uri: `users/${localStorage.getItem("userId")}`,
+  //   useToken: true,
+  //   req: { method: "GET", headers: { "Content-Type": "application/json" } },
+  // });
+
+  // console.log("from user/page");
+  // console.log(data, success);
+
+  // const [userDataTest, userLoaded, userSuccess] = useUser({
+  //   id: Number(localStorage.getItem("userId")),
+  // });
+
   useEffect(() => {
     async function loadData() {
       try {
-        const vehicles = await VehicleDAO.getFromUser();
+        // const vehicles = await VehicleDAO.getFromUser();
         //began testing with ! expression mark (i guess this one ignores the warning about it. possibly, it's better if wrapping around try-catch for better error management)
-        const user = await UserDAO.get(localStorage.getItem("userId")!);
-        const bSolicitations = await BookingDAO.listSolicitations();
+        // const user = await UserDAO.get(localStorage.getItem("userId")!);
+        // const bSolicitations = await BookingDAO.listSolicitations();
         const nextBookings = await BookingDAO.list();
 
         if (nextBookings) {
           const cards = [];
           for (const booking of nextBookings) {
             cards.push(
-              <DashboardEntityCard
+              <EntityCard
                 key={`next_booking_${booking.id}`}
-                // id={`booking_solicitation_${booking.id}`}
                 title={booking.spot.identifier}
                 description={`Data: ${booking.datePeriod.start.toLocaleDateString()}, Status: ${booking.status}`}
-                className="mb-3"
-              >
-                <div className="flex flex-row"></div>
-              </DashboardEntityCard>,
+                redirectTo={""}
+              />,
+              // <DashboardEntityCard
+              //   key={`next_booking_${booking.id}`}
+              //   // id={`booking_solicitation_${booking.id}`}
+              //   title={booking.spot.identifier}
+              //   description={`Data: ${booking.datePeriod.start.toLocaleDateString()}, Status: ${booking.status}`}
+              //   className="mb-3"
+              // >
+              //   <div className="flex flex-row"></div>
+              // </DashboardEntityCard>,
             );
           }
           setnextBookingsCards(cards);
@@ -232,9 +259,9 @@ export default function Page() {
         console.log(nextBookings);
 
         // setCarData(vehicle);
-        setCarsData(vehicles ? vehicles : []);
-        setUserData(user);
-        setBookingSolicitations(bSolicitations);
+        // setCarsData(vehicles ? vehicles : []);
+        // setUserData(user);
+        // bookingSolicitations(bSolicitations);
         setnextBookings(nextBookings);
       } catch (error) {
         console.log(error);
@@ -335,7 +362,8 @@ export default function Page() {
               title={"Próximas Reservas"}
               notFoundMessage={"Nenhuma reserva Agendada"}
             >
-              <CardCarousel title={""} cards={nextBookingsCards}></CardCarousel>
+              <CarouselContainer title={""} cards={nextBookingsCards} />
+              {/*<CardCarousel title={""} cards={nextBookingsCards}></CardCarousel>*/}
               {/*{nextBookings?.map((booking) => {
                 return (
                   <section

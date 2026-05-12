@@ -2,6 +2,8 @@ import { User as IUser, Person as IPerson } from "@/interface/user";
 import * as api from "@/entity/api";
 import { UserResponse } from "@/interface/api/user";
 import { Image } from "@/interface/media";
+import { useApi } from "./useApi";
+import { useEffect, useState } from "react";
 
 export class User implements IUser, Exportable {
   constructor(
@@ -179,4 +181,116 @@ class Person implements IPerson {
     public registrationDate: string,
     public isActive: boolean,
   ) {}
+}
+
+class PersonTest {
+  public id: number;
+  public name: string;
+  public cpf: string;
+  public gender: string;
+  public phone: string;
+  public birthDate: string;
+  public registrationDate: string;
+  public isActive: boolean;
+
+  constructor(data: {
+    id: number;
+    name: string;
+    cpf: string;
+    gender: string;
+    phone: string;
+    birthDate: string;
+    registrationDate: string;
+    isActive: boolean;
+  }) {
+    this.id = data.id;
+    this.name = data.name;
+    this.cpf = data.cpf;
+    this.gender = data.gender;
+    this.phone = data.phone;
+    this.birthDate = data.birthDate;
+    this.registrationDate = data.registrationDate;
+    this.isActive = data.isActive;
+  }
+}
+
+export class UserTest {
+  public id: number;
+  public email: string;
+  public password: string;
+  public lastLogin: string;
+  public isBlocked: boolean;
+  public isAdmin: boolean;
+  public permissionLevel: number;
+  public person: Person;
+  public userPicture: Image;
+
+  constructor(data: {
+    id: number;
+    email: string;
+    password: string;
+    lastLogin: string;
+    isBlocked: boolean;
+    isAdmin: boolean;
+    permissionLevel: number;
+    person: Person;
+    userPicture: Image;
+  }) {
+    this.id = data.id;
+    this.email = data.email;
+    this.password = data.password;
+    this.lastLogin = data.lastLogin;
+    this.isBlocked = data.isBlocked;
+    this.isAdmin = data.isAdmin;
+    this.permissionLevel = data.permissionLevel;
+    this.person = data.person;
+    this.userPicture = data.userPicture;
+  }
+
+  export(): string {
+    throw new Error("Method not implemented.");
+  }
+}
+
+export function useUser({
+  id,
+}: {
+  id: number;
+}): [user: User | undefined, loading: boolean, success: boolean] {
+  const [data, success] = useApi({
+    uri: `users/${id}`,
+    dataOnly: true,
+    useToken: true,
+    req: { method: "GET" },
+  });
+  const [user, setUser] = useState<UserTest | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
+
+  if (data && !loading) {
+    // console.log("userDAta:");
+    // console.log(data);
+    const image = new Image(data.avatarUrl);
+    const test = {
+      ...data,
+      userPicture: image,
+    };
+    const newUser = new User(
+      test.id,
+      test.email,
+      test.password,
+      test.lastLogin,
+      test.isBlocked,
+      test.isAdmin,
+      test.permissionLevel,
+      test.person,
+      test.userPicture,
+    );
+    // const newUser = new UserTest(test);
+    setUser(newUser);
+    setLoading(true);
+  }
+  // useEffect(() => {
+  // }, [data]);
+
+  return [user, loading, success];
 }

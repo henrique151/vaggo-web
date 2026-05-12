@@ -4,7 +4,9 @@ import {
   VehicleTypes,
 } from "@/interface/vehicle";
 import * as api from "@/entity/api";
-import { User, UserDAO } from "./user";
+import { User, UserDAO, useUser } from "./user";
+import { useApi } from "./useApi";
+import { useEffect, useState } from "react";
 
 export class Vehicle implements IVehicle {
   constructor(
@@ -96,4 +98,49 @@ export class VehicleDAO {
   static register(obj: Vehicle) {}
 
   static list() {}
+}
+
+export function useUserVehicles(): [
+  vehicles: Vehicle[] | undefined,
+  loading: boolean,
+] {
+  const [data, dataLoading] = useApi({
+    uri: `vehicles/my-vehicles`,
+    dataOnly: true,
+    useToken: true,
+    req: { method: "GET" },
+  });
+  const [user, userLoading] = useUser({
+    id: Number(localStorage.getItem("userId")),
+  });
+  const [loading, setLoading] = useState(true);
+  const [vehicles, setVehicles] = useState<Vehicle[] | undefined>(undefined);
+
+  useEffect(() => {
+    if (data && user) {
+      const instances = data.map(
+        (vehicle) =>
+          new Vehicle(
+            vehicle.id,
+            vehicle.brand,
+            vehicle.model,
+            vehicle.color,
+            vehicle.licensePlate,
+            vehicle.manufactureYear,
+            vehicle.type,
+            vehicle.size,
+            user,
+          ),
+      );
+      // const newUser = new UserTest(test);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setVehicles(instances);
+      setLoading(false);
+    }
+  }, [data, user]);
+
+  // useEffect(() => {
+  // }, [data]);
+
+  return [vehicles, loading];
 }

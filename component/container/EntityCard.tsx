@@ -138,29 +138,32 @@ export function EntityCard({
   return (
     <div
       className="
-      w-[260px]
+      w-65
       bg-white
       border border-gray-200
       rounded-2xl
       shadow-sm
-      overflow-hidden
       hover:shadow-md
       transition
     "
+      // overflow-hidden # this one keeps messy
     >
-      {/* Imagem */}
-      <div className="w-full h-[160px] overflow-hidden">
-        {/* TODO change to <Image> */}
-        <img
-          src={`${image.url}`}
-          alt={"Card name"}
-          className="
+      {/*Imagem */}
+      {image ? (
+        <div className="w-full h-[160px] overflow-hidden">
+          {/* TODO change to <Image> */}
+          <img
+            src={`${image.url}`}
+            // src={`/`}
+            alt={"Card name"}
+            className="
             w-full h-full object-cover
             hover:scale-105
             transition duration-300
           "
-        />
-      </div>
+          />
+        </div>
+      ) : null}
 
       {/* Conteúdo */}
       <div className="p-4">

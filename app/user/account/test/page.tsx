@@ -18,7 +18,7 @@ import * as api from "@/app/api";
 import { VehicleResponse } from "@/interface/api/vehicle";
 
 import FormCard from "@/component/form_card";
-import EntityCard, { DefaultEntityFrame } from "@/component/entityCard";
+import EntityFrame, { DefaultEntityFrame } from "@/component/entityCard";
 
 import { User, UserDAO } from "@/entity/user";
 
@@ -161,7 +161,7 @@ export default function Page() {
         <div className="space-y-4">
           {vehicles.map((vehicle) => {
             return (
-              <EntityCard
+              <EntityFrame
                 key={vehicle.id}
                 // data={{
                 //   id: vehicle.id,
@@ -177,7 +177,7 @@ export default function Page() {
                   description={vehicle.manufactureYear}
                   tagList={[vehicle.color, vehicle.licensePlate]}
                 />
-              </EntityCard>
+              </EntityFrame>
             );
           })}
         </div>
@@ -200,7 +200,7 @@ export default function Page() {
         <div className="space-y-4">
           {properties.map((property) => {
             return (
-              <EntityCard
+              <EntityFrame
                 key={property.id}
                 // // type="property"
                 // // editHref="/property/register"
@@ -221,7 +221,7 @@ export default function Page() {
                     `CEP: ${property.zipCode}`,
                   ]}
                 />
-              </EntityCard>
+              </EntityFrame>
             );
           })}
         </div>
@@ -244,7 +244,7 @@ export default function Page() {
         <div className="space-y-4">
           {spots.map((spot) => {
             return (
-              <EntityCard
+              <EntityFrame
                 // type="spot"
                 key={spot.id}
                 // editHref="/spot/register"
@@ -263,7 +263,7 @@ export default function Page() {
                   title={spot.identifier}
                   description={spot.status}
                 />
-              </EntityCard>
+              </EntityFrame>
             );
           })}
           {/* <EntityCard
