@@ -237,7 +237,7 @@ export class BookingDAO {
 }
 
 export function useFetchPropertySolicitations(): [
-  vehicles: Vehicle[] | undefined,
+  solicitations: Booking[] | undefined,
   loading: boolean,
 ] {
   const [data, dataLoading] = useApi({
@@ -267,4 +267,43 @@ export function useFetchPropertySolicitations(): [
   // }, [data]);
 
   return [solicitations, loading];
+}
+
+export function useFetchNextBookings(): [
+  bookings: Booking[],
+  loading: boolean,
+] {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [data, dataLoading] = useApi({
+    uri: `reservations`,
+    dataOnly: true,
+    useToken: true,
+    req: { method: "GET" },
+  });
+  const [user, userLoading] = useUser({
+    id: Number(localStorage.getItem("userId")),
+  });
+
+  useEffect(() => {
+    if (data && user) {
+      const instances = data.map((booking: any) => {
+        booking.datePeriod = new DatePeriod(
+          new Date(booking.startDate),
+          new Date(booking.endDate),
+        );
+
+        return new Booking(booking);
+      });
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setBookings(instances);
+      setLoading(false);
+    }
+  }, [data, user]);
+
+  // useEffect(() => {
+  // }, [data]);
+
+  return [bookings, loading];
 }

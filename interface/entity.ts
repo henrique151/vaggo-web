@@ -9,4 +9,11 @@ export class DatePeriod {
     public start: Date,
     public end: Date,
   ) {}
+
+  public toString() {
+    return {
+      start: `${this.start.getFullYear()}-${this.start.getMonth()}-${this.start.getDate()}`,
+      end: `${this.end.getFullYear()}-${this.end.getMonth()}-${this.end.getDate()}`,
+    };
+  }
 }

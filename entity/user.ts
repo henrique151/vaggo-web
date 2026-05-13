@@ -183,75 +183,6 @@ class Person implements IPerson {
   ) {}
 }
 
-class PersonTest {
-  public id: number;
-  public name: string;
-  public cpf: string;
-  public gender: string;
-  public phone: string;
-  public birthDate: string;
-  public registrationDate: string;
-  public isActive: boolean;
-
-  constructor(data: {
-    id: number;
-    name: string;
-    cpf: string;
-    gender: string;
-    phone: string;
-    birthDate: string;
-    registrationDate: string;
-    isActive: boolean;
-  }) {
-    this.id = data.id;
-    this.name = data.name;
-    this.cpf = data.cpf;
-    this.gender = data.gender;
-    this.phone = data.phone;
-    this.birthDate = data.birthDate;
-    this.registrationDate = data.registrationDate;
-    this.isActive = data.isActive;
-  }
-}
-
-export class UserTest {
-  public id: number;
-  public email: string;
-  public password: string;
-  public lastLogin: string;
-  public isBlocked: boolean;
-  public isAdmin: boolean;
-  public permissionLevel: number;
-  public person: Person;
-  public userPicture: Image;
-
-  constructor(data: {
-    id: number;
-    email: string;
-    password: string;
-    lastLogin: string;
-    isBlocked: boolean;
-    isAdmin: boolean;
-    permissionLevel: number;
-    person: Person;
-    userPicture: Image;
-  }) {
-    this.id = data.id;
-    this.email = data.email;
-    this.password = data.password;
-    this.lastLogin = data.lastLogin;
-    this.isBlocked = data.isBlocked;
-    this.isAdmin = data.isAdmin;
-    this.permissionLevel = data.permissionLevel;
-    this.person = data.person;
-    this.userPicture = data.userPicture;
-  }
-
-  export(): string {
-    throw new Error("Method not implemented.");
-  }
-}
-
 export function useUser({
   id,
 }: {
@@ -263,7 +194,7 @@ export function useUser({
     useToken: true,
     req: { method: "GET" },
   });
-  const [user, setUser] = useState<UserTest | undefined>(undefined);
+  const [user, setUser] = useState<User | undefined>(undefined);
   const [loading, setLoading] = useState(false);
 
   if (data && !loading) {

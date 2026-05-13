@@ -4,96 +4,98 @@ import Header from "@/component/header";
 import Link from "next/link";
 import { HTMLAttributes, useEffect, useState } from "react";
 // import { VehicleResponse } from "@/interface/api/vehicle"
-import { User, UserDAO, UserTest, useUser } from "@/entity/user";
+import { User, UserDAO, useUser } from "@/entity/user";
 import { useUserVehicles, Vehicle, VehicleDAO } from "@/entity/vehicle";
 import Image from "next/image";
 import {
-  Booking,
-  BookingDAO,
+  // Booking,
+  // BookingDAO,
+  useFetchNextBookings,
   useFetchPropertySolicitations,
 } from "@/entity/booking";
-import SpotCard from "@/component/spot_card";
+// import SpotCard from "@/component/spot_card";
 import CarouselContainer from "@/component/container/CarouselContainer";
 import { EntityCard } from "@/component/container/EntityCard";
 import { useApi } from "@/entity/useApi";
+import { useSearchProperties } from "@/entity/property";
 
-interface CardCarousel {
-  title: string;
-  // children: React.ReactNode;
-  cards: React.ReactNode[];
-}
+// interface CardCarousel {
+//   title: string;
+//   // children: React.ReactNode;
+//   cards: React.ReactNode[];
+// }
 
-function CardCarousel({ title, cards = [] }: CardCarousel) {
-  const [index, setIndex] = useState(0);
+// function CardCarousel({ title, cards = [] }: CardCarousel) {
+//   const [index, setIndex] = useState(0);
 
-  const CARD_WIDTH = 260;
-  const GAP = 12;
-  const STEP = CARD_WIDTH + GAP;
+//   const CARD_WIDTH = 260;
+//   const GAP = 12;
+//   const STEP = CARD_WIDTH + GAP;
 
-  const visibleCards = 3;
-  const maxIndex = cards.length - visibleCards;
+//   const visibleCards = 3;
+//   const maxIndex = cards.length - visibleCards;
 
-  const next = () => index < maxIndex && setIndex(index + 1);
-  const prev = () => index > 0 && setIndex(index - 1);
+//   const next = () => index < maxIndex && setIndex(index + 1);
+//   const prev = () => index > 0 && setIndex(index - 1);
 
-  // if (!spots) return <></>
-  return (
-    <section className="w-full">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
+//   // if (!spots) return <></>
+//   return (
+//     <section className="w-full">
+//       {/* Header */}
+//       <div className="flex items-center justify-between mb-4">
+//         <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
 
-        <div className="flex gap-2">
-          <button
-            onClick={prev}
-            disabled={index === 0}
-            className="
-              w-8 h-8
-              rounded-full
-              bg-white
-              border border-gray-200
-              shadow-sm
-              hover:bg-gray-50
-              disabled:opacity-30
-            "
-          >
-            ‹
-          </button>
+//         <div className="flex gap-2">
+//           <button
+//             onClick={prev}
+//             disabled={index === 0}
+//             className="
+//               w-8 h-8
+//               rounded-full
+//               bg-white
+//               border border-gray-200
+//               shadow-sm
+//               hover:bg-gray-50
+//               disabled:opacity-30
+//             "
+//           >
+//             ‹
+//           </button>
 
-          <button
-            onClick={next}
-            disabled={index === maxIndex}
-            className="
-              w-8 h-8
-              rounded-full
-              bg-white
-              border border-gray-200
-              shadow-sm
-              hover:bg-gray-50
-              disabled:opacity-30
-            "
-          >
-            ›
-          </button>
-        </div>
-      </div>
+//           <button
+//             onClick={next}
+//             disabled={index === maxIndex}
+//             className="
+//               w-8 h-8
+//               rounded-full
+//               bg-white
+//               border border-gray-200
+//               shadow-sm
+//               hover:bg-gray-50
+//               disabled:opacity-30
+//             "
+//           >
+//             ›
+//           </button>
+//         </div>
+//       </div>
 
-      {/* Slides */}
-      <div className="overflow-hidden">
-        <div
-          className="flex gap-3 transition-transform duration-300"
-          style={{
-            transform: `translateX(-${index * STEP}px)`,
-          }}
-        >
-          {cards.map((card) => {
-            return <>{card}</>;
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
+//       {/* Slides */}
+//       <div className="overflow-hidden">
+//         <div
+//           className="flex gap-3 transition-transform duration-300"
+//           style={{
+//             transform: `translateX(-${index * STEP}px)`,
+//           }}
+//         >
+//           {cards.map((card) => {
+//             return <>{card}</>;
+//           })}
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
 
 function VehicleCard({ raw_data }: { raw_data: Vehicle }) {
   const data: Vehicle = raw_data;
@@ -179,12 +181,19 @@ export default function Page() {
   });
   const [bookingSolicitations] = useFetchPropertySolicitations();
 
-  const [nextBookings, setnextBookings] = useState<Booking[] | undefined>([]);
+  const [nextBookings, setnextBookings] = useFetchNextBookings();
+
   const [nextBookingsCards, setnextBookingsCards] = useState<
     (typeof DashboardEntityCard)[] | undefined
   >([]);
-  const [loading, setLoading] = useState(true);
 
+  const [result, resultsLoading] = useSearchProperties({
+    address: "São Paulo",
+  });
+
+  // const [loading, setLoading] = useState(true);
+
+  console.log(result);
   const handleSolicitation = async (id: number, accept: boolean) => {
     const status = accept ? "approve" : "reject";
     const res = await fetch(
@@ -209,81 +218,46 @@ export default function Page() {
     return false;
   };
 
-  // const [data, success] = useApi({
-  //   uri: `users/${localStorage.getItem("userId")}`,
-  //   useToken: true,
-  //   req: { method: "GET", headers: { "Content-Type": "application/json" } },
-  // });
-
-  // console.log("from user/page");
-  // console.log(data, success);
-
-  // const [userDataTest, userLoaded, userSuccess] = useUser({
-  //   id: Number(localStorage.getItem("userId")),
-  // });
-
   useEffect(() => {
-    async function loadData() {
-      try {
-        // const vehicles = await VehicleDAO.getFromUser();
-        //began testing with ! expression mark (i guess this one ignores the warning about it. possibly, it's better if wrapping around try-catch for better error management)
-        // const user = await UserDAO.get(localStorage.getItem("userId")!);
-        // const bSolicitations = await BookingDAO.listSolicitations();
-        const nextBookings = await BookingDAO.list();
+    if (nextBookings) {
+      console.log("nextBookings: ");
+      console.log(nextBookings);
 
-        if (nextBookings) {
-          const cards = [];
-          for (const booking of nextBookings) {
-            cards.push(
-              <EntityCard
-                key={`next_booking_${booking.id}`}
-                title={booking.spot.identifier}
-                description={`Data: ${booking.datePeriod.start.toLocaleDateString()}, Status: ${booking.status}`}
-                redirectTo={""}
-              />,
-              // <DashboardEntityCard
-              //   key={`next_booking_${booking.id}`}
-              //   // id={`booking_solicitation_${booking.id}`}
-              //   title={booking.spot.identifier}
-              //   description={`Data: ${booking.datePeriod.start.toLocaleDateString()}, Status: ${booking.status}`}
-              //   className="mb-3"
-              // >
-              //   <div className="flex flex-row"></div>
-              // </DashboardEntityCard>,
-            );
-          }
-          setnextBookingsCards(cards);
-        }
-        // const user = await UserDAO.get(localStorage.getItem("userId")!);
-
-        console.log(nextBookings);
-
-        // setCarData(vehicle);
-        // setCarsData(vehicles ? vehicles : []);
-        // setUserData(user);
-        // bookingSolicitations(bSolicitations);
-        setnextBookings(nextBookings);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+      const cards = [];
+      for (const booking of nextBookings) {
+        cards.push(
+          <EntityCard
+            key={`next_booking_${booking.id}`}
+            title={booking.spot.identifier}
+            description={`Data: ${booking.datePeriod.start.toLocaleDateString()}, Status: ${booking.status}`}
+            redirectTo={""}
+          />,
+          // <DashboardEntityCard
+          //   key={`next_booking_${booking.id}`}
+          //   // id={`booking_solicitation_${booking.id}`}
+          //   title={booking.spot.identifier}
+          //   description={`Data: ${booking.datePeriod.start.toLocaleDateString()}, Status: ${booking.status}`}
+          //   className="mb-3"
+          // >
+          //   <div className="flex flex-row"></div>
+          // </DashboardEntityCard>,
+        );
       }
+      setnextBookingsCards(cards);
     }
+  }, [nextBookings]);
 
-    loadData();
-  }, []);
+  // if (loading) {
+  //   return (
+  //     <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+  //       <Header />
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-        <Header />
-
-        <div className="max-w-7xl mx-auto px-6 py-16 text-center text-gray-500">
-          Carregando painel...
-        </div>
-      </main>
-    );
-  }
+  //       <div className="max-w-7xl mx-auto px-6 py-16 text-center text-gray-500">
+  //         Carregando painel...
+  //       </div>
+  //     </main>
+  //   );
+  // }
 
   const loadCondition = !carsData || !userData || !bookingSolicitations;
 
@@ -419,6 +393,7 @@ export default function Page() {
                             if (res) {
                               console.log("operação executada com sucesso");
                               // BUG element cant get hidden for some reason
+                              // if works, delete itself.
                               console.log(
                                 document.getElementById(
                                   `booking_solicitation_${booking.id}`,
@@ -451,6 +426,19 @@ export default function Page() {
                               booking.id,
                               false,
                             );
+                            if (res) {
+                              console.log("operação executada com sucesso");
+                              // BUG element cant get hidden for some reason
+                              // if works, delete itself.
+                              console.log(
+                                document.getElementById(
+                                  `booking_solicitation_${booking.id}`,
+                                ),
+                              );
+                              document.getElementById(
+                                `booking_solicitation_${booking.id}`,
+                              )!.style.visibility = "hidden";
+                            }
                           }}
                           className="
                             mt-4
