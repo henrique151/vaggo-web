@@ -12,19 +12,22 @@ import TabSidebar from "@/component/container/TabContainer/tabSidebar";
 import EntityCard from "@/component/entity_card";
 import EditCard from "@/component/edit_card";
 
-import { UserResponse } from "@/interface/api/user";
-import { PropertyResponse } from "@/interface/api/property";
-import { ParkingSpotResponse } from "@/interface/api/spot";
+// import { UserResponse } from "@/interface/api/user";
+// import { PropertyResponse } from "@/interface/api/property";
+// import { ParkingSpotResponse } from "@/interface/api/spot";
 
 import * as api from "@/app/api";
-import { VehicleResponse } from "@/interface/api/vehicle";
+// import { VehicleResponse } from "@/interface/api/vehicle";
 
 import FormCard from "@/component/form_card";
+import { useGetUserById } from "@/hooks/api/user/useGetUserById";
+import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetUserVehicles";
+import { useGetMyProperties } from "@/hooks/api/property/useGetMyProperties";
 
-import { User, UserDAO } from "@/entity/user";
-import { Vehicle, VehicleDAO } from "@/entity/vehicle";
-import Property, { PropertyDAO } from "@/entity/property";
-import { Spot } from "@/entity/spot";
+// import { User, UserDAO } from "@/entity/user";
+// import { Vehicle, VehicleDAO } from "@/entity/vehicle";
+// import Property, { PropertyDAO } from "@/entity/property";
+// import { Spot } from "@/entity/spot";
 
 function ProfileItem({ label, value }: { label: string; value: string }) {
   return (
@@ -39,12 +42,18 @@ function ProfileItem({ label, value }: { label: string; value: string }) {
 export default function Page() {
   const [activeTab, setActiveTab] = useState("Perfil");
   const [isEditing, setIsEditing] = useState(false);
-  const [user, setUser] = useState<User | undefined>(undefined);
-  const [vehicles, setVehicles] = useState<Vehicle[] | []>([]);
-  const [properties, setProperties] = useState<Property[] | undefined>(
-    undefined,
-  );
-  const [spots, setSpots] = useState<Spot | undefined>(undefined);
+  // const [user, setUser] = useState<User | undefined>(undefined);
+  // const [vehicles, setVehicles] = useState<Vehicle[] | []>([]);
+  // const [properties, setProperties] = useState<Property[] | undefined>(
+  //   undefined,
+  // );
+  // const [spots, setSpots] = useState<Spot | undefined>(undefined);
+  const [user, setUser] = useGetUserById({
+    id: Number(localStorage.getItem("userId")),
+  });
+  const [vehicles, setVehicles] = useGetMyVehicles();
+  const [properties, setProperties] = useGetMyProperties();
+  const [spots, setSpots] = useGetMyProperties();
 
   // const user = {
   //   email: "galvian@email.com",
@@ -58,36 +67,36 @@ export default function Page() {
   //   }
   // }
 
-  useEffect(() => {
-    const query = async () => {
-      const userData = await UserDAO.get(localStorage.getItem("userId")!);
-      // const userData = await api.call(
-      //   `users/${localStorage.getItem("userId")}`,
-      //   true,
-      //   { dataOnly: true },
-      // );
-      setUser(userData);
+  // useEffect(() => {
+  //   const query = async () => {
+  //     const userData = await UserDAO.get(localStorage.getItem("userId")!);
+  //     // const userData = await api.call(
+  //     //   `users/${localStorage.getItem("userId")}`,
+  //     //   true,
+  //     //   { dataOnly: true },
+  //     // );
+  //     setUser(userData);
 
-      // const vehicleData = await api.call(`vehicles/my-vehicles`, true, {
-      // dataOnly: true,
-      // });
-      const vehicleData = await VehicleDAO.getFromUser();
-      setVehicles(vehicleData);
+  //     // const vehicleData = await api.call(`vehicles/my-vehicles`, true, {
+  //     // dataOnly: true,
+  //     // });
+  //     const vehicleData = await VehicleDAO.getFromUser();
+  //     setVehicles(vehicleData);
 
-      // const propertyData = await api.call(`properties/my-properties`, true, {
-      //   dataOnly: true,
-      // });
-      const propertyData = await PropertyDAO.getFromUser();
-      setProperties(propertyData ? propertyData : []);
+  //     // const propertyData = await api.call(`properties/my-properties`, true, {
+  //     //   dataOnly: true,
+  //     // });
+  //     const propertyData = await PropertyDAO.getFromUser();
+  //     setProperties(propertyData ? propertyData : []);
 
-      // TODO check API's response on spot data. change if necessary
-      const spotData = await api.call(`properties/my-properties`, true, {
-        dataOnly: true,
-      });
-      setSpots(spotData);
-    };
-    query();
-  }, []);
+  //     // TODO check API's response on spot data. change if necessary
+  //     const spotData = await api.call(`properties/my-properties`, true, {
+  //       dataOnly: true,
+  //     });
+  //     setSpots(spotData);
+  //   };
+  //   query();
+  // }, []);
 
   const querySuccess = user && vehicles && properties && spots;
 

@@ -1,5 +1,5 @@
 import { Address } from "./location";
-import { Image } from "./media";
+import { Image } from "../classes/data/Image";
 import { Spot } from "./spot";
 
 export interface Property {

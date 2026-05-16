@@ -4,21 +4,25 @@ import Header from "@/component/header";
 import Link from "next/link";
 import { HTMLAttributes, useEffect, useState } from "react";
 // import { VehicleResponse } from "@/interface/api/vehicle"
-import { User, UserDAO, useUser } from "@/entity/user";
-import { useUserVehicles, Vehicle, VehicleDAO } from "@/entity/vehicle";
+// import { User, UserDAO, useUser } from "@/entity/user";
+import { useGetUserById } from "@/hooks/api/user/useGetUserById";
+// import { useUserVehicles, Vehicle, VehicleDAO } from "@/entity/vehicle";
+import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetUserVehicles";
 import Image from "next/image";
-import {
-  // Booking,
-  // BookingDAO,
-  useFetchNextBookings,
-  useFetchPropertySolicitations,
-} from "@/entity/booking";
+// import {
+//   // Booking,
+//   // BookingDAO,
+//   useFetchNextBookings,
+//   useFetchPropertySolicitations,
+// } from "@/entity/booking";
+import { useGetMyNextBookings } from "@/hooks/api/booking/useGetMyNextBookings";
+import { useGetMySolicitations } from "@/hooks/api/booking/useGetMySolicitations";
 // import SpotCard from "@/component/spot_card";
 import CarouselContainer from "@/component/container/CarouselContainer";
 import { EntityCard } from "@/component/container/EntityCard";
-import { useApi } from "@/entity/useApi";
-import { useSearchProperties } from "@/entity/property";
-
+// import { useApi } from "@/entity/useApi";
+import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
+import { useUserToken } from "@/hooks/api/user/useUserToken";
 // interface CardCarousel {
 //   title: string;
 //   // children: React.ReactNode;
@@ -175,13 +179,14 @@ function DashboardEntityCard({
 }
 
 export default function Page() {
-  const [carsData] = useUserVehicles();
-  const [userData] = useUser({
-    id: Number(localStorage.getItem("userId")),
+  const [token] = useUserToken();
+  const [carsData] = useGetMyVehicles();
+  const [userData] = useGetUserById({
+    id: Number(token?.id),
   });
-  const [bookingSolicitations] = useFetchPropertySolicitations();
+  const [bookingSolicitations] = useGetMySolicitations();
 
-  const [nextBookings, setnextBookings] = useFetchNextBookings();
+  const [nextBookings, setnextBookings] = useGetMyNextBookings();
 
   const [nextBookingsCards, setnextBookingsCards] = useState<
     (typeof DashboardEntityCard)[] | undefined
@@ -192,8 +197,11 @@ export default function Page() {
   });
 
   // const [loading, setLoading] = useState(true);
+  //
+  // console.log("NextSolicitations");
+  // console.log(bookingSolicitations);
 
-  console.log(result);
+  // console.log(result);
   const handleSolicitation = async (id: number, accept: boolean) => {
     const status = accept ? "approve" : "reject";
     const res = await fetch(
@@ -285,7 +293,7 @@ export default function Page() {
               alt="Foto de Perfil do Usuário"
               width={128}
               height={128}
-              src={userData.userPicture.url}
+              src={userData.userPicture.url || "/"}
               className="mr-6 rounded-4xl"
             />
 
@@ -380,7 +388,7 @@ export default function Page() {
                       key={`booking_solicitation_${booking.id}`}
                       // id={`booking_solicitation_${booking.id}`}
                       title={booking.spot.identifier}
-                      description={`Solicitante: ${booking.user?.person.name}`}
+                      description={`Código: ${booking.code} Solicitante: ${booking?.user?.person?.name || "Desconhecido"}`}
                       className="mb-3"
                     >
                       <div className="flex flex-row">

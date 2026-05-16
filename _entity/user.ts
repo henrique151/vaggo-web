@@ -1,8 +1,8 @@
 import { User as IUser, Person as IPerson } from "@/interface/user";
 import * as api from "@/entity/api";
 import { UserResponse } from "@/interface/api/user";
-import { Image } from "@/interface/media";
-import { useApi } from "./useApi";
+import { Image } from "@/classes/data/Image";
+import { useApi } from "../hooks/api/useApi";
 import { useEffect, useState } from "react";
 
 export class User implements IUser, Exportable {
@@ -225,3 +225,5 @@ export function useUser({
 
   return [user, loading, success];
 }
+
+// READY TO DELETE

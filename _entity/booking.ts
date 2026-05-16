@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DatePeriod } from "@/interface/entity";
+import { DatePeriod } from "@/classes/data/DatePeriod";
 import { Spot } from "./spot";
-import { User, UserDAO, useUser } from "./user";
+import { User, UserDAO } from "./user";
+import { useGetUserById } from "@/hooks/api/user/useGetUserById";
 import { Vehicle } from "./vehicle";
 import * as api from "@/app/api";
-import { useApi } from "./useApi";
+import { useApi } from "../hooks/api/useApi";
 import { useEffect, useState } from "react";
 
 export class Booking {
@@ -246,7 +247,7 @@ export function useFetchPropertySolicitations(): [
     useToken: true,
     req: { method: "GET" },
   });
-  const [user, userLoading] = useUser({
+  const [user, userLoading] = useGetUserById({
     id: Number(localStorage.getItem("userId")),
   });
   const [loading, setLoading] = useState(true);
@@ -282,7 +283,7 @@ export function useFetchNextBookings(): [
     useToken: true,
     req: { method: "GET" },
   });
-  const [user, userLoading] = useUser({
+  const [user, userLoading] = useGetUserById({
     id: Number(localStorage.getItem("userId")),
   });
 

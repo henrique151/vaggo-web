@@ -1,4 +1,4 @@
-import Property from "@/entity/property";
+// import Property from "@/entity/property";
 import { VehicleTypes } from "./vehicle";
 
 export interface Spot {

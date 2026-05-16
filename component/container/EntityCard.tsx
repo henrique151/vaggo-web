@@ -1,7 +1,7 @@
 // // component/entity_card.tsx
 // 'use client'
 
-import { Image } from "@/interface/media";
+import { Image } from "@/classes/data/Image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -50,7 +50,7 @@ import { useState } from "react";
 
 // const Context = createContext(null);
 
-interface EntityCardProps {
+interface EntityFrameProps {
   children: React.ReactNode;
   editForm?: React.ReactNode;
   // data: never;
@@ -59,7 +59,7 @@ interface EntityCardProps {
 export default function EntityFrame({
   children,
   // data,
-}: EntityCardProps) {
+}: EntityFrameProps) {
   return (
     <section className="border border-gray-200 rounded-2xl p-5 bg-white shadow-sm hover:shadow-md transition">
       <div className="flex items-start justify-between gap-4">
@@ -98,7 +98,7 @@ export function EditableEntityFrame({
   children,
   editForm,
   // data,
-}: EntityCardProps) {
+}: EntityFrameProps) {
   const [showEntityEditForm, setShowEntityForm] = useState(editForm);
 
   return (

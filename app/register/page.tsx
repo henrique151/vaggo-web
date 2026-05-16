@@ -2,7 +2,7 @@
 import FormCard, { GenericFormLayout } from "@/component/form_card";
 import Header from "@/component/header";
 import RegisterCard from "@/component/register_card";
-import { UserDAO } from "@/entity/user";
+// import { UserDAO } from "@/entity/user";
 import { The_Nautigal } from "next/font/google";
 import Link from "next/link";
 // import Image from "next/image";

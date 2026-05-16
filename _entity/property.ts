@@ -4,14 +4,14 @@ import {
   City as ICity,
   State as IState,
 } from "@/interface/location";
-import { Image } from "@/interface/media";
+import { Image } from "@/classes/data/Image";
 import { Property as IProperty } from "@/interface/property";
 import * as api from "./api";
-import { Spot, SpotDAO } from "./spot";
-import { useApi } from "./useApi";
+import { Spot, SpotDAO, useFetchSpotsFromProperty } from "./spot";
+import { useApi } from "../hooks/api/useApi";
 import { useEffect, useState } from "react";
 import { useUser } from "./user";
-import { DatePeriod } from "@/interface/entity";
+import { DatePeriod } from "@/classes/data/DatePeriod";
 
 export default class Property {
   public id: number;
@@ -274,29 +274,36 @@ export function useFetchStates(): [states: State[], loading: boolean] {
 
 export function useFetchProperty({
   id,
+  withSpots = false,
 }: {
   id: number;
+  withSpots: boolean;
 }): [property: Property | undefined, loading: boolean] {
   const [data, dataLoading] = useApi({
-    uri: `locations/${id}`,
+    uri: `properties/${id}`,
     dataOnly: true,
     useToken: true,
     req: { method: "GET" },
   });
-  const [stateData, stateDataLoading] = useFetchStates();
+  // const [stateData, stateDataLoading] = useFetchStates();
 
   const [property, setProperty] = useState<Property | undefined>(undefined);
+  const [spots, spotsLoading] = withSpots
+    ? // eslint-disable-next-line react-hooks/rules-of-hooks
+      useFetchSpotsFromProperty({ id: id })
+    : [true, null];
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (data && stateData) {
-      const property = Property.fromRawData(data, stateData);
+    if (data && spots) {
+      data.spots = withSpots ? spots : [];
+      const property = new Property(data);
 
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setProperty(property);
       setLoading(false);
     }
-  }, [data, stateData]);
+  }, [data, loading]);
 
   return [property, loading];
 }
@@ -314,10 +321,6 @@ export function useFetchUserProperties(): [
 
   const [stateData, stateDataLoading] = useFetchStates();
 
-  // const [user, userLoading] = useUser({
-  //   id: Number(localStorage.getItem("userId")),
-  // });
-
   const [properties, setSolicitaions] = useState<Property[] | undefined>(
     undefined,
   );
@@ -327,9 +330,6 @@ export function useFetchUserProperties(): [
   useEffect(() => {
     if (data && stateData) {
       const instances = data.map((property: any) => {
-        // public address: IAddress;
-        // public spots ?: Spot[];
-
         property.images = Image.createFromList(property.images);
 
         property.address.city.state = State.getFromList(
@@ -348,9 +348,6 @@ export function useFetchUserProperties(): [
       setLoading(false);
     }
   }, [data, stateData]);
-
-  // useEffect(() => {
-  // }, [data]);
 
   return [properties, loading];
 }
@@ -409,6 +406,7 @@ export class SearchResult {
   };
   public results: {
     // property: Property;
+    propertyId: number;
     spots: {
       id: number;
       identifier: string;
@@ -416,7 +414,7 @@ export class SearchResult {
       price: string;
       allowedVehicles: string[];
       status: string;
-    };
+    }[];
     latitude: string;
     longitude: string;
     route: {
@@ -435,18 +433,13 @@ export class SearchResult {
       query: data.searchOrigin.query,
       source: data.searchOrigin.source,
     };
+
     for (const result of data.results) {
       console.log(result);
-      this.results.push({
-        // property: result.property,
-        spots: {
-          id: result.spotId,
-          identifier: result.identifier,
-          covered: result.isCovered,
-          price: result.price,
-          allowedVehicles: result.allowedVehicles,
-          status: result.currentStatus,
-        },
+
+      const newResult = {
+        propertyId: result.propertyId,
+        spots: [],
         latitude: result.propertyLat,
         longitude: result.propertyLng,
         route: {
@@ -455,7 +448,32 @@ export class SearchResult {
           durationNum: result.route.durationMinutes,
           distanceMeters: result.route.distanceMeters,
         },
-      });
+      };
+
+      if (
+        !this.results.find(
+          (element) => element.propertyId == newResult.propertyId,
+        )
+      ) {
+        this.results.push(newResult);
+      }
+    }
+
+    for (const property of this.results) {
+      for (const result of data.results) {
+        const spotObj = {
+          id: result.spotId,
+          identifier: result.identifier,
+          covered: result.isCovered,
+          price: result.price,
+          allowedVehicles: result.allowedVehicles,
+          status: result.currentStatus,
+        };
+
+        if (result.propertyId == property.propertyId) {
+          property.spots.push(spotObj);
+        }
+      }
     }
   }
 }

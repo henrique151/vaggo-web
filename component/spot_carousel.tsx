@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import SpotCard from "./spot_card";
-import * as api from "@/app/api";
-import { PropertyResponse } from "interface://api/property";
-import { ParkingSpotResponse } from "@/interface/api/spot";
-import { DataResponse } from "@/interface/api/api";
+// import * as api from "@/app/api";
+// import { PropertyResponse } from "interface://api/property";
+// import { ParkingSpotResponse } from "@/interface/api/spot";
+// import { DataResponse } from "@/interface/api/api";
 
 interface SpotCarouselProps {
   title: string;

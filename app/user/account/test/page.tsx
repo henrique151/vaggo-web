@@ -10,7 +10,7 @@ import TabSidebar from "@/component/container/TabContainer/tabSidebar";
 
 import EditCard from "@/component/edit_card";
 
-import { UserResponse } from "@/interface/api/user";
+// import { UserResponse } from "@/interface/api/user";
 import { PropertyResponse } from "@/interface/api/property";
 import { ParkingSpotResponse } from "@/interface/api/spot";
 
@@ -20,7 +20,7 @@ import { VehicleResponse } from "@/interface/api/vehicle";
 import FormCard from "@/component/form_card";
 import EntityFrame, { DefaultEntityFrame } from "@/component/entityCard";
 
-import { User, UserDAO } from "@/entity/user";
+// import { User, UserDAO } from "@/entity/user";
 
 function ProfileItem({ label, value }: { label: string; value: string }) {
   return (

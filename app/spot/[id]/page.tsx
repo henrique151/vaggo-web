@@ -3,25 +3,31 @@
 import Image from "next/image";
 
 import Header from "@/component/header";
-import * as api from "@/app/api";
-import { PropertyResponse } from "@/interface/api/property";
+// import * as api from "@/app/api";
+// import { PropertyResponse } from "@/interface/api/property";
 import { MouseEventHandler, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ParkingSpotResponse } from "@/interface/api/spot";
+// import { ParkingSpotResponse } from "@/interface/api/spot";
 import BlurOverlay from "@/component/blur_overlay";
-import { Spot } from "@/entity/spot";
-import Property, { PropertyDAO } from "@/entity/property";
+// import { Spot } from "@/entity/spot";
+// import Property, { PropertyDAO, useFetchProperty } from "@/entity/property";
+import { useGetPropertyById } from "@/hooks/api/property/useGetPropertyById";
 import GenericWindow from "@/component/GenericWindow";
-import { Vehicle, VehicleDAO } from "@/entity/vehicle";
-import { BookingDAO } from "@/entity/booking";
-import { DatePeriod } from "@/interface/entity";
+// import { Vehicle, VehicleDAO } from "@/entity/vehicle";
+// import { BookingDAO } from "@/entity/booking";
+import DatePeriod from "@/classes/data/DatePeriod";
+import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetUserVehicles";
+import { useApi } from "@/hooks/api/useApi";
 
 export default function Page({ params }: any) {
   params = useParams();
-  const [property, setProperty] = useState<Property>(); //TODO REPLACE WITH TYPES
+  const [property, propertyLoading] = useGetPropertyById({
+    id: Number(params.id),
+    withSpots: true,
+  }); //TODO REPLACE WITH TYPES
   const [spots, setSpots] = useState<Spot[]>();
   const [showWindow, setShowWindow] = useState(false);
-  const [vehicles, setVehicles] = useState<Vehicle[] | undefined>(undefined);
+  const [vehicles, setVehicles] = useGetMyVehicles();
 
   const [showSpotsWindow, setShowSpotsWindow] = useState(false);
   const [showVehicleWindow, setShowVehicleWindow] = useState(false);
@@ -32,6 +38,13 @@ export default function Page({ params }: any) {
   const [bookingStatus, setBookingStatus] = useState(false);
   const [bookingStatusWindow, setBookingStatusWindow] = useState(false);
 
+  useEffect(() => {
+    if (selectedSpot != -1 && selectedVehicle != -1) {
+      const [data, loaded] = useApi({});
+      console.log("now you can call the api for that!");
+    }
+  }, [selectedSpot, selectedVehicle]);
+
   const handleReserve = async (spotId: number, vehicleId: number) => {
     const datePeriod: DatePeriod = {
       start: new Date("2026-01-01"),
@@ -40,7 +53,8 @@ export default function Page({ params }: any) {
 
     setSelectedVehicle(vehicleId);
 
-    const res = await BookingDAO.reserve(selectedSpot, vehicleId, datePeriod);
+    // const res = await BookingDAO.reserve(selectedSpot, vehicleId, datePeriod);
+    const res = true;
 
     console.log(
       `you selected spot number ${selectedSpot} to use with car ${selectedVehicle}`,
@@ -51,8 +65,7 @@ export default function Page({ params }: any) {
     if (res) {
       console.log("success!");
       setBookingStatus(true);
-    }
-    {
+    } else {
       setBookingStatus(false);
     }
     setShowVehicleWindow(false);
@@ -153,18 +166,18 @@ export default function Page({ params }: any) {
   }: {
     onExit: MouseEventHandler;
   }) {
-    useEffect(() => {
-      const load = async () => {
-        if (!vehicles) {
-          const vehicles = await VehicleDAO.getFromUser();
-          setVehicles(vehicles);
-        }
-      };
+    // useEffect(() => {
+    //   const load = async () => {
+    //     if (!vehicles) {
+    //       const vehicles = await VehicleDAO.getFromUser();
+    //       setVehicles(vehicles);
+    //     }
+    //   };
 
-      load();
+    //   load();
 
-      console.log(vehicles);
-    }, []);
+    //   console.log(vehicles);
+    // }, []);
     if (!vehicles) return <></>;
     return (
       <>
@@ -218,28 +231,28 @@ export default function Page({ params }: any) {
     );
   }
 
-  useEffect(() => {
-    const query = async () => {
-      // const data = await api.call(`properties/${params.id}`, true, {
-      // dataOnly: true,
-      // });
-      const spotData = await api.call(
-        `spots/properties/${params.id}/spots`,
-        true,
-        { dataOnly: true },
-      );
+  // useEffect(() => {
+  //   const query = async () => {
+  //     // const data = await api.call(`properties/${params.id}`, true, {
+  //     // dataOnly: true,
+  //     // });
+  //     const spotData = await api.call(
+  //       `spots/properties/${params.id}/spots`,
+  //       true,
+  //       { dataOnly: true },
+  //     );
 
-      const data = await PropertyDAO.get(params.id, true);
+  //     const data = await PropertyDAO.get(params.id, true);
 
-      // const spotData = await PropertyDAO.getSpots()
-      console.log(data);
-      console.log(spotData);
+  //     // const spotData = await PropertyDAO.getSpots()
+  //     console.log(data);
+  //     console.log(spotData);
 
-      setProperty(data);
-      // setSpots(spotData as ParkingSpotResponse);
-    };
-    query();
-  }, []);
+  //     setProperty(data);
+  //     // setSpots(spotData as ParkingSpotResponse);
+  //   };
+  //   query();
+  // }, []);
 
   if (property === undefined) return <section></section>;
   return (
@@ -249,12 +262,14 @@ export default function Page({ params }: any) {
       <section className="m-10 flex flex-row">
         <section className="bg-white w-full rounded-3xl border border-gray-200 shadow-sm p-8 flex flex-row">
           <h2 className="text-2xl w-1/2  mb-6 mr-6">
-            <img
-              src={`${property.images[0].url}`}
+            <Image
+              width={128}
+              height={128}
+              src={`${property.images[0].url || ""}`}
               alt={"test"}
               className="
-                            w-full h-full object-cover
-                        "
+                  w-full h-full object-cover
+              "
             />
           </h2>
 

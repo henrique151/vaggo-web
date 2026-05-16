@@ -2,83 +2,54 @@
 import Header from "@/component/header";
 import LoginCard from "@/component/login_card";
 import FormCard, { GenericFormLayout } from "@/component/form_card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { UserDAO } from "@/entity/user";
+import { useApi } from "@/hooks/api/useApi";
+import { useAuthenticateUser } from "@/hooks/api/user/useAuthenticateUser";
+// import { UserDAO } from "@/entity/user";
 
 export default function Page() {
   const [loading, setLoading] = useState(false);
+  const [request, setRequest] = useState({});
+  const [data, loaded] = useAuthenticateUser(request);
+
   const router = useRouter();
 
-  // const handle = async (e: React.SubmitEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   setLoading(true);
+  // const handleAuthenticate = (res: any[]) => {
+  //   const [data, loading, success] = res;
 
-  //   const formData = new FormData(e.currentTarget);
-  //   const values = Object.fromEntries(formData) as { email: string; pass: string };
+  //   if (data) {
+  //     //user logged in
+  //     console.log("you're in.");
+  //     // console.log(res)
+  //     localStorage.setItem("token", data.token);
+  //     localStorage.setItem("userId", data.user.id);
 
-  //   // remove qualquer campo desnecessário
-  //   delete (values as any).passConfirm;
-  //   // delete values.passConfirm;
-
-  //   try {
-  //     const res = await fetch("http://localhost:3000/users/login", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(values),
-  //     });
-
-  //     const data = await res.json();
-
-  //     if (res.ok) {
-  //       localStorage.setItem("token", data.data.token);
-  //       localStorage.setItem("userId", data.data.user.id);
-  //       console.log("Login bem-sucedido:", data);
-  //       // router.push("/user/dashboard");
-  //     } else {
-  //       console.error("Erro ao logar:", data);
-  //     }
-  //   } catch (err) {
-  //     console.error("Erro na requisição:", err);
-  //   } finally {
-  //     setLoading(false);
+  //     router.push("/user/dashboard");
+  //   } else {
+  //     //api response returned error due to user-error or smth else
+  //     console.log("are you dumb for inserting your password or what?");
   //   }
   // };
 
-  // const authenticate = async (e:any) => {
-  //   e.preventDefault();
-  //   setLoading(true)
+  const handleSubmission = (e: any) => {
+    e.preventDefault();
 
-  //   const formData = new FormData(e.currentTarget);
-  //   const values = Object.fromEntries(formData) as { email: string; password: string };
+    const formData = new FormData(e.currentTarget);
 
-  //   console.log("i'm talking through the code that the page provided.")
-  //   let res = await UserDAO.authenticate(values.email, values.password) as {token: string, user: {id: string}} | undefined
+    setRequest(Object.fromEntries(formData));
+  };
 
-  //   if (res) { //user logged in
-  //     console.log("you're in.")
-  //     localStorage.setItem("token", res.token)
-  //     localStorage.setItem("userId", res.user.id)
-  //   } else { //api response returned error due to user-error or smth else
-  //     console.log("are you dumb for inserting your password or what?")
-  //   }
-  // }
-
-  const handleAuthenticate = async (res: any) => {
-    if (res) {
-      //user logged in
-      console.log("you're in.");
-      // console.log(res)
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("userId", res.user.id);
-
+  useEffect(() => {
+    if (data) {
+      console.log(data);
+      localStorage.setItem("token", JSON.stringify(data));
       router.push("/user/dashboard");
     } else {
-      //api response returned error due to user-error or smth else
-      console.log("are you dumb for inserting your password or what?");
+      console.log("data not loaded into api yet!");
     }
-  };
+  }, [data]);
 
   return (
     <main className="flex flex-col min-h-screen">
@@ -92,7 +63,8 @@ export default function Page() {
           useToken={false}
           content="json"
           method="POST"
-          postSubmit={handleAuthenticate}
+          onSubmit={handleSubmission}
+          // postSubmit={handleAuthenticate}
         >
           <GenericFormLayout
             title={"Entrar no Vaggo"}
@@ -108,13 +80,13 @@ export default function Page() {
                 required
                 placeholder="seu@email.com"
                 className="
-                px-4 py-3
-                rounded-lg
-                border border-gray-300
-                bg-white/90
-                focus:outline-none
-                focus:ring-2 focus:ring-gray-300
-              "
+                  px-4 py-3
+                  rounded-lg
+                  border border-gray-300
+                  bg-white/90
+                  focus:outline-none
+                  focus:ring-2 focus:ring-gray-300
+                "
               />
             </div>
 
@@ -127,13 +99,13 @@ export default function Page() {
                 required
                 placeholder="••••••••"
                 className="
-                px-4 py-3
-                rounded-lg
-                border border-gray-300
-                bg-white/90
-                focus:outline-none
-                focus:ring-2 focus:ring-gray-300
-              "
+                  px-4 py-3
+                  rounded-lg
+                  border border-gray-300
+                  bg-white/90
+                  focus:outline-none
+                  focus:ring-2 focus:ring-gray-300
+                "
               />
             </div>
 

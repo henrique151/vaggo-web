@@ -5,7 +5,7 @@ import {
 } from "@/interface/vehicle";
 import * as api from "@/entity/api";
 import { User, UserDAO, useUser } from "./user";
-import { useApi } from "./useApi";
+import { useApi } from "../hooks/api/useApi";
 import { useEffect, useState } from "react";
 
 export class Vehicle implements IVehicle {
@@ -144,3 +144,5 @@ export function useUserVehicles(): [
 
   return [vehicles, loading];
 }
+
+// READY TO DELETE

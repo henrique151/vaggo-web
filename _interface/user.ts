@@ -1,4 +1,4 @@
-import { Image } from "./media";
+import { Image } from "../classes/data/Image";
 
 export interface User {
   id: number;

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Image } from "@/interface/media";
+import { Image } from "@/classes/data/Image";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -17,11 +17,12 @@ interface Spot {
 }
 
 interface SpotProps {
-  spot: Spot;
+  spot: any;
 }
 
 export default function SpotCard({ spot }: SpotProps) {
-  // console.log(spot.images);
+  console.log("spot");
+  console.log(spot);
   return (
     <div
       className="
@@ -39,7 +40,8 @@ export default function SpotCard({ spot }: SpotProps) {
       <div className="w-full h-[160px] overflow-hidden">
         {/* TODO change to <Image> */}
         <img
-          src={`${spot.images.url}`}
+          // src={`${spot.images.url}`}
+          src={`/`}
           alt={spot.propertyName}
           className="
             w-full h-full object-cover

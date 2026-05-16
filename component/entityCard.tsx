@@ -1,7 +1,7 @@
 // // component/entity_card.tsx
 // 'use client'
 
-import { Image } from "@/interface/media";
+import { Image } from "@/classes/data/Image";
 import Link from "next/link";
 import { useState } from "react";
 

@@ -5,55 +5,69 @@ import * as api from "@/entity/api";
 import { VehicleTypes } from "@/interface/vehicle";
 import { Property } from "@/interface/property";
 import { PropertyDAO } from "./property";
+import { useEffect, useState } from "react";
+import { useApi } from "../hooks/api/useApi";
 
 export class Spot implements ISpot {
+  public id: number;
+  public size: string;
+  public status: string;
+  public identifier: string;
+  public isCovered: boolean;
+  public approvalStatus: string;
+  public allowedVehicles: VehicleTypes[];
+  // public operatingHours: OperatingHours
+  public isActive: boolean;
+  public property?: Property;
   constructor(
-    public id: number,
-    public size: string,
-    public status: string,
-    public identifier: string,
-    public isCovered: boolean,
-    public approvalStatus: string,
-    public allowedVehicles: VehicleTypes[],
-    // public operatingHours: OperatingHours,
-    public isActive: boolean,
-    public property?: Property,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: any,
     //TODO insert Availability properties here, and check an efficient way of putting mass variables in a single way
-  ) {}
+  ) {
+    this.id = data.id;
+    this.size = data.size;
+    this.status = data.status;
+    this.identifier = data.identifier;
+    this.isCovered = data.isCovered;
+    this.approvalStatus = data.approvalStatus;
+    this.allowedVehicles = data.allowedVehicles;
+    this.isActive = data.isActive;
+    this.property = data.property;
+  }
 
   // public static create(data: ISpot): Spot;
-  public static create(data: ISpot, property?: Property): Spot {
-    let spot: Spot | undefined;
+  // public static create(data: ISpot, property?: Property): Spot {
+  //   let spot: Spot | undefined;
 
-    if (property) {
-      spot = new Spot(
-        data.id,
-        data.size,
-        data.status,
-        data.identifier,
-        data.isCovered,
-        data.approvalStatus,
-        data.allowedVehicles,
-        // data.operatingHours,
-        data.isActive,
-        property,
-      );
-    } else {
-      spot = new Spot(
-        data.id,
-        data.size,
-        data.status,
-        data.identifier,
-        data.isCovered,
-        data.approvalStatus,
-        data.allowedVehicles,
-        // data.operatingHours,
-        data.isActive,
-      );
-    }
+  //   if (property) {
+  //     spot = new Spot(
+  //       data.id,
+  //       data.size,
+  //       data.status,
+  //       data.identifier,
+  //       data.isCovered,
+  //       data.approvalStatus,
+  //       data.allowedVehicles,
+  //       // data.operatingHours,
+  //       data.isActive,
+  //       property,
+  //     );
+  //   } else {
+  //     spot = new Spot(
+  //       data.id,
+  //       data.size,
+  //       data.status,
+  //       data.identifier,
+  //       data.isCovered,
+  //       data.approvalStatus,
+  //       data.allowedVehicles,
+  //       // data.operatingHours,
+  //       data.isActive,
+  //     );
+  //   }
 
-    return spot;
-  }
+  //   return spot;
+  // }
 }
 
 export class SpotDAO {
@@ -135,4 +149,37 @@ export class SpotDAO {
   static register(obj: Spot) {}
 
   static list() {}
+}
+
+export function useFetchSpotsFromProperty({
+  id,
+}: {
+  id: number;
+}): [spots: Spot[] | undefined, loading: boolean] {
+  const [data, dataLoading] = useApi({
+    uri: `spots/properties/${id}/spots`,
+    dataOnly: true,
+    useToken: true,
+    req: { method: "GET" },
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [spots, setSpots] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const instances = data.map((spot: any) => {
+        spot.image = new Image(spot.imageUrl);
+
+        return new Spot(spot);
+      });
+
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSpots(instances);
+      setLoading(false);
+    }
+  }, [data]);
+
+  return [spots, loading];
 }

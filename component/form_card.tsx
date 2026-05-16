@@ -1,13 +1,14 @@
 import * as api from "@/app/api";
+import { useApi } from "@/hooks/api/useApi";
 import { SubmitEventHandler } from "react";
 
 interface FormCardProps {
   endpoint: string;
   method: api.requestTypeSupport;
   content: api.contentTypeSupport;
-  onSubmit?: Function; //in case you need to implement a custom submission handling
+  onSubmit?: CallableFunction; //in case you need to implement a custom submission handling
   validator?: FormValidatorHandler; //a custom validator function for the data entered if needed. Possibly not useful since entities can potentially validate on their own?
-  postSubmit?: Function;
+  postSubmit?: CallableFunction;
   useToken: boolean;
 
   children?: any;
@@ -22,23 +23,33 @@ export interface FormPostSubmissionHandler {
 }
 
 // function SubmissionHandler(e:any, endpoint:string, useToken:boolean, method:api.requestTypeSupport, content:api.contentTypeSupport) {
-async function SubmissionHandler(e: any, props: FormCardProps) {
+function SubmissionHandler(e: any, props: FormCardProps) {
   e.preventDefault();
   // console.log("i'm talking inside the component's default callback");
 
   const formData = new FormData(e.currentTarget);
-  const values = Object.fromEntries(formData);
+  // const values = Object.fromEntries(formData);
 
   // console.log(values)
 
-  const res = await api.call(props.endpoint, props.useToken, {
+  const [data, loading, success] = useApi({
+    uri: props.endpoint,
+    useToken: props.useToken,
     dataOnly: true,
-    method: props.method,
-    contentType: props.content,
-    body: JSON.stringify(values),
-  }); //maybe, check and switch for general api calling, i need to see this ig.
+    req: {
+      method: props.method,
+      body: formData,
+    },
+  });
 
-  if (props.postSubmit) props.postSubmit(res);
+  // await api.call(props.endpoint, props.useToken, {
+  // dataOnly: true,
+  // method: props.method,
+  // contentType: props.content,
+  // body: JSON.stringify(values),
+  // }); //maybe, check and switch for general api calling, i need to see this ig.
+
+  if (props.postSubmit) props.postSubmit([data, loading, success]);
 }
 
 export default function FormCard({

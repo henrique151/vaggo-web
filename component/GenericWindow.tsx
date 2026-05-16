@@ -30,15 +30,15 @@ export default function GenericWindow({
         <button
           onClick={onExit}
           className="
-                        absolute -top-3 -right-3
-                        w-9 h-9
-                        rounded-full
-                        bg-white
-                        border border-gray-200
-                        shadow-md
-                        hover:bg-gray-100
-                        transition
-                      "
+            absolute -top-3 -right-3
+            w-9 h-9
+            rounded-full
+            bg-white
+            border border-gray-200
+            shadow-md
+            hover:bg-gray-100
+            transition
+          "
         >
           ✕
         </button>

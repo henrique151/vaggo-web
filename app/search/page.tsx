@@ -1,40 +1,48 @@
 "use client";
+import CarouselContainer from "@/component/container/CarouselContainer";
+import { EntityCard } from "@/component/container/EntityCard";
 import Header from "@/component/header";
-import SpotCard from "@/component/spot_card";
-import SpotCarousel from "@/component/spot_carousel";
-import { PropertyDAO } from "@/entity/property";
+// import SpotCard from "@/component/spot_card";
+// import SpotCarousel from "@/component/spot_carousel";
+// import { PropertyDAO, useSearchProperties } from "@/entity/property";
+import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [foundProperties, setFoundProperties] = useState<(typeof SpotCard)[]>(
-    [],
-  );
   const params = useSearchParams();
 
+  const [foundPropertiesData, foundPropertiesLoading] = useSearchProperties({
+    address: params.get("address") != null ? params.get("address")! : "",
+  });
+
+  const [foundPropertiesCards, setFoundPropertiesCards] = useState<
+    (typeof EntityCard)[]
+  >([]);
+
   useEffect(() => {
-    async function load() {
-      const parsedParams = {} as Record<string, string>;
-
-      for (const [key, value] of params.entries()) {
-        parsedParams[key] = value;
-      }
-      console.log(parsedParams);
-
-      const res = await PropertyDAO.search(parsedParams);
-
-      if (!res) return undefined;
-
+    console.log("foundPropertiesData");
+    console.log(foundPropertiesData);
+    // if (foundPropertiesData && foundPropertiesCards.length < 0) {
+    if (foundPropertiesData && !foundPropertiesLoading) {
       const spotCards = [];
-      for (const property of res.results) {
+
+      for (const property of foundPropertiesData.results) {
+        console.log("property");
         console.log(property);
-        spotCards.push(<SpotCard spot={property} />);
+        spotCards.push(
+          <EntityCard
+            title={`Propriedade #${property.propertyId}`}
+            description={`Distância: ${property.route.distance}`}
+            redirectTo={`/spot/${property.propertyId}`}
+          ></EntityCard>,
+        );
       }
-      console.log(res);
-      setFoundProperties(spotCards);
+      console.log(spotCards);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFoundPropertiesCards(spotCards);
     }
-    load();
-  }, []);
+  }, [foundPropertiesData]);
 
   // get spots nearby search with PropertyDAO.search(query.search)
   // list result in container
@@ -48,9 +56,13 @@ export default function Home() {
       <section className="section-default">
         <div className="container-default mt-6">
           <div className="rounded-2xl shadow-sm p-6">
-            <SpotCarousel
+            {/*<SpotCarousel
               title="Pontos mais próximos ao endereço"
-              spotCards={foundProperties}
+              spotCards={foundPropertiesData}
+            />*/}
+            <CarouselContainer
+              title={"Pontos mais próximos ao endereço"}
+              cards={foundPropertiesCards}
             />
             {/*<SpotCard spot={spot} />*/}
 

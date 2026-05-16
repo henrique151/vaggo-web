@@ -1,75 +1,82 @@
 // component/entity_card.tsx
-'use client'
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import BlurOverlay from "@/component/blur_overlay"
-import EditCard from "@/component/edit_card"
+import { useState } from "react";
+import Link from "next/link";
+import BlurOverlay from "@/component/blur_overlay";
+import EditCard from "@/component/edit_card";
 
-import * as api from '@/app/api'
-import { VehicleResponse } from "@/interface/api/vehicle"
+import * as api from "@/app/api";
+// import { VehicleResponse } from "@/interface/api/vehicle"
 
-type CardType = "vehicle" | "property" | "spot"
+type CardType = "vehicle" | "property" | "spot";
 
 interface VehicleData {
-  id: number
-  brand: string
-  model: string
-  color: string
-  licensePlate: string
-  manufactureYear: string
+  id: number;
+  brand: string;
+  model: string;
+  color: string;
+  licensePlate: string;
+  manufactureYear: string;
 }
 
 interface PropertyData {
-  name: string
-  type: string
-  description: string
-  totalCapacity: number
-  zipCode: string
+  name: string;
+  type: string;
+  description: string;
+  totalCapacity: number;
+  zipCode: string;
 }
 
 interface SpotData {
-  size: string
-  status: "DISPONIVEL" | "INDISPONIVEL" | "OCUPADA" | any
-  identifier: string
-  isCovered: boolean
-  approvalStatus: "PENDENTE" | "APROVADA" | "RECUSADA" | any
-  allowedVehicles: any
-  operatingHours: any
+  size: string;
+  status: "DISPONIVEL" | "INDISPONIVEL" | "OCUPADA" | any;
+  identifier: string;
+  isCovered: boolean;
+  approvalStatus: "PENDENTE" | "APROVADA" | "RECUSADA" | any;
+  allowedVehicles: any;
+  operatingHours: any;
 }
 
 interface EntityCardProps {
-  type: CardType
-  data: VehicleData | PropertyData | SpotData
-  editHref?: string
+  type: CardType;
+  data: VehicleData | PropertyData | SpotData;
+  editHref?: string;
 }
 
 export default function EntityCard({
   type,
   data,
-  editHref = "#"
+  editHref = "#",
 }: EntityCardProps) {
-  const [openEdit, setOpenEdit] = useState(false)
+  const [openEdit, setOpenEdit] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>, endpoint:string) {
-    e.preventDefault()
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>,
+    endpoint: string,
+  ) {
+    e.preventDefault();
 
-    const formData = new FormData(e.currentTarget)
-    const values = Object.fromEntries(formData)
+    const formData = new FormData(e.currentTarget);
+    const values = Object.fromEntries(formData);
 
-    const res = await api.call(endpoint, true, {body: JSON.stringify(values), method: "PUT", contentType:"json"})
+    const res = await api.call(endpoint, true, {
+      body: JSON.stringify(values),
+      method: "PUT",
+      contentType: "json",
+    });
     // const res = await api.call(endpoint, true, {body: '{"color": "brancao", "model": "De marrom"}', method: "PUT", contentType:"json"})
 
-    console.log(res)
+    console.log(res);
 
-    console.log("Dados editados:", values)
+    console.log("Dados editados:", values);
 
-    setOpenEdit(false)
+    setOpenEdit(false);
   }
 
   function renderContent() {
     if (type === "vehicle") {
-      const vehicle = data as VehicleData
+      const vehicle = data as VehicleData;
 
       return (
         <>
@@ -77,22 +84,18 @@ export default function EntityCard({
             {vehicle.brand} {vehicle.model}
           </h3>
 
-          <p className="text-sm text-gray-500 mt-1">
-            {vehicle.licensePlate}
-          </p>
+          <p className="text-sm text-gray-500 mt-1">{vehicle.licensePlate}</p>
 
           <div className="flex gap-2 mt-3 flex-wrap">
             <Tag>{vehicle.color}</Tag>
-            <Tag>
-              {vehicle.manufactureYear}
-            </Tag>
+            <Tag>{vehicle.manufactureYear}</Tag>
           </div>
         </>
-      )
+      );
     }
 
     if (type === "property") {
-      const property = data as PropertyData
+      const property = data as PropertyData;
 
       return (
         <>
@@ -100,19 +103,17 @@ export default function EntityCard({
             {property.name}
           </h3>
 
-          <p className="text-sm text-gray-500 mt-1">
-            {property.type}
-          </p>
+          <p className="text-sm text-gray-500 mt-1">{property.type}</p>
 
           <div className="flex gap-2 mt-3 flex-wrap">
             <Tag>{property.totalCapacity} vagas</Tag>
             <Tag>ID {property.zipCode}</Tag>
           </div>
         </>
-      )
+      );
     }
 
-    const spot = data as SpotData
+    const spot = data as SpotData;
 
     return (
       <>
@@ -120,54 +121,61 @@ export default function EntityCard({
           Vaga {spot.identifier}
         </h3>
 
-        <p className="text-sm text-gray-500 mt-1">
-          {spot.operatingHours}
-        </p>
+        <p className="text-sm text-gray-500 mt-1">{spot.operatingHours}</p>
 
         <div className="flex gap-2 mt-3 flex-wrap">
           <Tag>{spot.status}</Tag>
           <Tag>{spot.isCovered ? "Coberta" : "Descoberta"}</Tag>
         </div>
       </>
-    )
+    );
   }
 
   function renderPopup() {
     if (type === "vehicle") {
-      console.log(`vehicle data:`, data)
+      console.log(`vehicle data:`, data);
       return (
         <EditCard
           type="vehicle"
-          onSubmit={(e, data:any) => {handleSubmit(e, `vehicles/${data.id}`)}}
+          onSubmit={(e, data: any) => {
+            handleSubmit(e, `vehicles/${data.id}`);
+          }}
           defaultValues={data}
           hasBlur={true}
         />
-      )
+      );
     }
 
     if (type === "property") {
       return (
         <EditCard
           type="property"
-          onSubmit={(e, data:any) => {handleSubmit(e, `properties/${data.id}`)}}
+          onSubmit={(e, data: any) => {
+            handleSubmit(e, `properties/${data.id}`);
+          }}
           defaultValues={data}
           hasBlur={true}
         />
-      )
+      );
     }
 
     if (type === "spot") {
       return (
         <EditCard
           type="spot"
-          onSubmit={(e, data:any) => {handleSubmit(e, `spots/properties/${localStorage.getItem('userId')}/spots/${data.id}`)}}
+          onSubmit={(e, data: any) => {
+            handleSubmit(
+              e,
+              `spots/properties/${localStorage.getItem("userId")}/spots/${data.id}`,
+            );
+          }}
           defaultValues={data}
           hasBlur={true}
         />
-      )
+      );
     }
 
-    return null
+    return null;
   }
 
   return (
@@ -185,10 +193,7 @@ export default function EntityCard({
         "
       >
         <div className="flex items-start justify-between gap-4">
-
-          <div className="flex-1">
-            {renderContent()}
-          </div>
+          <div className="flex-1">{renderContent()}</div>
 
           <button
             onClick={() => setOpenEdit(true)}
@@ -206,20 +211,15 @@ export default function EntityCard({
           >
             Editar
           </button>
-
         </div>
       </div>
 
       {/* POPUP */}
-      <BlurOverlay
-        show={openEdit}
-        onClick={() => setOpenEdit(false)}
-      />
+      <BlurOverlay show={openEdit} onClick={() => setOpenEdit(false)} />
 
       {openEdit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="relative w-full max-w-lg">
-
             {renderPopup()}
 
             <button
@@ -236,19 +236,14 @@ export default function EntityCard({
             >
               ✕
             </button>
-
           </div>
         </div>
       )}
     </>
-  )
+  );
 }
 
-function Tag({
-  children
-}: {
-  children: React.ReactNode
-}) {
+function Tag({ children }: { children: React.ReactNode }) {
   return (
     <span
       className="
@@ -261,5 +256,5 @@ function Tag({
     >
       {children}
     </span>
-  )
+  );
 }
