@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useUserToken } from "./user/useUserToken";
+import request from "@/services/api.service";
 
 const API_ADDRESS = "http://localhost:3000";
 
@@ -45,7 +46,7 @@ export function useApi({
         "Fetch is below this logging. If is appearing many times, it means api is being called alot",
       );
       console.log(req);
-      const res = await fetch(`${API_ADDRESS}/${uri}`, req);
+      const res = await request(`${API_ADDRESS}/${uri}`, req);
 
       setSuccess(res.ok);
 
