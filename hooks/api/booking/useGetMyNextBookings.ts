@@ -1,6 +1,6 @@
 import { Booking } from "@/classes/booking";
 import { useApi } from "../useApi";
-import { DatePeriod } from "@/classes/data/DatePeriod";
+import DatePeriod from "@/classes/data/DatePeriod";
 import { useState, useEffect } from "react";
 import { useGetUserById } from "../user/useGetUserById";
 import { map } from "@/mappers/booking.mapper";

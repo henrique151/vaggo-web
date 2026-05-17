@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 interface SpotCarouselProps {
   title: string;
   // children: React.ReactNode;
-  cards: React.ReactNode[];
+  cards: Element[];
 }
 
 export default function CarouselContainer({

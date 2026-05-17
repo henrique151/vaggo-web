@@ -1,182 +1,102 @@
 "use client";
 
-import Header from "@/component/header";
 import Link from "next/link";
-import { HTMLAttributes, useEffect, useState } from "react";
-// import { VehicleResponse } from "@/interface/api/vehicle"
-// import { User, UserDAO, useUser } from "@/entity/user";
-import { useGetUserById } from "@/hooks/api/user/useGetUserById";
-// import { useUserVehicles, Vehicle, VehicleDAO } from "@/entity/vehicle";
-import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetUserVehicles";
+import { MouseEvent, useEffect, useState } from "react";
 import Image from "next/image";
-// import {
-//   // Booking,
-//   // BookingDAO,
-//   useFetchNextBookings,
-//   useFetchPropertySolicitations,
-// } from "@/entity/booking";
+
+import CarouselContainer from "@/component/container/CarouselContainer";
+import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
+import Header from "@/component/header";
+
+import { useGetUserById } from "@/hooks/api/user/useGetUserById";
+import { useUserToken } from "@/hooks/api/user/useUserToken";
+import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
+import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetUserVehicles";
 import { useGetMyNextBookings } from "@/hooks/api/booking/useGetMyNextBookings";
 import { useGetMySolicitations } from "@/hooks/api/booking/useGetMySolicitations";
-// import SpotCard from "@/component/spot_card";
-import CarouselContainer from "@/component/container/CarouselContainer";
-import { EntityCard } from "@/component/container/EntityCard";
-// import { useApi } from "@/entity/useApi";
-import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
-import { useUserToken } from "@/hooks/api/user/useUserToken";
-// interface CardCarousel {
-//   title: string;
-//   // children: React.ReactNode;
-//   cards: React.ReactNode[];
+import PanelContainer from "@/component/container/PanelContainer";
+import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
+import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
+import ConfirmationEntityCard from "@/component/cards/ConfirmationEntityCard";
+import ConfirmationEntityFrame from "@/component/frames/ConfirmationEntityFrame";
+import { changeBookingSolicitationStatus } from "@/services/booking.service";
+
+// function VehicleCard({ raw_data }: { raw_data: Vehicle }) {
+//   const data: Vehicle = raw_data;
+
+//   if (!data) return null;
+
+//   return (
+//     <div
+//       className="
+//         bg-white
+//         border border-gray-200
+//         rounded-2xl
+//         shadow-sm
+//         p-5
+//         hover:shadow-md
+//         transition
+//       "
+//     >
+//       <h3 className="text-lg font-semibold text-gray-900">
+//         {data.brand} {data.model}
+//       </h3>
+
+//       <p className="text-sm text-gray-500 mt-2">Placa: {data.licensePlate}</p>
+//     </div>
+//   );
 // }
 
-// function CardCarousel({ title, cards = [] }: CardCarousel) {
-//   const [index, setIndex] = useState(0);
-
-//   const CARD_WIDTH = 260;
-//   const GAP = 12;
-//   const STEP = CARD_WIDTH + GAP;
-
-//   const visibleCards = 3;
-//   const maxIndex = cards.length - visibleCards;
-
-//   const next = () => index < maxIndex && setIndex(index + 1);
-//   const prev = () => index > 0 && setIndex(index - 1);
-
-//   // if (!spots) return <></>
+// function DashboardTile({
+//   title,
+//   notFoundMessage,
+//   children,
+// }: {
+//   title: string;
+//   notFoundMessage: string;
+//   children?: React.ReactNode;
+// }) {
 //   return (
-//     <section className="w-full">
-//       {/* Header */}
-//       <div className="flex items-center justify-between mb-4">
-//         <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
+//     <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+//       <h2 className="text-2xl font-semibold mb-6">{title}</h2>
 
-//         <div className="flex gap-2">
-//           <button
-//             onClick={prev}
-//             disabled={index === 0}
-//             className="
-//               w-8 h-8
-//               rounded-full
-//               bg-white
-//               border border-gray-200
-//               shadow-sm
-//               hover:bg-gray-50
-//               disabled:opacity-30
-//             "
-//           >
-//             ‹
-//           </button>
-
-//           <button
-//             onClick={next}
-//             disabled={index === maxIndex}
-//             className="
-//               w-8 h-8
-//               rounded-full
-//               bg-white
-//               border border-gray-200
-//               shadow-sm
-//               hover:bg-gray-50
-//               disabled:opacity-30
-//             "
-//           >
-//             ›
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Slides */}
-//       <div className="overflow-hidden">
-//         <div
-//           className="flex gap-3 transition-transform duration-300"
-//           style={{
-//             transform: `translateX(-${index * STEP}px)`,
-//           }}
-//         >
-//           {cards.map((card) => {
-//             return <>{card}</>;
-//           })}
-//         </div>
-//       </div>
+//       <section>{children}</section>
+//       {/*<div className="text-gray-500">{notFoundMessage}</div>*/}
 //     </section>
 //   );
 // }
 
-function VehicleCard({ raw_data }: { raw_data: Vehicle }) {
-  const data: Vehicle = raw_data;
-
-  if (!data) return null;
-
-  return (
-    <div
-      className="
-        bg-white
-        border border-gray-200
-        rounded-2xl
-        shadow-sm
-        p-5
-        hover:shadow-md
-        transition
-      "
-    >
-      <h3 className="text-lg font-semibold text-gray-900">
-        {data.brand} {data.model}
-      </h3>
-
-      <p className="text-sm text-gray-500 mt-2">Placa: {data.licensePlate}</p>
-    </div>
-  );
-}
-
-function DashboardTile({
-  title,
-  notFoundMessage,
-  children,
-}: {
-  title: string;
-  notFoundMessage: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-      <h2 className="text-2xl font-semibold mb-6">{title}</h2>
-
-      <section>{children}</section>
-      {/*<div className="text-gray-500">{notFoundMessage}</div>*/}
-    </section>
-  );
-}
-
-function DashboardEntityCard({
-  title,
-  description = "",
-  className,
-  children,
-}: {
-  title: string;
-  description: string;
-  // className: HTMLAttributes<HTMLElement>.className;
-  className: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className={`
-        bg-white
-        border border-gray-200
-        rounded-2xl
-        shadow-sm
-        p-5
-        hover:shadow-md
-        transition
-        ${className}
-      `}
-    >
-      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-      <p className="text-sm text-gray-500 mt-2">{description}</p>
-      <section>{children}</section>
-    </div>
-  );
-}
+// function DashboardEntityCard({
+//   title,
+//   description = "",
+//   className,
+//   children,
+// }: {
+//   title: string;
+//   description: string;
+//   // className: HTMLAttributes<HTMLElement>.className;
+//   className: string;
+//   children: React.ReactNode;
+// }) {
+//   return (
+//     <div
+//       className={`
+//         bg-white
+//         border border-gray-200
+//         rounded-2xl
+//         shadow-sm
+//         p-5
+//         hover:shadow-md
+//         transition
+//         ${className}
+//       `}
+//     >
+//       <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+//       <p className="text-sm text-gray-500 mt-2">{description}</p>
+//       <section>{children}</section>
+//     </div>
+//   );
+// }
 
 export default function Page() {
   const [token] = useUserToken();
@@ -186,7 +106,7 @@ export default function Page() {
   });
   const [bookingSolicitations] = useGetMySolicitations();
 
-  const [nextBookings, setnextBookings] = useGetMyNextBookings();
+  const [nextBookings] = useGetMyNextBookings();
 
   const [nextBookingsCards, setnextBookingsCards] = useState<
     (typeof DashboardEntityCard)[] | undefined
@@ -202,25 +122,19 @@ export default function Page() {
   // console.log(bookingSolicitations);
 
   // console.log(result);
-  const handleSolicitation = async (id: number, accept: boolean) => {
+  const handleSolicitation = async (
+    id: number,
+    mode: "approve" | "reject" | "cancel",
+  ) => {
     const status = accept ? "approve" : "reject";
-    const res = await fetch(
-      `http://localhost:3000/reservations/${id}/${status}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        method: "PATCH",
-      },
-    );
+    const res = await changeBookingSolicitationStatus(id, mode);
 
-    if (res.ok) {
-      const data = await res.json();
+    if (res) {
+      // const data = await res.json();
       console.log(
         `This solicitation has been ${status}. The following data is from api`,
       );
-      console.log(data);
+      // console.log(data);
       return true;
     }
     return false;
@@ -302,20 +216,7 @@ export default function Page() {
                 Olá, {userData.person.name}!
               </h1>
 
-              <p className="text-gray-500 mt-2 text-lg">
-                {(() => {
-                  const currentTime = new Date().getHours();
-                  if (currentTime >= 0 && currentTime <= 12)
-                    return <>Bom dia!</>;
-                  else if (currentTime >= 13 && currentTime <= 17)
-                    return <>Boa Tarde!</>;
-                  else if (currentTime >= 18 && currentTime <= 23)
-                    return <>Boa noite!</>;
-                  else {
-                    return <>Bom dia!</>;
-                  }
-                })()}
-              </p>
+              <p className="text-gray-500 mt-2 text-lg">{GreetUser()}</p>
             </div>
           </div>
 
@@ -340,51 +241,45 @@ export default function Page() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* ESQUERDA */}
           <div className="lg:col-span-2 space-y-8">
-            <DashboardTile
-              title={"Próximas Reservas"}
-              notFoundMessage={"Nenhuma reserva Agendada"}
-            >
-              <CarouselContainer title={""} cards={nextBookingsCards} />
-              {/*<CardCarousel title={""} cards={nextBookingsCards}></CardCarousel>*/}
-              {/*{nextBookings?.map((booking) => {
-                return (
-                  <section
-                    key={`next_booking_${booking.id}`}
-                    id={`next_booking_${booking.id}`}
-                  >
-                    <DashboardEntityCard
-                      key={`next_booking_${booking.id}`}
-                      // id={`booking_solicitation_${booking.id}`}
-                      title={booking.spot.identifier}
-                      description={`Data: ${booking.datePeriod.start.toLocaleDateString()}, Status: ${booking.status}`}
-                      className="mb-3"
-                    >
-                      <div className="flex flex-row"></div>
-                    </DashboardEntityCard>
-                  </section>
-                );
-              })}*/}
-              {/*<p>Nenhuma reserva Agendada</p>*/}
-            </DashboardTile>
+            {/* Paineis de Reservas */}
 
-            <DashboardTile
-              title={"Reservas anteriores"}
-              notFoundMessage={"Histórico aparecerá aqui."}
-            >
-              <p>Histórico aparecerá aqui</p>
-            </DashboardTile>
+            {/* Próximas Reservas */}
+            <PanelContainer title={"Próximas Reservas"}>
+              {nextBookingsCards ? (
+                <CarouselContainer title={""} cards={nextBookingsCards} />
+              ) : (
+                <p>Não há reservas agendadas no momento.</p>
+              )}
+            </PanelContainer>
 
-            <DashboardTile
-              title={"Solicitações de Reservas"}
-              notFoundMessage={"Nenhuma mensagem recente."}
-            >
+            {/* Histórico de Reservas */}
+            <PanelContainer title={"Reservas anteriores"}>
+              <p>Por enquanto não há reservas no histórico.</p>
+            </PanelContainer>
+
+            {/* Solicitações de Reservas */}
+            <PanelContainer title={"Solicitações de Reservas"}>
               {bookingSolicitations?.map((booking) => {
                 return (
                   <section
                     key={`booking_solicitation_${booking.id}`}
                     id={`booking_solicitation_${booking.id}`}
                   >
-                    <DashboardEntityCard
+                    <ConfirmationEntityFrame
+                      title={booking.spot.identifier}
+                      description={`Código: ${booking.code} Solicitante: ${booking?.user?.person?.name || "Desconhecido"}`}
+                      onConfirm={function (
+                        event: MouseEvent<Element, MouseEvent>,
+                      ): void {
+                        throw new Error("Function not implemented.");
+                      }}
+                      onCancel={function (
+                        event: MouseEvent<Element, MouseEvent>,
+                      ): void {
+                        throw new Error("Function not implemented.");
+                      }}
+                    />
+                    {/*<DashboardEntityCard
                       key={`booking_solicitation_${booking.id}`}
                       // id={`booking_solicitation_${booking.id}`}
                       title={booking.spot.identifier}
@@ -464,60 +359,31 @@ export default function Page() {
                           Recusar
                         </button>
                       </div>
-                    </DashboardEntityCard>
+                    </DashboardEntityCard>*/}
                   </section>
                 );
               })}
-              {/*<p>Nenhuma solicitação Recente</p>*/}
-            </DashboardTile>
-
-            {/*<section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-              <h2 className="text-2xl font-semibold mb-6">Próximas reservas</h2>
-
-              <div className="text-gray-500">Nenhuma reserva agendada.</div>
-            </section>*/}
-
-            {/*<section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-              <h2 className="text-2xl font-semibold mb-6">
-                Reservas anteriores
-              </h2>
-
-              <div className="text-gray-500">Histórico aparecerá aqui.</div>
-            </section>*/}
+            </PanelContainer>
           </div>
 
           {/* DIREITA */}
           <div className="space-y-8">
-            <DashboardTile
-              title={"Seu(s) veículo(os)"}
-              notFoundMessage={"Nenhum Veículo Cadastrado"}
-            >
+            <PanelContainer title={"Seu(s) veículo(os)"}>
               {carsData.map((car) => {
-                return <VehicleCard key={car.id} raw_data={car} />;
+                // return <VehicleCard key={car.id} raw_data={car} />;
+                return (
+                  <EntityFrame key={car.id}>
+                    <DefaultEntityFrame
+                      title={`${car.brand} ${car.model}`}
+                      description={`Placa: ${car.licensePlate}`}
+                    />
+                  </EntityFrame>
+                );
               })}
-            </DashboardTile>
-            <DashboardTile
-              title={"Mensagens"}
-              notFoundMessage={"Nenhuma mensagem recente."}
-            >
+            </PanelContainer>
+            <PanelContainer title={"Mensagens"}>
               <p>Nenhuma mensagem recente</p>
-            </DashboardTile>
-
-            {/*<section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-              <h2 className="text-2xl font-semibold mb-6">
-                Seu(s) veículo(os)
-              </h2>
-
-              {carsData.map((car) => {
-                return <VehicleCard key={car.id} raw_data={car} />;
-              })}
-            </section>
-
-            <section className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-              <h2 className="text-2xl font-semibold mb-6">Mensagens</h2>
-
-              <div className="text-gray-500">Nenhuma mensagem recente.</div>
-            </section>*/}
+            </PanelContainer>
           </div>
         </div>
       </section>
@@ -525,121 +391,14 @@ export default function Page() {
   );
 }
 
-/*
-'use client'
-// import Link from "next/link"
-// import Image from "next/image";
-
-import Header from "@/component/header"
-import Link from "next/link"
-import { useEffect, useState } from "react"
-import * as api from '@/app/api'
-import { VehicleResponse } from "@/interface/api/vehicle"
-import { UserResponse } from "@/interface/api/user"
-
-function VehicleCard({raw_data}:any) {
-    // const [data, setData] = useState(null)
-    const data:VehicleResponse = raw_data
-    // setData(raw_data)
-    // console.log(data)
-
-    if (data != null)
-    return (
-        <section>
-            <div>
-                <p>Veículo: {data.brand} {data.model}</p>
-                <p>Placa: {data.licensePlate}</p>
-            </div>
-        </section>
-    )
+function GreetUser() {
+  const currentTime = new Date().getHours();
+  if (currentTime >= 0 && currentTime <= 12) return <>Bom dia!</>;
+  else if (currentTime >= 13 && currentTime <= 17) return <>Boa Tarde!</>;
+  else if (currentTime >= 18 && currentTime <= 23) return <>Boa noite!</>;
+  else {
+    return <>Bom dia!</>;
+  }
 }
 
-export default function Page() {
-    const [carData, setCarData] = useState<VehicleResponse | undefined>(undefined)
-    const [userData, setUserData] = useState<UserResponse | undefined>(undefined)
-
-    useEffect(() => {
-        try {
-            api.call("vehicles/1", true, {dataOnly: true})
-            .then(data => setCarData(data as VehicleResponse))
-
-            api.call(users/${localStorage.getItem("userId")}, true, {dataOnly: true})
-            .then(data => setUserData(data as UserResponse))
-            // .then(data => console.log(data as api.UserResponse))
-
-
-            // fetch(http://localhost:3000/vehicles/${localStorage.getItem('userId')}, {
-            // fetch(http://localhost:3000/vehicles/5, {
-            // headers: {
-            //     'Authorization': Bearer ${localStorage.getItem('token')},
-            //     "Content-Type": "application/json"
-            // },
-            // })
-            // .then((res) => res.json())
-            // .then((data) => {
-            //     // console.log(data);
-            //     setCarData(data.data)
-            // })
-
-            // fetch(http://localhost:3000/users/${localStorage.getItem('userId')}, {
-            // headers: {
-            //     'Authorization': Bearer ${localStorage.getItem('token')},
-            //     "Content-Type": "application/json"
-            // },
-            // })
-            // .then((res) => res.json())
-            // .then((data) => {
-            //     // console.log(data);
-            //     setUserData(data.data)
-            // })
-
-            // api.fetch('')
-
-
-        } catch (error) {
-            console.log(error)
-        }
-
-        // api.fetch('')
-    }, [])
-
-    if ((carData != undefined && userData != undefined))
-    return (
-        <main>
-
-            <Header/>
-
-            <h1>Olá {userData.person.name}!</h1>
-            <Link href={"/user/vehicle/register"}>Registrar Veículo</Link>
-
-            <section className="mb-1">
-                <h1>Mensagens</h1>
-                <div>
-                    [Insira uma lista de últimos contatos]
-                </div>
-            </section>
-
-            <section className="mb-3">
-                <h1>Veículos</h1>
-                <div>
-                    <VehicleCard raw_data={carData}/>
-                </div>
-            </section>
-
-            <section className="mb-3">
-                <h1>Suas próximas reservas</h1>
-                <div>
-                    [Insira cartões de informações de reservas aqui]
-                </div>
-            </section>
-
-            <section>
-                <h1>Suas reservas anteriores</h1>
-                <div>
-                    [Insira cartões das últimas reservas com possíveis informações sobre avaliações]
-                </div>
-            </section>
-        </main>
-    )
-}
-*/
+function mapBookingCards(d: any) {}

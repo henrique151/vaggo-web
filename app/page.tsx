@@ -1,5 +1,7 @@
 "use client";
-import EntityFrame, { EntityCard } from "@/component/container/EntityCard";
+import EntityFrame, {
+  EntityCard,
+} from "@/component/container/EntityContainer/EntityCard";
 import Header from "@/component/header";
 import SpotCard from "@/component/spot_card";
 import SpotCarousel from "@/component/spot_carousel";

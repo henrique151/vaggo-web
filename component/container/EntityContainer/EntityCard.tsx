@@ -5,76 +5,13 @@ import { Image } from "@/classes/data/Image";
 import Link from "next/link";
 import { useState } from "react";
 
-interface EntityCardProps {
-  children: React.ReactNode;
-  editForm?: React.ReactNode;
-  // data: never;
-}
-
-export default function EntityFrame({
-  children,
-  // data,
-}: EntityCardProps) {
-  return (
-    <section className="border border-gray-200 rounded-2xl p-5 bg-white shadow-sm hover:shadow-md transition">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">{children}</div>
-      </div>
-    </section>
-  );
-}
-
-type DefaultEntityFrameProps = {
+type componentProps = {
   title: string;
   description: string;
-  tagList?: string[];
+  redirectTo?: string;
+  image?: Image;
+  children?: React.ReactNode;
 };
-export function DefaultEntityFrame({
-  title,
-  description,
-  tagList,
-}: DefaultEntityFrameProps) {
-  return (
-    <>
-      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-
-      <p className="text-sm text-gray-500 mt-1">{description}</p>
-
-      <div className="flex gap-2 mt-3 flex-wrap">
-        {tagList?.map((tag) => {
-          return <Tag key={tag}>{tag}</Tag>;
-        })}
-      </div>
-    </>
-  );
-}
-
-export function EditableEntityFrame({
-  children,
-  editForm,
-  // data,
-}: EntityCardProps) {
-  const [showEntityEditForm, setShowEntityForm] = useState(editForm);
-
-  return (
-    <section className="border border-gray-200 rounded-2xl p-5 bg-white shadow-sm hover:shadow-md transition">
-      <div className="flex items-start justify-between gap-4">
-        {/*<Context.Provider value={data}>*/}
-        <div className="flex-1">{children}</div>
-        {/*</Context.Provider>*/}
-
-        {editForm ? (
-          // insert expression to popup editForm's window (possibly only accepts <FormCard>?)
-          <button className="px-4 py-2 rounded-xl text-sm font-medium bg-gray-900 text-white hover:bg-black transition shrink-0">
-            Editar
-          </button>
-        ) : null}
-
-        {showEntityEditForm ? <>{editForm}</> : null}
-      </div>
-    </section>
-  );
-}
 
 export function EntityCard({
   title,
@@ -82,56 +19,58 @@ export function EntityCard({
   redirectTo,
   image,
   children,
-}: {
-  title: string;
-  description: string;
-  redirectTo: string;
-  image?: Image;
-  children?: React.ReactNode;
-}) {
-  // console.log(spot.images);
+}: componentProps) {
+  const titleFragment = (
+    <h3
+      className="
+    font-semibold
+    text-lg
+    text-gray-900
+    hover:text-black
+    transition
+  "
+    >
+      {title}
+    </h3>
+  );
+
   return (
     <div
       className="
-      w-[260px]
+      w-65
       bg-white
       border border-gray-200
       rounded-2xl
       shadow-sm
-      overflow-hidden
       hover:shadow-md
       transition
     "
+      // overflow-hidden # this one keeps messy
     >
-      {/* Imagem */}
-      <div className="w-full h-[160px] overflow-hidden">
-        {/* TODO change to <Image> and add conditionals */}
-        <img
-          src={`${image.url}`}
-          alt={"Card name"}
-          className="
+      {/*Imagem */}
+      {image ? (
+        <div className="w-full h-[160px] overflow-hidden">
+          {/* TODO change to <Image> */}
+          <img
+            src={`${image.url}`}
+            // src={`/`}
+            alt={"Card name"}
+            className="
             w-full h-full object-cover
             hover:scale-105
             transition duration-300
           "
-        />
-      </div>
+          />
+        </div>
+      ) : null}
 
       {/* Conteúdo */}
       <div className="p-4">
-        <Link href={`${redirectTo}`}>
-          <h3
-            className="
-            font-semibold
-            text-lg
-            text-gray-900
-            hover:text-black
-            transition
-          "
-          >
-            {title}
-          </h3>
-        </Link>
+        {redirectTo ? (
+          <Link href={`${redirectTo}`}>{titleFragment}</Link>
+        ) : (
+          titleFragment
+        )}
 
         <p className="text-sm text-gray-500 mt-1">{description}</p>
 
@@ -340,19 +279,3 @@ export function EntityCard({
 //     </>
 //   )
 // }
-
-function Tag({ children }: { children: React.ReactNode }) {
-  return (
-    <span
-      className="
-        px-3 py-1
-        rounded-full
-        text-xs
-        bg-gray-100
-        text-gray-700
-      "
-    >
-      {children}
-    </span>
-  );
-}
