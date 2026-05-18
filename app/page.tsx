@@ -1,19 +1,10 @@
 "use client";
-import EntityFrame, {
-  EntityCard,
-} from "@/component/container/EntityContainer/EntityCard";
+import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 import Header from "@/component/header";
-import SpotCard from "@/component/spot_card";
-import SpotCarousel from "@/component/spot_carousel";
-// import {
-//   PropertyDAO,
-//   PropertySearchResult,
-//   // SearchResult,
-//   // useSearchProperties,
-// } from "@/entity/property";
 import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
 import { SearchResult } from "@/classes/SearchResult";
 import { useEffect, useState } from "react";
+import CarouselContainer from "@/component/container/CarouselContainer";
 
 export default function Home() {
   const [currentLocationSpotsResult, currentLocationSpotsLoading] =
@@ -21,11 +12,11 @@ export default function Home() {
   const [lastBookingLocationSpotsResult, lastBookingLocationSpotsLoading] =
     useSearchProperties({ address: "São Paulo" });
 
-  const [currentLocationCards, setCurrentLocationCards] = useState<
-    (typeof SpotCard)[]
-  >([]);
+  const [currentLocationCards, setCurrentLocationCards] = useState<Element[]>(
+    [],
+  );
   const [lastBookingLocationCards, setLastBookingLocationCards] = useState<
-    (typeof SpotCard)[]
+    Element[]
   >([]);
 
   // useEffect(() => {
@@ -91,22 +82,27 @@ export default function Home() {
       <section className="section-default">
         <div className="container-default mt-6">
           <div className="rounded-2xl shadow-sm p-6">
-            <SpotCarousel
+            <CarouselContainer
               title="Pontos de interesse com base na sua localização"
-              spotCards={currentLocationCards}
+              cards={currentLocationCards}
             />
 
             <div className="h-16"></div>
 
-            <SpotCarousel
+            <CarouselContainer
               title="Pontos de interesse com reservas anteriores"
-              spotCards={lastBookingLocationCards}
+              cards={lastBookingLocationCards}
             />
 
             <div className="h-12"></div>
           </div>
         </div>
       </section>
+      <div className="h-12"></div>
+
+      {/*<div className="border-b-4 p-4">*/}
+      {/*Your content with a bottom border shadow*/}
+      {/*</div>*/}
     </main>
   );
 }

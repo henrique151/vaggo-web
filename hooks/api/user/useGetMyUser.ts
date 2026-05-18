@@ -2,10 +2,7 @@ import { useState } from "react";
 import { useApi } from "../useApi";
 import User from "@/classes/user";
 import { Image } from "@/classes/data/Image";
-
-type stateProps = {
-  id: number;
-};
+import { getToken } from "@/services/user.service";
 
 type stateReturnProps = [
   user: User | undefined,
@@ -13,10 +10,10 @@ type stateReturnProps = [
   success: boolean,
 ];
 
-export function useGetUserById({ id }: stateProps): stateReturnProps {
-  // console.log(id);
+export function useGetMyUser(): stateReturnProps {
+  const token = getToken();
   const [data, success] = useApi({
-    uri: `users/${id}`,
+    uri: `users/${token?.id}`,
     dataOnly: true,
     useToken: true,
     req: { method: "GET" },

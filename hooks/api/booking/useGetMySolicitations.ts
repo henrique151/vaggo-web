@@ -3,7 +3,9 @@ import { useApi } from "../useApi";
 import { useGetUserById } from "../user/useGetUserById";
 import { useEffect, useState } from "react";
 import { map } from "@/mappers/booking.mapper";
-import { useUserToken } from "../user/useUserToken";
+// import { useUserToken } from "../user/useUserToken";
+import { getToken } from "@/services/user.service";
+import { useGetMyUser } from "../user/useGetMyUser";
 
 type stateReturnProps = [
   solicitations: Booking[] | undefined,
@@ -12,7 +14,7 @@ type stateReturnProps = [
 
 // export function useFetchPropertySolicitations(): stateReturnProps {
 export function useGetMySolicitations(): stateReturnProps {
-  const [token] = useUserToken();
+  const token = getToken();
   const [data, dataLoading] = useApi({
     uri: `reservations/owner`,
     dataOnly: true,
@@ -20,9 +22,7 @@ export function useGetMySolicitations(): stateReturnProps {
     req: { method: "GET" },
   });
   // TODO investigate this line and delete if being unused
-  const [user, userLoading] = useGetUserById({
-    id: Number(token?.id),
-  });
+  const [user, userLoading] = useGetMyUser();
 
   const [loading, setLoading] = useState(true);
   const [solicitations, setSolicitations] = useState<Booking[] | undefined>(

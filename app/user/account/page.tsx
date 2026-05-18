@@ -21,7 +21,7 @@ import * as api from "@/app/api";
 
 import FormCard from "@/component/form_card";
 import { useGetUserById } from "@/hooks/api/user/useGetUserById";
-import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetUserVehicles";
+import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetMyrVehicles";
 import { useGetMyProperties } from "@/hooks/api/property/useGetMyProperties";
 
 // import { User, UserDAO } from "@/entity/user";

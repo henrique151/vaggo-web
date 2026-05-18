@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useApi } from "@/hooks/api/useApi";
 import { useAuthenticateUser } from "@/hooks/api/user/useAuthenticateUser";
+import { authenticate } from "@/services/user.service";
 // import { UserDAO } from "@/entity/user";
 
 export default function Page() {
@@ -33,23 +34,32 @@ export default function Page() {
   //   }
   // };
 
-  const handleSubmission = (e: any) => {
+  const handleSubmission = async (e: any) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
+    const res = await authenticate({
+      email: (formData.get("email") as string) || "",
+      password: (formData.get("password") as string) || "",
+    });
 
-    setRequest(Object.fromEntries(formData));
+    if (res) {
+      localStorage.setItem("token", JSON.stringify(res));
+      router.push("/user/dashboard");
+    }
+
+    // setRequest(Object.fromEntries(formData));
   };
 
-  useEffect(() => {
-    if (data) {
-      console.log(data);
-      localStorage.setItem("token", JSON.stringify(data));
-      router.push("/user/dashboard");
-    } else {
-      console.log("data not loaded into api yet!");
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data) {
+  //     console.log(data);
+  //     localStorage.setItem("token", JSON.stringify(data));
+  //     router.push("/user/dashboard");
+  //   } else {
+  //     console.log("data not loaded into api yet!");
+  //   }
+  // }, [data]);
 
   return (
     <main className="flex flex-col min-h-screen">

@@ -8,6 +8,7 @@ start.sh
 notes.txt
 README_OLD.md
 /old_node_modules
+/.zed
 
 # dependencies
 /node_modules

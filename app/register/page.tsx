@@ -1,9 +1,10 @@
 "use client";
 import FormCard, { GenericFormLayout } from "@/component/form_card";
 import Header from "@/component/header";
-import RegisterCard from "@/component/register_card";
-import { UserDAO } from "@/entity/user";
-import { The_Nautigal } from "next/font/google";
+import { authenticate, register } from "@/services/user.service";
+// import RegisterCard from "@/component/register_card";
+// import { UserDAO } from "@/entity/user";
+// import { The_Nautigal } from "next/font/google";
 import Link from "next/link";
 // import Image from "next/image";
 import { useRouter, redirect } from "next/navigation";
@@ -15,7 +16,7 @@ export default function Page() {
   //  - credentials inserted will be validated and see if email and pass matches from api call
   //  - if approved, insert credentials as cookies or somewhere safe, like a token or smth
   //  - make user credential validation function on controller or model side, idk where tf this stays at i forgor
-  // const router = useRouter()
+  const router = useRouter();
 
   const [user, setUser] = useState(null);
 
@@ -39,78 +40,26 @@ export default function Page() {
     };
 
     // console.log(values);
-    // let result
-    // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzc0NjYxNTkzLCJleHAiOjE3NzQ2NjUxOTN9.Qd96mltdnSXA9XMGYfawBO3GN3dvloZIJe53jcWXcW4"
 
     delete values.passConfirm;
 
-    // console.log(formData);
-    const res = await UserDAO.register(values);
+    const res = await register(values);
+    console.log("result from register");
     console.log(res);
 
-    // TODO change here when UserDAO adapts to api.call()
-    if (res.email) {
-      //success
-      const resLogin = (await UserDAO.authenticate(
-        values.email,
-        values.password,
-      )) as { token: string; user: { id: string } };
+    if (res.data.email) {
+      const resLogin = await authenticate({
+        email: values.email,
+        password: values.password,
+      });
 
       if (resLogin) {
         console.log("you are in!");
         console.log(resLogin);
-        localStorage.setItem("token", resLogin.token);
-        localStorage.setItem("userId", resLogin.user.id);
-        // TODO push user to dashboard
+        localStorage.setItem("token", JSON.stringify(resLogin));
+        router.push("/user/dashboard");
       }
     }
-
-    // fetch("http://localhost:3000/users", {
-    //   headers: {
-    //     // 'Authorization': `Bearer ${token}`,
-    //     "Content-Type": "application/json",
-    //   },
-    //   method: "POST",
-    //   body: JSON.stringify(values),
-    // })
-    //   .then((res) => res.json())
-    //   .then((data) => setUser(data))
-    //   .then(() => {
-    //     let loginData = {
-    //       email: values.email,
-    //       password: values.password,
-    //       // name: values.name,
-    //       // cpf: values.cpf,
-    //       // gender: values.gender,
-    //       // phone: values.phone,
-    //       // birthDate: values.birthDate
-    //     };
-    //     console.log(`para login: ${JSON.stringify(loginData)}`);
-
-    //     fetch("http://localhost:3000/users/login", {
-    //       headers: {
-    //         // 'Authorization': `Bearer ${token}`,
-    //         "Content-Type": "application/json",
-    //       },
-    //       method: "POST",
-    //       body: JSON.stringify(loginData),
-    //     })
-    //       .then((res) => res.json())
-    //       .then((data) => {
-    //         localStorage.setItem("token", data.data.token);
-    //         localStorage.setItem("userId", data.data.user.id);
-    //       });
-    //   });
-
-    // se resposta da api for 200, loga o usuário com a senha criada pelo forms e leva o usuário para a página dashboard
-    // console.log(user)
-
-    // transformar dados registro em JSON
-
-    // enviar JSON pra API ->
-    // <- API envia mensagem 200 (message: true, new_id: token)
-
-    // router.push('/user/dashboard')
   };
   return (
     <main className="min-h-screen bg-gray-50">

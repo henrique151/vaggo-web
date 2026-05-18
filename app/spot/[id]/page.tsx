@@ -16,17 +16,25 @@ import GenericWindow from "@/component/GenericWindow";
 // import { Vehicle, VehicleDAO } from "@/entity/vehicle";
 // import { BookingDAO } from "@/entity/booking";
 import DatePeriod from "@/classes/data/DatePeriod";
-import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetUserVehicles";
-import { useApi } from "@/hooks/api/useApi";
+import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetMyrVehicles";
+// import { useApi } from "@/hooks/api/useApi";
+import { bookSpot } from "@/services/booking.service";
+import { Spot } from "@/classes/spot";
+import { getSpotsByPropertyId } from "@/services/spot.service";
+import Property from "@/classes/property";
+import { Vehicle } from "@/classes/vehicle";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Page({ params }: any) {
-  params = useParams();
+  params = useParams() as unknown as { id: number };
+
+  const [spots, setSpots] = useState<Spot[]>([]);
+  const [showWindow, setShowWindow] = useState(false);
+
   const [property, propertyLoading] = useGetPropertyById({
-    id: Number(params.id),
+    id: params.id,
     withSpots: true,
   }); //TODO REPLACE WITH TYPES
-  const [spots, setSpots] = useState<Spot[]>();
-  const [showWindow, setShowWindow] = useState(false);
   const [vehicles, setVehicles] = useGetMyVehicles();
 
   const [showSpotsWindow, setShowSpotsWindow] = useState(false);
@@ -38,26 +46,33 @@ export default function Page({ params }: any) {
   const [bookingStatus, setBookingStatus] = useState(false);
   const [bookingStatusWindow, setBookingStatusWindow] = useState(false);
 
+  console.log(property);
+
   useEffect(() => {
-    if (selectedSpot != -1 && selectedVehicle != -1) {
-      const [data, loaded] = useApi({});
-      console.log("now you can call the api for that!");
-    }
-  }, [selectedSpot, selectedVehicle]);
+    const load = async () => {
+      setSpots(await getSpotsByPropertyId(params.id));
+    };
+    load();
+  }, []);
 
   const handleReserve = async (spotId: number, vehicleId: number) => {
-    const datePeriod: DatePeriod = {
-      start: new Date("2026-01-01"),
-      end: new Date("2026-12-31"),
-    };
+    const datePeriod = new DatePeriod(
+      new Date(2026, 0, 1),
+      new Date(2026, 11, 31),
+    );
 
-    setSelectedVehicle(vehicleId);
+    // setSelectedVehicle(vehicleId);
 
     // const res = await BookingDAO.reserve(selectedSpot, vehicleId, datePeriod);
-    const res = true;
+    const res = await bookSpot({
+      id: spotId,
+      vehicleId: vehicleId,
+      datePeriod: datePeriod,
+    });
+    // const res = true;
 
     console.log(
-      `you selected spot number ${selectedSpot} to use with car ${selectedVehicle}`,
+      `you selected spot number ${spotId} to use with car ${vehicleId}`,
     );
 
     console.log(res);
@@ -65,6 +80,9 @@ export default function Page({ params }: any) {
     if (res) {
       console.log("success!");
       setBookingStatus(true);
+
+      setSpots(await getSpotsByPropertyId(Number(params.id)));
+      // console.log(document.getElementById(`available_spot_${spotId}`));
     } else {
       setBookingStatus(false);
     }
@@ -151,11 +169,20 @@ export default function Page({ params }: any) {
           exitButton={true}
           onExit={onExit}
         >
-          {property.spots!.map((spot: Spot) => {
-            if (spot.status != "INDISPONIVEL" && spot.status != "OCUPADA") {
-              return <SpotAvailabilityCard key={spot.id} spot={spot} />;
-            }
-          })}
+          {/* TODO insert scroll here */}
+          <section className="overflow-y-scroll scroll-smooth h-64">
+            {spots.map((spot: Spot) => {
+              // TODO change to EntityFrame
+              if (spot.status != "INDISPONIVEL" && spot.status != "OCUPADA") {
+                return (
+                  <SpotAvailabilityCard
+                    key={`available_spot_${spot.id}`}
+                    spot={spot}
+                  />
+                );
+              }
+            })}
+          </section>
         </GenericWindow>
       </>
     );
@@ -258,19 +285,20 @@ export default function Page({ params }: any) {
   return (
     <main>
       <Header />
-
       <section className="m-10 flex flex-row">
         <section className="bg-white w-full rounded-3xl border border-gray-200 shadow-sm p-8 flex flex-row">
           <h2 className="text-2xl w-1/2  mb-6 mr-6">
-            <Image
-              width={128}
-              height={128}
-              src={`${property.images[0].url || ""}`}
-              alt={"test"}
-              className="
+            {property?.images[0] ? (
+              <Image
+                width={128}
+                height={128}
+                src={`${property.images[0]}`}
+                alt={"Imagem da Propriedade"}
+                className="
                   w-full h-full object-cover
               "
-            />
+              />
+            ) : null}
           </h2>
 
           <div className="flex w-1/2 flex-col items-end">

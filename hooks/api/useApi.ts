@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useUserToken } from "./user/useUserToken";
+// import { useUserToken } from "./user/useUserToken";
 import request from "@/services/api.service";
 
 const API_ADDRESS = "http://localhost:3000";
@@ -24,29 +24,32 @@ export function useApi({
   const [success, setSuccess] = useState(false);
   const [loaded, setLoaded] = useState(false);
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [token, tokenLoaded] = useToken ? useUserToken() : [null, false];
+  // const [token, tokenLoaded] = useToken ? useUserToken() : [null, false];
 
   useEffect(() => {
     const fetchData = async () => {
       // if (!loaded) {
-      if (useToken && token) {
-        //check token's expiration date
-        // if still valid, proceed with operation
-        // else, throws error or redirects user automatically to login page
-
-        const apiHeader: HeadersInit = {
-          Authorization: `Bearer ${token.token}`,
-        };
-        req.headers = Object.assign(apiHeader, req.headers);
-      } else if (useToken && !token) {
-        return null;
-      }
+      // if (useToken && token) {
+      // //check token's expiration date
+      // // if still valid, proceed with operation
+      // // else, throws error or redirects user automatically to login page
+      // const apiHeader: HeadersInit = {
+      //   Authorization: `Bearer ${token.token}`,
+      // };
+      // req.headers = Object.assign(apiHeader, req.headers);
+      // } else if (useToken && !token) {
+      // return null;
+      // }
 
       console.log(
         "Fetch is below this logging. If is appearing many times, it means api is being called alot",
       );
       console.log(req);
-      const res = await request(`${API_ADDRESS}/${uri}`, req);
+      const res = await request({
+        url: uri || "",
+        useToken: useToken,
+        req: req,
+      });
 
       setSuccess(res.ok);
 
@@ -54,6 +57,7 @@ export function useApi({
 
       if (dataOnly && data) {
         console.log("data from api");
+        console.log(`url: ${uri}`);
         console.log(data);
         setData(data.data);
       } else {
@@ -86,7 +90,7 @@ export function useApi({
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uri, data, loaded, token]);
+  }, [uri, data, loaded]);
 
   return [data, loaded, success];
 }
