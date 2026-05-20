@@ -2,6 +2,8 @@
 
 # remove later
 /public/icons
+/_entity
+/_interface
 
 #development project files
 start.sh
