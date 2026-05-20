@@ -1,23 +1,28 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import SpotCard from './spot_card'
-import * as api from '@/app/api'
-import { PropertyResponse } from 'interface://api/property'
-import { ParkingSpotResponse } from '@/interface/api/spot'
-import { DataResponse } from '@/interface/api/api'
+import { useEffect, useState } from "react";
+import SpotCard from "./spot_card";
+// import * as api from "@/app/api";
+// import { PropertyResponse } from "interface://api/property";
+// import { ParkingSpotResponse } from "@/interface/api/spot";
+// import { DataResponse } from "@/interface/api/api";
 
 interface SpotCarouselProps {
-  title: string
+  title: string;
+  // children: React.ReactNode;
+  spotCards: (typeof SpotCard)[];
 }
 
-export default function SpotCarousel({ title }: SpotCarouselProps) {
-  const [index, setIndex] = useState(0)
-  const [spots, setSpots] = useState<any>([])
+export default function SpotCarousel({
+  title,
+  spotCards = [],
+}: SpotCarouselProps) {
+  const [index, setIndex] = useState(0);
+  // const [spots, setSpots] = useState<(typeof SpotCard)[]>([]);
 
-  const CARD_WIDTH = 260
-  const GAP = 12
-  const STEP = CARD_WIDTH + GAP
+  const CARD_WIDTH = 260;
+  const GAP = 12;
+  const STEP = CARD_WIDTH + GAP;
 
   // const spots_decoy = [
   //   { id: 1, name: "Shopping Interlagos", time: "Seg-Sex • 10h às 18h", price: "R$ 120 / diária" },
@@ -27,135 +32,131 @@ export default function SpotCarousel({ title }: SpotCarouselProps) {
   //   { id: 5, name: "Royal Parking", time: "Seg-Dom • 6h às 22h", price: "R$ 110 / diária" }
   // ]
 
-  const spotsTest = []
+  // const spotsTest = [];
 
-  useEffect(() => {
-    const query = async () => {
-      const data = await api.call("properties", true, {dataOnly: true}) as PropertyResponse[]
-      console.log(data)
-      
-      
-      if (!data) return null
-      
-      var spots:any = []
-      
-      for (const property of data) {
-        let currentProperty = {
-          id: property.id,
-          name: property.name,
-          time: "",
-          price: ""
-        }
+  // useEffect(() => {
+  //   const query = async () => {
+  //     const data = (await api.call("properties", true, {
+  //       dataOnly: true,
+  //     })) as PropertyResponse[];
+  //     console.log(data);
 
-        api.call(`spots/properties/${currentProperty.id}/spots`, true, {dataOnly: true})
-        .then((data:any) => {
-          if (data) {
-            let spots : ParkingSpotResponse[] = data 
-            
-            var availableTimeList:string[] = []
-            
-            var timeMap:any = {
-              "segunda_a_sexta" : "Seg-Sex ",
-              "sabado" : "Sábado ",
-              "domingo" : "Domingo",
-            }
+  //     if (!data) return null;
 
-            for (const spot of spots) {
+  //     var spots: any = [];
 
-              console.log(spot)
-              for (const time of Object.keys(spot.operatingHours)) {
-                if (time in timeMap && !availableTimeList.includes(time)) {
-                  availableTimeList.push(time)
-                  currentProperty.time += timeMap[time]
-                }
+  //     for (const property of data) {
+  //       let currentProperty = {
+  //         id: property.id,
+  //         name: property.name,
+  //         time: "",
+  //         price: "",
+  //       };
 
-              }
+  //       api
+  //         .call(`spots/properties/${currentProperty.id}/spots`, true, {
+  //           dataOnly: true,
+  //         })
+  //         .then((data: any) => {
+  //           if (data) {
+  //             let spots: ParkingSpotResponse[] = data;
 
-              // console.log(availableTime)
-            }
-          }
-        })
+  //             var availableTimeList: string[] = [];
 
-        currentProperty.price = "R$0 / Reserva"
-        spots.push(currentProperty)
-      }
+  //             var timeMap: any = {
+  //               segunda_a_sexta: "Seg-Sex ",
+  //               sabado: "Sábado ",
+  //               domingo: "Domingo",
+  //             };
 
-      console.log(spots)
+  //             for (const spot of spots) {
+  //               console.log(spot);
+  //               for (const time of Object.keys(spot.operatingHours)) {
+  //                 if (time in timeMap && !availableTimeList.includes(time)) {
+  //                   availableTimeList.push(time);
+  //                   currentProperty.time += timeMap[time];
+  //                 }
+  //               }
 
-      setSpots(spots)
+  //               // console.log(availableTime)
+  //             }
+  //           }
+  //         });
 
-      // const test = data.map((property) => {
-      //   let currentProperty = {
-      //     id: property.id,
-      //     name: property.name,
-      //     time: "",
-      //     price: ""
-      //   }
+  //       currentProperty.price = "R$0 / Reserva";
+  //       spots.push(currentProperty);
+  //     }
 
-      //   // var availableTime = ""
-      //   var availablePrice = "R$0 / Reserva"
+  //     console.log(spots);
 
-      //   api.call(`spots/properties/${currentProperty.id}/spots`, true, {dataOnly: true})
-      //   .then((data:any) => {
-      //     if (data) {
-      //       let spots : ParkingSpotResponse[] = data 
-            
-      //       var availableTimeList:string[] = []
-            
-      //       var timeMap:any = {
-      //         "segunda_a_sexta" : "Seg-Sex ",
-      //         "sabado" : "Sábado ",
-      //         "domingo" : "Domingo",
-      //       }
+  //     setSpots(spots);
 
-      //       for (const spot of spots) {
+  //     // const test = data.map((property) => {
+  //     //   let currentProperty = {
+  //     //     id: property.id,
+  //     //     name: property.name,
+  //     //     time: "",
+  //     //     price: ""
+  //     //   }
 
-      //         console.log(spot)
-      //         for (const time of Object.keys(spot.operatingHours)) {
-      //           if (time in timeMap && !availableTimeList.includes(time)) {
-      //             availableTimeList.push(time)
-      //             currentProperty.time += timeMap[time]
-      //           }
+  //     //   // var availableTime = ""
+  //     //   var availablePrice = "R$0 / Reserva"
 
-      //         }
+  //     //   api.call(`spots/properties/${currentProperty.id}/spots`, true, {dataOnly: true})
+  //     //   .then((data:any) => {
+  //     //     if (data) {
+  //     //       let spots : ParkingSpotResponse[] = data
 
-      //         // console.log(availableTime)
-      //       }
-      //     }
-      //   })
+  //     //       var availableTimeList:string[] = []
 
-      //   // console.log("sdijasd" + availableTimeList)
+  //     //       var timeMap:any = {
+  //     //         "segunda_a_sexta" : "Seg-Sex ",
+  //     //         "sabado" : "Sábado ",
+  //     //         "domingo" : "Domingo",
+  //     //       }
 
+  //     //       for (const spot of spots) {
 
-      //   // currentProperty.time = availableTime
-      //   currentProperty.price = availablePrice
-      //   return currentProperty
-      // })
-      // console.log(test)
-      // setSpots(test)
-    };
-    query()
-  }, [])
+  //     //         console.log(spot)
+  //     //         for (const time of Object.keys(spot.operatingHours)) {
+  //     //           if (time in timeMap && !availableTimeList.includes(time)) {
+  //     //             availableTimeList.push(time)
+  //     //             currentProperty.time += timeMap[time]
+  //     //           }
 
-  const visibleCards = 3
-  const maxIndex = spots.length - visibleCards
+  //     //         }
 
-  const next = () => index < maxIndex && setIndex(index + 1)
-  const prev = () => index > 0 && setIndex(index - 1)
+  //     //         // console.log(availableTime)
+  //     //       }
+  //     //     }
+  //     //   })
+
+  //     //   // console.log("sdijasd" + availableTimeList)
+
+  //     //   // currentProperty.time = availableTime
+  //     //   currentProperty.price = availablePrice
+  //     //   return currentProperty
+  //     // })
+  //     // console.log(test)
+  //     // setSpots(test)
+  //   };
+  //   query();
+  // }, []);
+
+  const visibleCards = 3;
+  const maxIndex = spotCards.length - visibleCards;
+
+  const next = () => index < maxIndex && setIndex(index + 1);
+  const prev = () => index > 0 && setIndex(index - 1);
 
   // if (!spots) return <></>
   return (
     <section className="w-full">
-
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-
-        <h2 className="text-2xl font-semibold text-gray-900">
-          {title}
-        </h2>
+        <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
 
         <div className="flex gap-2">
-
           <button
             onClick={prev}
             disabled={index === 0}
@@ -187,7 +188,6 @@ export default function SpotCarousel({ title }: SpotCarouselProps) {
           >
             ›
           </button>
-
         </div>
       </div>
 
@@ -196,17 +196,20 @@ export default function SpotCarousel({ title }: SpotCarouselProps) {
         <div
           className="flex gap-3 transition-transform duration-300"
           style={{
-            transform: `translateX(-${index * STEP}px)`
+            transform: `translateX(-${index * STEP}px)`,
           }}
         >
-          {spots.map((spot:any) => (
+          {spotCards.map((spot) => {
+            return <>{spot}</>;
+          })}
+          {/*{spotCards}*/}
+          {/*{spots.map((spot: any) => (
             <div key={spot.id} className="min-w-[260px]">
               <SpotCard spot={spot} />
             </div>
-          ))}
+          ))}*/}
         </div>
       </div>
-
     </section>
-  )
+  );
 }

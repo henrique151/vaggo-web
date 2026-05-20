@@ -1,52 +1,59 @@
 // app/account/page.tsx
-'use client'
+"use client";
 
-import Header from "@/component/header"
-import { useEffect, useState } from "react"
-import Link from "next/link"
+import Header from "@/component/header";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
-import TabContainer from "@/component/container/TabContainer/tabContainer"
-import TabPage from "@/component/container/TabContainer/tabPage"
-import TabSidebar from "@/component/container/TabContainer/tabSidebar"
+import TabContainer from "@/component/container/TabContainer/tabContainer";
+import TabPage from "@/component/container/TabContainer/tabPage";
+import TabSidebar from "@/component/container/TabContainer/tabSidebar";
 
-import EntityCard from "@/component/entity_card"
-import EditCard from "@/component/edit_card"
+import EntityCard from "@/component/entity_card";
+import EditCard from "@/component/edit_card";
 
-import { UserResponse } from "@/interface/api/user"
-import { PropertyResponse } from "@/interface/api/property"
-import { ParkingSpotResponse } from "@/interface/api/spot"
+// import { UserResponse } from "@/interface/api/user";
+// import { PropertyResponse } from "@/interface/api/property";
+// import { ParkingSpotResponse } from "@/interface/api/spot";
 
-import * as api from "@/app/api"
-import { VehicleResponse } from "@/interface/api/vehicle"
+import * as api from "@/app/api";
+// import { VehicleResponse } from "@/interface/api/vehicle";
 
+import FormCard from "@/component/form_card";
+import { useGetUserById } from "@/hooks/api/user/useGetUserById";
+import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetMyrVehicles";
+import { useGetMyProperties } from "@/hooks/api/property/useGetMyProperties";
 
-function ProfileItem({
-  label,
-  value
-}: {
-  label: string
-  value: string
-}) {
+// import { User, UserDAO } from "@/entity/user";
+// import { Vehicle, VehicleDAO } from "@/entity/vehicle";
+// import Property, { PropertyDAO } from "@/entity/property";
+// import { Spot } from "@/entity/spot";
+
+function ProfileItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="border border-gray-200 rounded-2xl p-4 bg-white">
-      <p className="text-sm text-gray-500 mb-1">
-        {label}
-      </p>
+      <p className="text-sm text-gray-500 mb-1">{label}</p>
 
-      <p className="font-medium text-gray-900">
-        {value}
-      </p>
+      <p className="font-medium text-gray-900">{value}</p>
     </div>
-  )
+  );
 }
 
 export default function Page() {
-  const [activeTab, setActiveTab] = useState("Perfil")
-  const [isEditing, setIsEditing] = useState(false)
-  const [user, setUser] = useState<UserResponse | undefined>(undefined)
-  const [vehicles, setVehicles] = useState<VehicleResponse[] | undefined>(undefined)
-  const [properties, setProperties] = useState<PropertyResponse[] | undefined>(undefined)
-  const [spots, setSpots] = useState<ParkingSpotResponse[] | undefined>(undefined)
+  const [activeTab, setActiveTab] = useState("Perfil");
+  const [isEditing, setIsEditing] = useState(false);
+  // const [user, setUser] = useState<User | undefined>(undefined);
+  // const [vehicles, setVehicles] = useState<Vehicle[] | []>([]);
+  // const [properties, setProperties] = useState<Property[] | undefined>(
+  //   undefined,
+  // );
+  // const [spots, setSpots] = useState<Spot | undefined>(undefined);
+  const [user, setUser] = useGetUserById({
+    id: Number(localStorage.getItem("userId")),
+  });
+  const [vehicles, setVehicles] = useGetMyVehicles();
+  const [properties, setProperties] = useGetMyProperties();
+  const [spots, setSpots] = useGetMyProperties();
 
   // const user = {
   //   email: "galvian@email.com",
@@ -60,46 +67,58 @@ export default function Page() {
   //   }
   // }
 
-  useEffect(
-    () => {
-      const query = async () => {
-        const userData = await api.call(`users/${localStorage.getItem("userId")}`, true, { dataOnly: true })
-        setUser(userData as UserResponse)
+  // useEffect(() => {
+  //   const query = async () => {
+  //     const userData = await UserDAO.get(localStorage.getItem("userId")!);
+  //     // const userData = await api.call(
+  //     //   `users/${localStorage.getItem("userId")}`,
+  //     //   true,
+  //     //   { dataOnly: true },
+  //     // );
+  //     setUser(userData);
 
-        const vehicleData = await api.call(`vehicles/my-vehicles`, true, { dataOnly: true })
-        setVehicles(vehicleData as VehicleResponse[])
+  //     // const vehicleData = await api.call(`vehicles/my-vehicles`, true, {
+  //     // dataOnly: true,
+  //     // });
+  //     const vehicleData = await VehicleDAO.getFromUser();
+  //     setVehicles(vehicleData);
 
-        const propertyData = await api.call(`properties/my-properties`, true, { dataOnly: true })
-        setProperties(propertyData as PropertyResponse[])
-        
-        const spotData = await api.call(`properties/my-properties`, true, { dataOnly: true })
-        setSpots(spotData as ParkingSpotResponse[])
-      }
-      query()
-    }
-    , [])
+  //     // const propertyData = await api.call(`properties/my-properties`, true, {
+  //     //   dataOnly: true,
+  //     // });
+  //     const propertyData = await PropertyDAO.getFromUser();
+  //     setProperties(propertyData ? propertyData : []);
 
-  if (!user) return (<></>)
-  if (!vehicles) return (<></>)
-  if (!properties) return (<></>)
-  if (!spots) return (<></>)
+  //     // TODO check API's response on spot data. change if necessary
+  //     const spotData = await api.call(`properties/my-properties`, true, {
+  //       dataOnly: true,
+  //     });
+  //     setSpots(spotData);
+  //   };
+  //   query();
+  // }, []);
+
+  const querySuccess = user && vehicles && properties && spots;
+
+  // if (!user) return <></>;
+  // if (!vehicles) return <></>;
+  // if (!properties) return <></>;
+  // if (!spots) return <></>;
+  if (!querySuccess) return <></>;
   const subPages = {
     Perfil: (
       <TabPage label="Perfil">
-
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">
-            Meu Perfil
-          </h2>
+          <h2 className="text-2xl font-semibold">Meu Perfil</h2>
 
           <div className="flex items-center gap-3">
-
             <span
               className={`
                 px-3 py-1 rounded-full text-xs font-medium
-                ${user.person.isActive
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
+                ${
+                  user.person.isActive
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
                 }
               `}
             >
@@ -122,7 +141,6 @@ export default function Page() {
             >
               Editar
             </button>
-
           </div>
         </div>
 
@@ -137,16 +155,13 @@ export default function Page() {
             value={new Date(user.lastLogin).toLocaleString("pt-BR")}
           />
         </div>
-
       </TabPage>
     ),
 
     Veículos: (
       <TabPage label="Veículos">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">
-            Meus Veículos
-          </h2>
+          <h2 className="text-2xl font-semibold">Meus Veículos</h2>
 
           <Link
             href="/user/vehicle/register"
@@ -157,10 +172,11 @@ export default function Page() {
         </div>
 
         <div className="space-y-4">
-          {
-            vehicles.map(vehicle => {
-              return (<EntityCard
+          {vehicles.map((vehicle) => {
+            return (
+              <EntityCard
                 type="vehicle"
+                key={vehicle.id}
                 editHref="/user/vehicle/register"
                 data={{
                   id: vehicle.id,
@@ -168,12 +184,11 @@ export default function Page() {
                   model: vehicle.model,
                   color: vehicle.color,
                   licensePlate: vehicle.licensePlate,
-                  manufactureYear: vehicle.manufactureYear
+                  manufactureYear: vehicle.manufactureYear,
                 }}
-              />)
-            })
-          }
-
+              />
+            );
+          })}
         </div>
       </TabPage>
     ),
@@ -181,9 +196,7 @@ export default function Page() {
     Propriedades: (
       <TabPage label="Propriedades">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">
-            Minhas Propriedades
-          </h2>
+          <h2 className="text-2xl font-semibold">Minhas Propriedades</h2>
 
           <Link
             href="/property/register"
@@ -194,24 +207,23 @@ export default function Page() {
         </div>
 
         <div className="space-y-4">
-          {
-            properties.map(property => {
-              return (
-                <EntityCard
-                  type="property"
-                  editHref="/property/register"
-                  data={{
-                    id: property.id,
-                    name: property.name,
-                    type: property.type,
-                    description: property.description,
-                    totalCapacity: property.totalCapacity,
-                    zipCode: property.zipCode
-                  }}
-                />
-              )
-            })
-          }
+          {properties.map((property) => {
+            return (
+              <EntityCard
+                key={property.id}
+                type="property"
+                editHref="/property/register"
+                data={{
+                  id: property.id,
+                  name: property.name,
+                  type: property.type,
+                  description: property.description,
+                  totalCapacity: property.totalCapacity,
+                  zipCode: property.zipCode,
+                }}
+              />
+            );
+          })}
         </div>
       </TabPage>
     ),
@@ -219,9 +231,7 @@ export default function Page() {
     Vaga_Placeholder: (
       <TabPage label="Vagas">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">
-            Minhas Vagas
-          </h2>
+          <h2 className="text-2xl font-semibold">Minhas Vagas</h2>
 
           <Link
             href="/spot/register"
@@ -232,26 +242,25 @@ export default function Page() {
         </div>
 
         <div className="space-y-4">
-          {
-            spots.map(spot => {
-              return (
-                <EntityCard
-                  type="spot"
-                  editHref="/spot/register"
-                  data={{
-                    id: spot.id,
-                    size: spot.size,
-                    status: spot.status,
-                    identifier: spot.identifier,
-                    isCovered: spot.isCovered,
-                    approvalStatus: spot.approvalStatus,
-                    allowedVehicles: spot.allowedVehicles,
-                    operatingHours: spot.operatingHours
-                  }}
-                />
-              )
-            })
-          }
+          {spots.map((spot) => {
+            return (
+              <EntityCard
+                type="spot"
+                key={spot.id}
+                editHref="/spot/register"
+                data={{
+                  id: spot.id,
+                  size: spot.size,
+                  status: spot.status,
+                  identifier: spot.identifier,
+                  isCovered: spot.isCovered,
+                  approvalStatus: spot.approvalStatus,
+                  allowedVehicles: spot.allowedVehicles,
+                  operatingHours: spot.operatingHours,
+                }}
+              />
+            );
+          })}
           {/* <EntityCard
             type="spot"
             editHref="/spot/register"
@@ -265,52 +274,38 @@ export default function Page() {
               operatingHours: "08:00 às 22:00"
             }}
           /> */}
-
         </div>
       </TabPage>
     ),
 
     Reservas: (
       <TabPage label="Reservas">
-        <h2 className="text-2xl font-semibold mb-6">
-          Minhas Reservas
-        </h2>
+        <h2 className="text-2xl font-semibold mb-6">Minhas Reservas</h2>
 
         <div className="space-y-4">
           <div className="border border-gray-200 rounded-2xl p-5 bg-white">
-            <h3 className="font-semibold">
-              Shopping Interlagos
-            </h3>
+            <h3 className="font-semibold">Shopping Interlagos</h3>
 
-            <p className="text-gray-500">
-              20/04/2026 • 08:00 às 18:00
-            </p>
+            <p className="text-gray-500">20/04/2026 • 08:00 às 18:00</p>
           </div>
 
           <div className="border border-gray-200 rounded-2xl p-5 bg-white">
-            <h3 className="font-semibold">
-              Aeroporto Congonhas
-            </h3>
+            <h3 className="font-semibold">Aeroporto Congonhas</h3>
 
-            <p className="text-gray-500">
-              25/04/2026 • 06:00 às 23:00
-            </p>
+            <p className="text-gray-500">25/04/2026 • 06:00 às 23:00</p>
           </div>
         </div>
       </TabPage>
     ),
-  }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <Header />
 
       <section className="max-w-7xl mx-auto px-6 py-10">
-
         <div className="mb-8">
-          <h1 className="text-4xl font-semibold text-gray-900">
-            Minha Conta
-          </h1>
+          <h1 className="text-4xl font-semibold text-gray-900">Minha Conta</h1>
 
           <p className="text-gray-500 mt-2">
             Gerencie suas informações e preferências
@@ -318,20 +313,14 @@ export default function Page() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-
           <TabSidebar
             subPages={subPages}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
           />
 
-          <TabContainer
-            subPages={subPages}
-            activeTab={activeTab}
-          />
-
+          <TabContainer subPages={subPages} activeTab={activeTab} />
         </div>
-
       </section>
 
       {/* EDIT DO MODAL */}
@@ -355,32 +344,39 @@ export default function Page() {
                 // cpf: user.person.cpf,
                 phone: user.person.phone,
                 birthDate: user.person.birthDate,
-                email: user.email
+                email: user.email,
               }}
               onSubmit={async (e) => {
-                e.preventDefault()
+                e.preventDefault();
 
-                const formData = new FormData(e.currentTarget)
+                const formData = new FormData(e.currentTarget);
 
-                let updatedUser = {
+                const updatedUser = {
                   name: formData.get("name"),
                   phone: formData.get("phone"),
                   birthDate: formData.get("birthDate"),
-                  email: formData.get("email")
-                }
+                  email: formData.get("email"),
+                };
 
-                const res = await api.call(`users/${localStorage.getItem("userId")}`, true, { body: JSON.stringify(updatedUser), method: "PUT", contentType: "json"})
+                const res = await api.call(
+                  `users/${localStorage.getItem("userId")}`,
+                  true,
+                  {
+                    body: JSON.stringify(updatedUser),
+                    method: "PUT",
+                    contentType: "json",
+                  },
+                );
 
-                console.log(res)
-                console.log(updatedUser)
+                console.log(res);
+                console.log(updatedUser);
 
-                setIsEditing(false)
+                setIsEditing(false);
               }}
             />
           </div>
         </div>
       )}
-
     </main>
-  )
+  );
 }
