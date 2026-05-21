@@ -4,7 +4,7 @@ export default class User {
   public id: number;
   public email: string;
   public password: string;
-  public lastLogin: string;
+  public lastLogin: Date;
   public isBlocked: boolean;
   public isAdmin: boolean;
   public permissionLevel: number;
@@ -17,7 +17,7 @@ export default class User {
     this.id = data.id;
     this.email = data.email;
     this.password = data.password;
-    this.lastLogin = data.lastLogin;
+    this.lastLogin = new Date(data.lastLogin);
     this.isBlocked = data.isBlocked;
     this.isAdmin = data.isAdmin;
     this.permissionLevel = data.permissionLevel;
