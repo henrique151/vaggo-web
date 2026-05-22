@@ -11,6 +11,7 @@ notes.txt
 README_OLD.md
 /old_node_modules
 /.zed
+/.unused
 
 # dependencies
 /node_modules
