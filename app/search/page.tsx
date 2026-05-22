@@ -51,7 +51,7 @@ export default function Home() {
 
   return (
     <main className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
-      <Header showSearch />
+      {/*<Header showSearch />*/}
 
       <section className="section-default">
         <div className="container-default mt-6">

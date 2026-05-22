@@ -4,7 +4,6 @@ import { useState } from "react";
 import SearchBar from "./search_bar";
 import LoginCard from "./login_card";
 import BlurOverlay from "./blur_overlay";
-import * as api from "@/app/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -12,6 +11,7 @@ interface HeaderProps {
   showSearch?: boolean;
 }
 
+// TODO refine website's header
 export default function Header({ showSearch = false }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);

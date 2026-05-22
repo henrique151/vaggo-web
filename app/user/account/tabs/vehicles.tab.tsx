@@ -3,6 +3,8 @@ import TabPage from "@/component/container/TabContainer/TabPage";
 import { usePageContext } from "../page.context";
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 import Link from "next/link";
+import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
+import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
 
 const Page = () => {
   const { vehicles } = usePageContext();
@@ -23,11 +25,19 @@ const Page = () => {
       <div className="space-y-4">
         {vehicles?.map((vehicle) => {
           return (
-            <EntityCard
-              key={vehicle.id}
-              title={`${vehicle.brand} - ${vehicle.model}`}
-              description={""}
-            />
+            <EntityFrame key={vehicle.id}>
+              <DefaultEntityFrame
+                key={vehicle.id}
+                title={`${vehicle.type.toLowerCase().replace(vehicle.type.toLowerCase()[0], vehicle.type[0])} ${vehicle.brand}`}
+                description={`Modelo: ${vehicle.model}`}
+                tagList={[
+                  `Placa: ${vehicle.licensePlate}`,
+                  `Fabricação: ${vehicle.manufactureYear}`,
+                  `Tamanho: ${{ PEQUENO: "Pequeno", MEDIO: "Médio", GRANDE: "Grande" }[vehicle.size]}`,
+                  `Cor: ${vehicle.color}`,
+                ]}
+              />
+            </EntityFrame>
           );
         }) || "Vazio"}
       </div>

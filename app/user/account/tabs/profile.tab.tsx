@@ -2,6 +2,7 @@ import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import { usePageContext } from "../page.context";
 import EntityItem from "@/component/container/EntityContainer/EntityItem";
+import StatusBadge from "@/component/ui/StatusDisplay";
 
 const Page = () => {
   const { user } = usePageContext();
@@ -12,18 +13,12 @@ const Page = () => {
         <h2 className="text-2xl font-semibold">Meu Perfil</h2>
 
         <div className="flex items-center gap-3">
-          <span
-            className={`
-            px-3 py-1 rounded-full text-xs font-medium
-            ${
-              user?.person.isActive
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }
-          `}
-          >
-            {user?.person.isActive ? "Ativo" : "Inativo"}
-          </span>
+          <StatusBadge
+            conditionValue={user?.person.isActive}
+            conditionTable={{ true: "green", false: "red" }}
+            statusLabelTable={{ green: "Ativo", red: "Inativo" }}
+            defaultValue="red"
+          />
 
           <button
             // onClick={() => setIsEditing(true)}

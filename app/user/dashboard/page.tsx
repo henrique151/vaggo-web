@@ -23,6 +23,7 @@ import {
   mapNextBookingCards,
   mapSolicitationFrames as mapSolicitationFrames,
 } from "./components.mapper";
+import PanelLayout from "@/component/layout/PanelLayout";
 
 export default function Page() {
   const [carsData] = useGetMyVehicles();
@@ -57,7 +58,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <Header />
+      {/*<Header />*/}
 
       <section className="max-w-7xl mx-auto px-6 py-10">
         {/* TOPO */}
@@ -80,7 +81,7 @@ export default function Page() {
             </div>
           </div>
 
-          <Link
+          {/*<Link
             href="/user/vehicle/register"
             className="
               px-6 py-4
@@ -94,7 +95,7 @@ export default function Page() {
             "
           >
             Registrar veículo
-          </Link>
+          </Link>*/}
         </div>
 
         {/* GRID */}
@@ -115,6 +116,7 @@ export default function Page() {
             {/* Histórico de Reservas */}
             <PanelContainer title={"Reservas anteriores"}>
               <p>Por enquanto não há reservas no histórico.</p>
+              {/*<PanelLayout>oi!</PanelLayout>*/}
             </PanelContainer>
 
             {/* Solicitações de Reservas */}

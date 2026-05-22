@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useApi } from "@/hooks/api/useApi";
 import { useAuthenticateUser } from "@/hooks/api/user/useAuthenticateUser";
 import { authenticate } from "@/services/user.service";
+import FormItem from "@/component/ui/form/FormItem";
 // import { UserDAO } from "@/entity/user";
 
 export default function Page() {
@@ -63,61 +64,41 @@ export default function Page() {
 
   return (
     <main className="flex flex-col min-h-screen">
-      <Header />
+      {/*<Header />*/}
 
       <div className="flex flex-1 items-center justify-center bg-[var(--background-soft)] px-4">
-        {/* Usando o componente LoginCard */}
-
         <FormCard
           endpoint="users/login"
           useToken={false}
           content="json"
           method="POST"
           onSubmit={handleSubmission}
-          // postSubmit={handleAuthenticate}
         >
           <GenericFormLayout
             title={"Entrar no Vaggo"}
             subtitle={"Acesse sua conta"}
             backlink={""}
           >
-            <div className="flex flex-col gap-1">
-              <label className="text-sm text-gray-600">Email</label>
+            <FormItem
+              type={"email"}
+              label={"Email"}
+              name={"email"}
+              placeholder={"seu@email.com"}
+            />
 
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="seu@email.com"
-                className="
-                  px-4 py-3
-                  rounded-lg
-                  border border-gray-300
-                  bg-white/90
-                  focus:outline-none
-                  focus:ring-2 focus:ring-gray-300
-                "
-              />
-            </div>
+            <FormItem
+              type={"password"}
+              label={"Senha"}
+              name={"password"}
+              placeholder={"••••••••"}
+            />
 
-            <div className="flex flex-col gap-1">
-              <label className="text-sm text-gray-600">Senha</label>
-
-              <input
-                type="password"
-                name="password"
-                required
-                placeholder="••••••••"
-                className="
-                  px-4 py-3
-                  rounded-lg
-                  border border-gray-300
-                  bg-white/90
-                  focus:outline-none
-                  focus:ring-2 focus:ring-gray-300
-                "
-              />
-            </div>
+            {/*<FormItem
+              type={"password"}
+              label={"Senha"}
+              name={"password"}
+              placeholder={"••••••••"}
+            />*/}
 
             <div className="flex justify-between text-sm mt-1">
               <Link href="/register" className="text-gray-600 hover:text-black">
@@ -148,29 +129,6 @@ export default function Page() {
             </button>
           </GenericFormLayout>
         </FormCard>
-
-        {/*<section
-          className={`
-          w-full max-w-sm
-          rounded-2xl
-          px-6 py-8
-          shadow-sm
-          border
-          transition
-
-        `}
-        >*/}
-        {/* Header */}
-        {/*<div className="text-center mb-6">*/}
-        {/*<h1 className="text-2xl font-semibold text-gray-900">*/}
-        {/*Entrar no Vaggo*/}
-        {/*</h1>*/}
-
-        {/*<p className="text-gray-500 text-sm mt-1">Acesse sua conta</p>*/}
-        {/*</div>*/}
-
-        {/*  */}
-        {/*</section>*/}
       </div>
     </main>
   );

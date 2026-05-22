@@ -21,7 +21,7 @@ export default function PageComponent() {
         <section className="max-w-7xl mx-auto px-6 py-10">
           <div className="mb-8">
             <h1 className="text-4xl font-semibold text-gray-900">
-              Minha Conta
+              Propriedade Casa Nova
             </h1>
 
             <p className="text-gray-500 mt-2">

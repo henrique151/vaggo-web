@@ -63,7 +63,7 @@ export default function Page() {
   };
   return (
     <main className="min-h-screen bg-gray-50">
-      <Header />
+      {/*<Header />*/}
 
       <div className="flex justify-center py-10 px-4">
         <FormCard
