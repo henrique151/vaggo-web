@@ -2,9 +2,9 @@
 
 import Header from "@/component/header";
 import { useState } from "react";
-import PageContextProvider from "../page.provider";
+import PageContextProvider from "./page.provider";
 
-import pageTabs from "../page.tabs";
+import pageTabs from "./page.tabs";
 import useTabController from "@/hooks/useTabController";
 import DefaultTabSidebar from "@/component/tabs/DefaultTabSidebar";
 import DefaultTabPageContainer from "@/component/tabs/DefaultTabPageContainer";

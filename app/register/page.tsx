@@ -1,7 +1,8 @@
 "use client";
 import FormCard, { GenericFormLayout } from "@/component/form_card";
 import Header from "@/component/header";
-import { authenticate, register } from "@/services/user.service";
+import { register } from "@/services/user.service";
+import { authenticate } from "@/services/auth.service";
 // import RegisterCard from "@/component/register_card";
 // import { UserDAO } from "@/entity/user";
 // import { The_Nautigal } from "next/font/google";
@@ -37,6 +38,7 @@ export default function Page() {
       email: string;
       password: string;
       avatarUrl: File;
+      passConfirm: string;
     };
 
     // console.log(values);

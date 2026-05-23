@@ -28,12 +28,13 @@ export default function Header({ showSearch = false }: HeaderProps) {
 
     delete (values as any).passConfirm;
 
-    const res = (await api.call("users/login", false, {
-      body: JSON.stringify(values),
-      dataOnly: true,
-      contentType: "json",
-      method: "POST",
-    })) as any;
+    // const res = (await request("users/login", false, {
+    //   body: JSON.stringify(values),
+    //   dataOnly: true,
+    //   contentType: "json",
+    //   method: "POST",
+    // })) as any;
+    const res = {} as any;
     console.log(res);
     console.log("Login enviado");
     setShowLogin(false);

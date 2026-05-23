@@ -15,11 +15,14 @@ export default function Page() {
   const sendMessage = (e: any) => {
     e.preventDefault();
     const textMessageForm = e.currentTarget;
+    const formData = new FormData(e.currentTarget);
+
     // console.log(formData.get("message"));
-    if (document.getElementById("text-box").value != "") {
-      const formData = new FormData(e.currentTarget);
+    // if (document.getElementById("text-box").value == null) return null
+    if (formData.get("message")) {
+      const element = document.getElementById("text-box") as HTMLInputElement;
       console.log(formData.get("message"));
-      document.getElementById("text-box").value = "";
+      element.value = "";
 
       console.log("sent!");
     }

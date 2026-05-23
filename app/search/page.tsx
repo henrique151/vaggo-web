@@ -7,17 +7,23 @@ import Header from "@/component/header";
 // import { PropertyDAO, useSearchProperties } from "@/entity/property";
 import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
-export default function Home() {
-  const params = useSearchParams();
+export const dynamic = "force-dynamic";
+
+export default function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ address?: string }>;
+}) {
+  const params = use(searchParams);
 
   const [foundPropertiesData, foundPropertiesLoading] = useSearchProperties({
-    address: params.get("address") != null ? params.get("address")! : "",
+    address: params.address != null ? params.address : "",
   });
 
   const [foundPropertiesCards, setFoundPropertiesCards] = useState<
-    (typeof EntityCard)[]
+    React.ReactNode[]
   >([]);
 
   useEffect(() => {
@@ -32,9 +38,9 @@ export default function Home() {
         console.log(property);
         spotCards.push(
           <EntityCard
-            title={`Propriedade #${property.propertyId}`}
+            title={`Propriedade #${property.property.id}`}
             description={`Distância: ${property.route.distance}`}
-            redirectTo={`/spot/${property.propertyId}`}
+            redirectTo={`/spot/${property.property.id}`}
           ></EntityCard>,
         );
       }

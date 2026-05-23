@@ -1,4 +1,6 @@
 import { Image } from "@/classes/data/Image";
+import { Address } from "./address/address";
+import { Spot } from "./spot";
 
 export default class Property {
   public id: number;
@@ -11,7 +13,7 @@ export default class Property {
   public latitude: string;
   public longitude: string;
   public zipCode: string;
-  public address: IAddress;
+  public address: Address;
   public spots?: Spot[];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

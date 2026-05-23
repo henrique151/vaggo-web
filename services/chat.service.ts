@@ -67,3 +67,8 @@ export async function getChat(id: number): Promise<any> {
     return result;
   }
 }
+
+export async function sendMessage(
+  chatId: number,
+  message: { content: string; image?: File },
+) {}

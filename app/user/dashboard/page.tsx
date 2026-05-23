@@ -37,7 +37,7 @@ export default function Page() {
   const [nextBookings] = useGetMyNextBookings();
 
   const [nextBookingsCards, setnextBookingsCards] = useState<
-    (typeof DashboardEntityCard)[] | undefined
+    React.ReactNode[] | undefined
   >([]);
 
   // const [result, resultsLoading] = useSearchProperties({

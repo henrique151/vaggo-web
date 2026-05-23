@@ -35,6 +35,6 @@ export default function StatusBadge({
   );
 }
 
-function Skok() {
-  return <StatusBadge></StatusBadge>;
-}
+// function Skok() {
+//   return <StatusBadge></StatusBadge>;
+// }

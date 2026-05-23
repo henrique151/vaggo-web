@@ -1,11 +1,11 @@
-import * as api from "@/app/api";
+// import * as api from "@/app/api";
 import { useApi } from "@/hooks/api/useApi";
 import { SubmitEventHandler } from "react";
 
 interface FormCardProps {
   endpoint: string;
-  method: api.requestTypeSupport;
-  content: api.contentTypeSupport;
+  method: string;
+  content: string;
   onSubmit?: CallableFunction; //in case you need to implement a custom submission handling
   validator?: FormValidatorHandler; //a custom validator function for the data entered if needed. Possibly not useful since entities can potentially validate on their own?
   postSubmit?: CallableFunction;

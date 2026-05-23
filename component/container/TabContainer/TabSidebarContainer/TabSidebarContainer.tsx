@@ -25,7 +25,9 @@ export default function TabSidebarContainer({
   TabSidebarComponentSetter,
   children,
 }: {
-  TabFragment: typeof TabSidebarFragment;
+  // TabFragment: React.ReactNode;
+  // TODO error: JSX element type 'TabFragment' does not have any construct or call signatures.
+  TabFragment: any;
   tabs: Tab[];
   activeTab: Tab;
   activeTabSetter: CallableFunction;

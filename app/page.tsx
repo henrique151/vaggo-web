@@ -19,11 +19,11 @@ export default function Home() {
       datePeriod: new DatePeriod(new Date(2026, 4, 10), new Date(2026, 4, 10)),
     });
 
-  const [currentLocationCards, setCurrentLocationCards] = useState<Element[]>(
-    [],
-  );
+  const [currentLocationCards, setCurrentLocationCards] = useState<
+    React.ReactNode[]
+  >([]);
   const [lastBookingLocationCards, setLastBookingLocationCards] = useState<
-    Element[]
+    React.ReactNode[]
   >([]);
 
   // useEffect(() => {
