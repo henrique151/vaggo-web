@@ -1,5 +1,5 @@
 import { SearchResult } from "@/classes/SearchResult";
-import { DatePeriod } from "@/classes/data/DatePeriod";
+import DatePeriod from "@/classes/data/DatePeriod";
 import { useState, useEffect } from "react";
 import { useApi } from "../useApi";
 import { useGetAllStates } from "../location/useGeAllStates";

@@ -1,7 +1,9 @@
 import AccessToken from "@/classes/AccessToken";
 import request from "./api.service";
+// import { cookies } from "next/headers";
 
 //encrypt user token when creating object?
+// export function getToken(): Promise<AccessToken | undefined> {
 export function getToken(): AccessToken | undefined {
   try {
     let token: AccessToken | string | null = localStorage.getItem("token");
@@ -26,41 +28,7 @@ export function getToken(): AccessToken | undefined {
 }
 
 //checks if user's token is valid by checking it's expiry date. returns true to valid and false to invalid.
-export function validateToken() {}
-
-export async function authenticate({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}): Promise<AccessToken | undefined> {
-  const res = await request({
-    url: "users/login",
-    req: {
-      method: "POST",
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  });
-
-  console.log(res);
-
-  if (res.ok) {
-    const data = await res.json();
-    console.log(data);
-
-    const token = new AccessToken(data.data);
-
-    return token;
-  }
-  return undefined;
-}
+export async function validateToken() {}
 
 type registerProps = {
   name: string;

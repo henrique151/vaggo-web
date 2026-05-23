@@ -1,20 +1,22 @@
 "use client";
-import Header from "@/component/header";
-import LoginCard from "@/component/login_card";
+// import Header from "@/component/header";
+// import LoginCard from "@/component/login_card";
 import FormCard, { GenericFormLayout } from "@/component/form_card";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useApi } from "@/hooks/api/useApi";
-import { useAuthenticateUser } from "@/hooks/api/user/useAuthenticateUser";
-import { authenticate } from "@/services/user.service";
+// import { useApi } from "@/hooks/api/useApi";
+// import { useAuthenticateUser } from "@/hooks/api/user/useAuthenticateUser";
+import { authenticate } from "@/services/auth.service";
 import FormItem from "@/component/ui/form/FormItem";
+import AccessToken from "@/classes/AccessToken";
 // import { UserDAO } from "@/entity/user";
 
 export default function Page() {
-  const [loading, setLoading] = useState(false);
-  const [request, setRequest] = useState({});
-  const [data, loaded] = useAuthenticateUser(request);
+  const loading = false;
+  // const [loading, setLoading] = useState(false);
+  // const [request, setRequest] = useState({});
+  // const [data, loaded] = useAuthenticateUser(request);
 
   const router = useRouter();
 
@@ -37,15 +39,17 @@ export default function Page() {
 
   const handleSubmission = async (e: any) => {
     e.preventDefault();
+    console.log("hello!");
 
     const formData = new FormData(e.currentTarget);
+
     const res = await authenticate({
       email: (formData.get("email") as string) || "",
       password: (formData.get("password") as string) || "",
     });
 
     if (res) {
-      localStorage.setItem("token", JSON.stringify(res));
+      localStorage.setItem("token", JSON.stringify(new AccessToken(res)));
       router.push("/user/dashboard");
     }
 

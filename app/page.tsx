@@ -5,12 +5,19 @@ import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
 import { SearchResult } from "@/classes/SearchResult";
 import { useEffect, useState } from "react";
 import CarouselContainer from "@/component/container/CarouselContainer";
+import DatePeriod from "@/classes/data/DatePeriod";
 
 export default function Home() {
   const [currentLocationSpotsResult, currentLocationSpotsLoading] =
-    useSearchProperties({ address: "São Paulo" });
+    useSearchProperties({
+      address: "São Paulo",
+      datePeriod: new DatePeriod(new Date(2026, 4, 10), new Date(2026, 4, 10)),
+    });
   const [lastBookingLocationSpotsResult, lastBookingLocationSpotsLoading] =
-    useSearchProperties({ address: "São Paulo" });
+    useSearchProperties({
+      address: "São Paulo",
+      datePeriod: new DatePeriod(new Date(2026, 4, 10), new Date(2026, 4, 10)),
+    });
 
   const [currentLocationCards, setCurrentLocationCards] = useState<Element[]>(
     [],
@@ -50,9 +57,9 @@ export default function Home() {
           console.log(data);
           cards.push(
             <EntityCard
-              title={`Propriedade #${data.propertyId}`}
+              title={`Propriedade ${data.property.name}`}
               description={`Distância: ${data.route.distance}`}
-              redirectTo={`/spot/${data.propertyId}`}
+              redirectTo={`/spot/${data.property.id}`}
             ></EntityCard>,
           );
           // cards.push(<SpotCard spot={data.spots} />);

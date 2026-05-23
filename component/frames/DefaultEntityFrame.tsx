@@ -1,20 +1,28 @@
+import Link from "next/link";
 import TagContainer from "../container/TagContainer";
 
 type DefaultEntityFrameProps = {
   title: string;
   description: string;
   tagList?: string[];
+  redirectTo?: string;
 };
 export default function DefaultEntityFrame({
   title,
   description,
   tagList,
+  redirectTo,
 }: DefaultEntityFrameProps) {
   return (
     // TODO add EntityFrame as parent, change EntityFrame to GenericEntityFrame
     <>
-      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-
+      {redirectTo ? (
+        <Link className="text-lg font-semibold text-gray-900" href={redirectTo}>
+          {title}
+        </Link>
+      ) : (
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      )}
       <p className="text-sm text-gray-500 mt-1">{description}</p>
 
       {tagList ? (

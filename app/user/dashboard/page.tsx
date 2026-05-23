@@ -24,11 +24,15 @@ import {
   mapSolicitationFrames as mapSolicitationFrames,
 } from "./components.mapper";
 import PanelLayout from "@/component/layout/PanelLayout";
+import { useGetMyChats } from "@/hooks/api/chat/useGetMyChats";
+import { useGetChat } from "@/hooks/api/chat/useGetChat";
 
 export default function Page() {
   const [carsData] = useGetMyVehicles();
   const [userData] = useGetMyUser();
   const [bookingSolicitations] = useGetMySolicitations();
+  const [chats] = useGetMyChats();
+  const [chatTest] = useGetChat(1);
 
   const [nextBookings] = useGetMyNextBookings();
 
@@ -45,7 +49,8 @@ export default function Page() {
   // console.log("NextSolicitations");
   // console.log(bookingSolicitations);
 
-  // console.log(result);
+  console.log("chat with Pedro");
+  console.log(chatTest);
 
   useEffect(() => {
     if (nextBookings) {
@@ -142,7 +147,20 @@ export default function Page() {
               }) || "Não há Veículos cadastrado no momento"}
             </PanelContainer>
             <PanelContainer title={"Mensagens"}>
-              <p>Nenhuma mensagem recente</p>
+              {chats?.map((chat) => {
+                return (
+                  <EntityFrame key={chat.id}>
+                    <DefaultEntityFrame
+                      title={`${chat.user.name} - ${chat.subtitle}`}
+                      description={
+                        chat.lastContent || "Nenhuma mensagem no momento."
+                      }
+                      redirectTo={`/chat/${chat.id}`}
+                    />
+                  </EntityFrame>
+                );
+              }) || <p>Nenhuma mensagem no momento.</p>}
+              {/*<p>Nenhuma mensagem recente</p>*/}
             </PanelContainer>
           </div>
         </div>

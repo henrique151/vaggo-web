@@ -345,3 +345,9 @@ export default function Page({ params }: any) {
     </main>
   );
 }
+
+// {
+// 	"base_url": "http://localhost:3000",
+// 	"bearer_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzc5MzIwNDM1LCJleHAiOjE3NzkzMjEwMzV9.MRucjVfv2JwAvcLA7BZJvQJQXnMeMKk9FwzPZaYUD_w",
+// 	"userId": 1
+// }
