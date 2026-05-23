@@ -57,7 +57,11 @@ export default function Page() {
       // console.log("nextBookings: ");
       // console.log(nextBookings);
 
-      setnextBookingsCards(nextBookings.map(mapNextBookingCards));
+      setnextBookingsCards(
+        nextBookings
+          .filter((booking) => booking.status === "APROVADA")
+          .map(mapNextBookingCards),
+      );
     }
   }, [nextBookings]);
 
