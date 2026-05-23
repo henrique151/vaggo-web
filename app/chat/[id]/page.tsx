@@ -42,7 +42,18 @@ export default function Page() {
     }
   }, [chat]);
 
-  console.log(chat);
+  useEffect(() => {
+    const load = async () => {
+      setInterval(async () => {
+        const history = await getChat(params.id);
+        console.log("refreshing chat history");
+        setChatHistory(history.messages);
+      }, 1500);
+    };
+    load();
+  }, []);
+
+  // console.log(chat);
 
   return (
     <main className="p-8">
@@ -104,7 +115,7 @@ export default function Page() {
 }
 
 function MessageContainer({ message }: { message?: any }) {
-  console.log(message);
+  // console.log(message);
   return (
     <section>
       <div className="flex flex-row mb-1.5 items-center">

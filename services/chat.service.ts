@@ -84,7 +84,7 @@ export async function sendMessage(chatId: number, message: FormData) {
     console.warn(
       "something happened while sending the message. The following request",
     );
-    console.log(res);
+    // console.log(res) ;
     return false;
   }
 }
