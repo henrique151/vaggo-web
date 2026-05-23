@@ -24,6 +24,12 @@ import { getSpotsByPropertyId } from "@/services/spot.service";
 import Property from "@/classes/property";
 import { Vehicle } from "@/classes/vehicle";
 import Link from "next/link";
+import PanelLayout from "@/component/layout/PanelLayout";
+import PanelContainer from "@/component/container/PanelContainer";
+import CarouselContainer from "@/component/container/CarouselContainer";
+import getReviewsFromProperty from "@/services/review.service";
+import PropertyReviews from "@/classes/property/review/PropertyReviews";
+import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Page({ params }: any) {
@@ -37,6 +43,8 @@ export default function Page({ params }: any) {
     withSpots: true,
   }); //TODO REPLACE WITH TYPES
   const [vehicles, setVehicles] = useGetMyVehicles();
+  const [reviews, setReviews] = useState<PropertyReviews>(undefined);
+  const [reviewCards, setReviewCards] = useState<React.ReactNode[]>([]);
 
   const [showSpotsWindow, setShowSpotsWindow] = useState(false);
   const [showVehicleWindow, setShowVehicleWindow] = useState(false);
@@ -52,6 +60,22 @@ export default function Page({ params }: any) {
   useEffect(() => {
     const load = async () => {
       setSpots(await getSpotsByPropertyId(params.id));
+      const reviews = await getReviewsFromProperty(params.id);
+      if (reviews) {
+        setReviews(reviews);
+
+        const cards = reviews.reviews.map((review) => {
+          return (
+            <EntityCard
+              key={review.id}
+              title={`${review.rating}/5`}
+              description={`${review.comment}`}
+              image={review.user.avatar}
+            />
+          );
+        });
+        setReviewCards(cards);
+      }
     };
     load();
   }, []);
@@ -263,6 +287,7 @@ export default function Page({ params }: any) {
   return (
     <main>
       {/*<Header />*/}
+      {/* TODO transform into ImageCarousel */}
       <section className="m-10 flex flex-row">
         <section className="bg-white w-full rounded-3xl border border-gray-200 shadow-sm p-8 flex flex-row">
           <h2 className="text-2xl w-1/2  mb-6 mr-6">
@@ -284,17 +309,22 @@ export default function Page({ params }: any) {
               Denunciar
             </Link>
 
-            <h1 className="text-2xl font-semibold">{property?.name}</h1>
-            <p className="text-sm mb-4 text-gray-400">{property?.type}</p>
-            <p>{property?.description}</p>
-            <p>Capacidade total: {property?.totalCapacity} Vaga(as)</p>
-            <p>Avaliação: 0/5</p>
+            <h1 className="text-2xl font-semibold">
+              {property?.name || "Propriedade"}
+            </h1>
+            <p className="text-sm mb-4 text-gray-400">
+              {property?.type || "Tipo"}
+            </p>
+            <p>{property?.description || "Descrição"}</p>
+            <p>Capacidade total: {property?.totalCapacity || "0"} Vaga(as)</p>
+            <p>Avaliação: {reviews?.averageRating || 0}/5</p>
 
             {/* TODO get all spots prices, return minnimum and maximum value of each one */}
             <h2 className="text-2xl font-semibold mt-6">R$ 0 / Reserva</h2>
 
             {/* TODO responsive: make buttons go down each other when resizing to small screen */}
-            <div className="grid grid-cols-2 w-full mt-3">
+            {/*<div className="grid grid-cols-2 w-full mt-3">*/}
+            <div className="w-full mt-3">
               <button
                 // onClick={() => setShowWindow(true)}
                 onClick={() => setShowSpotsWindow(true)}
@@ -302,17 +332,30 @@ export default function Page({ params }: any) {
               >
                 Vagas Disponíveis
               </button>
-              <Link href={`${params.id}/chat`} className="ml-2">
+              {/*<Link href={`${params.id}/chat`} className="ml-2">
                 <button
                   // onClick={() => setShowWindow(true)}
                   className="w-full py-3 rounded-lg font-medium text-white bg-gray-900 hover:bg-black transition disabled:opacity-60"
                 >
                   Conversar
                 </button>
-              </Link>
+              </Link>*/}
             </div>
           </div>
         </section>
+      </section>
+
+      <section className="m-10">
+        <PanelContainer title="Avaliações">
+          <p className="mb-2">
+            Avaliação Geral: {reviews?.averageRating || 0}/5
+          </p>
+          {reviews?.reviews ? (
+            <CarouselContainer title={""} cards={reviewCards} />
+          ) : (
+            <p>No momento, nenhuma avaliação foi registrada.</p>
+          )}
+        </PanelContainer>
       </section>
 
       {showSpotsWindow && (

@@ -16,13 +16,13 @@ export default function Page() {
   const send = async (e: any) => {
     e.preventDefault();
     const textMessageForm = e.currentTarget;
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(textMessageForm);
 
     // console.log(formData.get("message"));
     // if (document.getElementById("text-box").value == null) return null
     if (formData.get("content")) {
       const element = document.getElementById("text-box") as HTMLInputElement;
-      console.log(formData.get("message"));
+      console.log(formData.get("content"));
       element.value = "";
 
       const res = await sendMessage(params.id, formData);
