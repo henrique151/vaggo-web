@@ -127,7 +127,11 @@ export default function Page() {
             {/* Solicitações de Reservas */}
             <PanelContainer title={"Solicitações de Reservas"}>
               {/* TODO insert length checker */}
-              {bookingSolicitations?.map(mapSolicitationFrames)}
+              {bookingSolicitations?.length != 0 ? (
+                bookingSolicitations?.map(mapSolicitationFrames)
+              ) : (
+                <p>Nenhuma Solicitação no momento.</p>
+              )}
             </PanelContainer>
           </div>
 

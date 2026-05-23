@@ -1,6 +1,6 @@
 "use client";
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
-import Header from "@/component/header";
+// import Header from "@/component/header";
 import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
 import { SearchResult } from "@/classes/SearchResult";
 import { useEffect, useState } from "react";
@@ -26,24 +26,6 @@ export default function Home() {
     React.ReactNode[]
   >([]);
 
-  // useEffect(() => {
-  //   async function load(searchString: string, setter: CallableFunction) {
-  //     const res = await PropertyDAO.search({ address: searchString });
-
-  //     if (!res) return undefined;
-
-  //     const spotCards = [];
-  //     for (const property of res.results) {
-  //       console.log(property);
-  //       spotCards.push(<SpotCard spot={property} />);
-  //     }
-  //     console.log(res);
-  //     setter(spotCards);
-  //   }
-  //   load("São Paulo", setCurrentLocationSpots);
-  //   load("São Paulo", setLastBookingLocationSpots);
-  // }, []);
-
   useEffect(() => {
     function setCarousels(
       iterator: SearchResult | undefined,
@@ -60,6 +42,7 @@ export default function Home() {
               title={`Propriedade ${data.property.name}`}
               description={`Distância: ${data.route.distance}`}
               redirectTo={`/spot/${data.property.id}`}
+              image={data.property.image}
             ></EntityCard>,
           );
           // cards.push(<SpotCard spot={data.spots} />);
@@ -70,22 +53,10 @@ export default function Home() {
 
     setCarousels(currentLocationSpotsResult, setCurrentLocationCards);
     setCarousels(lastBookingLocationSpotsResult, setLastBookingLocationCards);
-
-    // if (lastBookingLocationSpotsResult) {
-    //   const cards = [];
-    //   for (const property of lastBookingLocationSpotsResult.results) {
-    //     console.log(property);
-    //     cards.push(<SpotCard spot={property} />);
-    //   }
-    //   // eslint-disable-next-line react-hooks/set-state-in-effect
-    //   setLastBookingLocationCards(cards);
-    // }
   }, [currentLocationSpotsResult, lastBookingLocationSpotsResult]);
 
   return (
     <main className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
-      {/*<Header showSearch />*/}
-
       <section className="section-default">
         <div className="container-default mt-6">
           <div className="rounded-2xl shadow-sm p-6">
@@ -106,10 +77,6 @@ export default function Home() {
         </div>
       </section>
       <div className="h-12"></div>
-
-      {/*<div className="border-b-4 p-4">*/}
-      {/*Your content with a bottom border shadow*/}
-      {/*</div>*/}
     </main>
   );
 }

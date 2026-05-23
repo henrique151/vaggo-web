@@ -1,4 +1,5 @@
 "use client";
+import DatePeriod from "@/classes/data/DatePeriod";
 import CarouselContainer from "@/component/container/CarouselContainer";
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 // import Header from "@/component/header";
@@ -17,9 +18,12 @@ export default function Home({
   searchParams: Promise<{ address?: string }>;
 }) {
   const params = use(searchParams);
+  console.log("params");
+  console.log(params);
 
   const [foundPropertiesData, foundPropertiesLoading] = useSearchProperties({
-    address: params.address != null ? params.address : "",
+    address: params.address ?? "",
+    datePeriod: new DatePeriod(new Date(2026, 4, 10), new Date(2026, 4, 10)),
   });
 
   const [foundPropertiesCards, setFoundPropertiesCards] = useState<
@@ -27,8 +31,8 @@ export default function Home({
   >([]);
 
   useEffect(() => {
-    console.log("foundPropertiesData");
-    console.log(foundPropertiesData);
+    // console.log("foundPropertiesData");
+    // console.log(foundPropertiesData);
     // if (foundPropertiesData && foundPropertiesCards.length < 0) {
     if (foundPropertiesData && !foundPropertiesLoading) {
       const spotCards = [];
@@ -38,9 +42,10 @@ export default function Home({
         console.log(property);
         spotCards.push(
           <EntityCard
-            title={`Propriedade #${property.property.id}`}
+            title={`${property.property.name}`}
             description={`Distância: ${property.route.distance}`}
             redirectTo={`/spot/${property.property.id}`}
+            image={property.property.image}
           ></EntityCard>,
         );
       }
