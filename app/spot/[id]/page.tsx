@@ -30,6 +30,8 @@ import CarouselContainer from "@/component/container/CarouselContainer";
 import getReviewsFromProperty from "@/services/review.service";
 import PropertyReviews from "@/classes/property/review/PropertyReviews";
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
+import FormItem from "@/component/ui/form/FormItem";
+import { sendReport } from "@/services/report.service";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Page({ params }: any) {
@@ -48,6 +50,7 @@ export default function Page({ params }: any) {
 
   const [showSpotsWindow, setShowSpotsWindow] = useState(false);
   const [showVehicleWindow, setShowVehicleWindow] = useState(false);
+  const [reportWindow, setReportWindow] = useState(false);
 
   const [selectedSpot, setSelectedSpot] = useState(-1);
   const [selectedVehicle, setSelectedVehicle] = useState(-1);
@@ -283,6 +286,73 @@ export default function Page({ params }: any) {
     );
   }
 
+  function ReportWindow({ onExit }: { onExit: MouseEventHandler }) {
+    const [messageState, setMessageState] = useState<boolean | undefined>(
+      undefined,
+    );
+
+    const handleReport = async (e) => {
+      e.preventDefault();
+      const currentTarget = e.currentTarget;
+      const formData = new FormData(currentTarget);
+      const res = await sendReport("SPOT", 1, formData);
+      setMessageState(res);
+    };
+    const messages = {
+      true: (
+        <p>
+          Sua denúncia foi enviada e será analisada por um de nossos
+          administradores.
+        </p>
+      ),
+      false: (
+        <p>
+          Houve um erro durante o envio da denúncia, tente novamente dentro de
+          alguns minutos. Pedimos desculpas pelo transtorno.
+        </p>
+      ),
+      undefined: (
+        <form onSubmit={handleReport}>
+          <FormItem
+            type="select"
+            label={"Selecione a vaga que gostaria de denunciar:"}
+            name={"targetId"}
+            items={
+              spots?.map((spot) => {
+                return { value: spot.id, label: spot.identifier };
+              }) ?? []
+            }
+          />
+
+          <div className="h-4" />
+          <FormItem
+            type="text"
+            label="Qual motivo para a denúncia?"
+            name={"reason"}
+          />
+
+          <div className="h-4" />
+
+          <button
+            type="submit"
+            className="w-full py-3 rounded-lg font-medium text-white bg-gray-900 hover:bg-black transition disabled:opacity-60"
+          >
+            Enviar
+          </button>
+        </form>
+      ),
+    };
+
+    return (
+      <>
+        <BlurOverlay show={true} onClick={() => {}} />
+        <GenericWindow title={"Denúncia"} exitButton={true} onExit={onExit}>
+          {messages[String(messageState)]}
+        </GenericWindow>
+      </>
+    );
+  }
+
   if (property === undefined) return <section></section>;
   return (
     <main>
@@ -305,9 +375,12 @@ export default function Page({ params }: any) {
           </h2>
 
           <div className="flex w-1/2 flex-col items-end">
-            <Link className="text-sm text-red-300 mb-3" href={"/"}>
+            <button
+              className="cursor-pointer text-sm text-red-300 mb-3"
+              onClick={() => setReportWindow(true)}
+            >
               Denunciar
-            </Link>
+            </button>
 
             <h1 className="text-2xl font-semibold">
               {property?.name || "Propriedade"}
@@ -382,6 +455,23 @@ export default function Page({ params }: any) {
           onExit={() => {
             setBookingStatusWindow(false);
             // console.log("hello!");
+          }}
+        />
+      )}
+
+      {bookingStatusWindow && (
+        <BookingStatusWindow
+          onExit={() => {
+            setBookingStatusWindow(false);
+            // console.log("hello!");
+          }}
+        />
+      )}
+
+      {reportWindow && (
+        <ReportWindow
+          onExit={() => {
+            setReportWindow(false);
           }}
         />
       )}
