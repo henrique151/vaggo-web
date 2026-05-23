@@ -3,30 +3,44 @@
 import PanelContainer from "@/component/container/PanelContainer";
 import PanelLayout from "@/component/layout/PanelLayout";
 import { useGetChat } from "@/hooks/api/chat/useGetChat";
+import { getChat, sendMessage } from "@/services/chat.service";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const params = useParams() as unknown as { id: number };
   const [chat] = useGetChat(params.id);
   const [chatHistory, setChatHistory] = useState([]);
 
-  const sendMessage = (e: any) => {
+  const send = async (e: any) => {
     e.preventDefault();
     const textMessageForm = e.currentTarget;
     const formData = new FormData(e.currentTarget);
 
     // console.log(formData.get("message"));
     // if (document.getElementById("text-box").value == null) return null
-    if (formData.get("message")) {
+    if (formData.get("content")) {
       const element = document.getElementById("text-box") as HTMLInputElement;
       console.log(formData.get("message"));
       element.value = "";
 
-      console.log("sent!");
+      const res = await sendMessage(params.id, formData);
+
+      if (res) {
+        console.log("sent!");
+        const updatedChat = await getChat(params.id);
+        setChatHistory(updatedChat.messages);
+      }
     }
   };
+
+  useEffect(() => {
+    if (chat) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setChatHistory(chat.messages);
+    }
+  }, [chat]);
 
   console.log(chat);
 
@@ -41,7 +55,7 @@ export default function Page() {
             <div className="overflow-y-auto h-120 mb-3 scroll-smooth">
               <div className="flex flex-col">
                 {/* TODO convert into mapper */}
-                {chat?.messages?.map((message) => {
+                {chatHistory?.map((message) => {
                   return (
                     <>
                       <MessageContainer key={message.id} message={message} />
@@ -71,10 +85,10 @@ export default function Page() {
 
           {/* Message ChatBox */}
           <PanelLayout className="px-5 py-2 flex flex-row">
-            <form onSubmit={sendMessage} className="flex flex-row w-full">
+            <form onSubmit={send} className="flex flex-row w-full">
               <input
                 type="text"
-                name="message"
+                name="content"
                 id="text-box"
                 // with border on input
                 // className="w-full mr-4 bg-gray-200 rounded-2xl border border-gray-300 focus:border-gray-400 px-3 py-1"

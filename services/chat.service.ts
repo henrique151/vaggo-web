@@ -68,7 +68,23 @@ export async function getChat(id: number): Promise<any> {
   }
 }
 
-export async function sendMessage(
-  chatId: number,
-  message: { content: string; image?: File },
-) {}
+export async function sendMessage(chatId: number, message: FormData) {
+  const res = await request({
+    url: `chats/${chatId}/messages`,
+    useToken: true,
+    req: {
+      method: "POST",
+      body: message,
+    },
+  });
+
+  if (res.ok) {
+    return true;
+  } else {
+    console.warn(
+      "something happened while sending the message. The following request",
+    );
+    console.log(res);
+    return false;
+  }
+}

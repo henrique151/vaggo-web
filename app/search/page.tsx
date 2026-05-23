@@ -1,12 +1,12 @@
 "use client";
 import CarouselContainer from "@/component/container/CarouselContainer";
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
-import Header from "@/component/header";
+// import Header from "@/component/header";
 // import SpotCard from "@/component/spot_card";
 // import SpotCarousel from "@/component/spot_carousel";
 // import { PropertyDAO, useSearchProperties } from "@/entity/property";
 import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
-import { useSearchParams } from "next/navigation";
+// import { useSearchParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
 export const dynamic = "force-dynamic";
