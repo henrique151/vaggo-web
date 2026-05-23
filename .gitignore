@@ -13,6 +13,7 @@ README_OLD.md
 /old_node_modules
 /.zed
 /.unused
+*.sync-conflict*
 
 # dependencies
 /node_modules
