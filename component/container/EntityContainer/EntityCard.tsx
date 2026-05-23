@@ -1,15 +1,17 @@
 // // component/entity_card.tsx
 // 'use client'
 
-import { Image } from "@/classes/data/Image";
+import { Image as ImageObject } from "@/classes/data/Image";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+// import Image from "next/image";
 
 type componentProps = {
   title: string;
   description: string;
   redirectTo?: string;
-  image?: Image;
+  image?: ImageObject;
   children?: React.ReactNode;
 };
 
@@ -51,7 +53,20 @@ export function EntityCard({
       {image ? (
         <div className="w-full h-[160px] overflow-hidden">
           {/* TODO change to <Image> */}
-          <img
+          <Image
+            src={`${image.url}`}
+            // src={`/`}
+            width={400}
+            height={400}
+            alt={"Card name"}
+            className="
+              w-full h-full object-cover
+              hover:scale-105
+              transition duration-300
+              rounded-t-2xl
+            "
+          />
+          {/*<img
             src={`${image.url}`}
             // src={`/`}
             alt={"Card name"}
@@ -59,8 +74,10 @@ export function EntityCard({
             w-full h-full object-cover
             hover:scale-105
             transition duration-300
+            rounded-t-2xl
+
           "
-          />
+          />*/}
         </div>
       ) : null}
 
