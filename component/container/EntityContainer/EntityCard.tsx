@@ -91,7 +91,7 @@ export function EntityCard({
 
         <p className="text-sm text-gray-500 mt-1">{description}</p>
 
-        <div className="text-gray-900 font-semibold mt-3">{children}</div>
+        <div className="text-gray-900 mt-3">{children}</div>
       </div>
     </div>
   );

@@ -50,3 +50,40 @@ export function mapNextBookingCards(d: any) {
     />
   );
 }
+
+export function mapLatestBookingCards(d: any, window: any) {
+  // export function mapLatestBookingCards(d: any) {
+  return (
+    <LatestBookingCard
+      id={d.id}
+      identifier={d.spot.identifier}
+      datePeriod={d.datePeriod}
+      status={d.status}
+      window={window}
+    />
+  );
+}
+
+function LatestBookingCard({ id, identifier, datePeriod, status, window }) {
+  return (
+    <>
+      <EntityCard
+        key={`next_booking_${id}`}
+        title={identifier}
+        description={`Data: ${datePeriod.start.toLocaleDateString()}, Status: ${status}`}
+        redirectTo={""}
+      >
+        {status === "APROVADA" && (
+          <button
+            onClick={() => {
+              window.windowSetter(true);
+              window.reservationSetter(id);
+            }}
+          >
+            Avaliar
+          </button>
+        )}
+      </EntityCard>
+    </>
+  );
+}

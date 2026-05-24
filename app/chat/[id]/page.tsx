@@ -48,14 +48,22 @@ export default function Page() {
   }, [chat]);
 
   useEffect(() => {
+    let intervalObj;
     const load = async () => {
-      setInterval(async () => {
+      const interval = setInterval(async () => {
         const history = await getChat(params.id);
         console.log("refreshing chat history");
         setChatHistory(history.messages);
       }, 60000);
     };
-    load();
+
+    load().then((interval) => {
+      intervalObj = interval;
+    });
+
+    return () => {
+      clearInterval(intervalObj);
+    };
   }, []);
 
   function ReportWindow({ onExit }: { onExit: MouseEventHandler }) {

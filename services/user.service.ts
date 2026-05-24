@@ -63,3 +63,25 @@ export async function register(data: registerProps): Promise<any> {
   }
 }
 //possible function to redirect user imediatally to login page?
+
+export async function editUser(id, formData) {
+  // const body = new FormData();
+
+  // for (const [key, value] of Object.entries(data)) {
+  //   console.log([key, value]);
+  //   body.append(key, value);
+  // }
+
+  const res = await request({
+    url: `users/${id}`,
+    req: {
+      method: "PUT",
+      body: formData,
+    },
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    return data;
+  }
+}

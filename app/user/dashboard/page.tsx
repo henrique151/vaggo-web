@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, MouseEventHandler, useEffect, useState } from "react";
 import Image from "next/image";
 
 import CarouselContainer from "@/component/container/CarouselContainer";
@@ -20,12 +20,17 @@ import ConfirmationEntityFrame from "@/component/frames/ConfirmationEntityFrame"
 import { changeBookingSolicitationStatus } from "@/services/booking.service";
 import { useGetMyUser } from "@/hooks/api/user/useGetMyUser";
 import {
+  mapLatestBookingCards,
   mapNextBookingCards,
   mapSolicitationFrames as mapSolicitationFrames,
 } from "./components.mapper";
 import PanelLayout from "@/component/layout/PanelLayout";
 import { useGetMyChats } from "@/hooks/api/chat/useGetMyChats";
 import { useGetChat } from "@/hooks/api/chat/useGetChat";
+import BlurOverlay from "@/component/blur_overlay";
+import GenericWindow from "@/component/GenericWindow";
+import FormItem from "@/component/ui/form/FormItem";
+import { sendReview } from "@/services/review.service";
 
 export default function Page() {
   const [carsData] = useGetMyVehicles();
@@ -39,6 +44,13 @@ export default function Page() {
   const [nextBookingsCards, setnextBookingsCards] = useState<
     React.ReactNode[] | undefined
   >([]);
+
+  const [latestBookingsCards, setLatestBookingsCards] = useState<
+    React.ReactNode[] | undefined
+  >([]);
+
+  const [window, setWindow] = useState(false);
+  const [reservationId, setReservationId] = useState(0);
 
   // const [result, resultsLoading] = useSearchProperties({
   //   address: "São Paulo",
@@ -54,16 +66,103 @@ export default function Page() {
 
   useEffect(() => {
     if (nextBookings) {
-      // console.log("nextBookings: ");
-      // console.log(nextBookings);
+      console.log("nextBookings: ");
+      console.log(nextBookings);
 
       setnextBookingsCards(
         nextBookings
           .filter((booking) => booking.status === "APROVADA")
           .map(mapNextBookingCards),
       );
+
+      setLatestBookingsCards(
+        nextBookings
+          // .filter((booking) => booking.status === "RECUSADA" || "PENDENTE")
+          .map((d) => {
+            return mapLatestBookingCards(d, {
+              windowSetter: setWindow,
+              reservationSetter: setReservationId,
+            });
+          }),
+      );
     }
   }, [nextBookings]);
+
+  function ReviewWindow({ onExit }: { onExit: MouseEventHandler }) {
+    const [messageState, setMessageState] = useState<boolean | undefined>(
+      undefined,
+    );
+
+    const handleReview = async (e) => {
+      e.preventDefault();
+      const currentTarget = e.currentTarget;
+      const formData = new FormData(currentTarget);
+      const values = Object.fromEntries(formData.entries()) as unknown as {
+        reservationId: number;
+        rating: number;
+        comment: string;
+      };
+
+      const res = await sendReview(
+        reservationId,
+        values.rating,
+        values.comment,
+      );
+      setMessageState(res);
+    };
+    const messages = {
+      true: (
+        <p>Sua Avaliação foi enviada! Obrigado por utilizar nosso serviço!</p>
+      ),
+      false: (
+        <p>
+          Houve um erro durante o envio da avaliação, tente novamente dentro de
+          alguns minutos. Pedimos desculpas pelo transtorno.
+        </p>
+      ),
+      undefined: (
+        <form onSubmit={handleReview}>
+          <FormItem
+            type="select"
+            label={"Qual sua avaliação para esta reserva?:"}
+            name={"rating"}
+            items={[
+              { label: "Péssimo", value: "1" },
+              { label: "Ruim", value: "2" },
+              { label: "Regular", value: "3" },
+              { label: "Bom", value: "4" },
+              { label: "Ótimo", value: "5" },
+            ]}
+          />
+
+          <div className="h-4" />
+          <FormItem
+            type="text"
+            label="Diga-nos como foi sua experiência. Isto irá ajudar outros usuários a saber mais sobre o local da reserva!"
+            name={"comment"}
+          />
+
+          <div className="h-4" />
+
+          <button
+            type="submit"
+            className="w-full py-3 rounded-lg font-medium text-white bg-gray-900 hover:bg-black transition disabled:opacity-60"
+          >
+            Enviar
+          </button>
+        </form>
+      ),
+    };
+
+    return (
+      <>
+        <BlurOverlay show={true} onClick={() => {}} />
+        <GenericWindow title={"Avaliação"} exitButton={true} onExit={onExit}>
+          {messages[String(messageState)]}
+        </GenericWindow>
+      </>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
@@ -124,7 +223,12 @@ export default function Page() {
 
             {/* Histórico de Reservas */}
             <PanelContainer title={"Reservas anteriores"}>
-              <p>Por enquanto não há reservas no histórico.</p>
+              {nextBookingsCards ? (
+                <CarouselContainer title={""} cards={latestBookingsCards} />
+              ) : (
+                <p>Não há reservas anteriores no momento.</p>
+              )}
+              {/*<p>Por enquanto não há reservas no histórico.</p>*/}
               {/*<PanelLayout>oi!</PanelLayout>*/}
             </PanelContainer>
 
@@ -157,15 +261,18 @@ export default function Page() {
             <PanelContainer title={"Mensagens"}>
               {chats?.map((chat) => {
                 return (
-                  <EntityFrame key={chat.id}>
-                    <DefaultEntityFrame
-                      title={`${chat.user.name} - ${chat.subtitle}`}
-                      description={
-                        chat.lastContent || "Nenhuma mensagem no momento."
-                      }
-                      redirectTo={`/chat/${chat.id}`}
-                    />
-                  </EntityFrame>
+                  <section key={chat.id}>
+                    <EntityFrame>
+                      <DefaultEntityFrame
+                        title={`${chat.user.name} - ${chat.subtitle}`}
+                        description={
+                          chat.lastContent || "Nenhuma mensagem no momento."
+                        }
+                        redirectTo={`/chat/${chat.id}`}
+                      />
+                    </EntityFrame>
+                    <div className="h-3" />
+                  </section>
                 );
               }) || <p>Nenhuma mensagem no momento.</p>}
               {/*<p>Nenhuma mensagem recente</p>*/}
@@ -173,6 +280,12 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      {window && (
+        <>
+          <ReviewWindow onExit={() => setWindow(false)} />
+        </>
+      )}
     </main>
   );
 }

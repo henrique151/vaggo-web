@@ -27,7 +27,7 @@ import Link from "next/link";
 import PanelLayout from "@/component/layout/PanelLayout";
 import PanelContainer from "@/component/container/PanelContainer";
 import CarouselContainer from "@/component/container/CarouselContainer";
-import getReviewsFromProperty from "@/services/review.service";
+import { getReviewsFromProperty } from "@/services/review.service";
 import PropertyReviews from "@/classes/property/review/PropertyReviews";
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 import FormItem from "@/component/ui/form/FormItem";
@@ -85,8 +85,8 @@ export default function Page({ params }: any) {
 
   const handleReserve = async (spotId: number, vehicleId: number) => {
     const datePeriod = new DatePeriod(
-      new Date(2026, 0, 1),
-      new Date(2026, 11, 31),
+      new Date(2026, 4, 10),
+      new Date(2026, 4, 10),
     );
 
     // setSelectedVehicle(vehicleId);
@@ -363,8 +363,8 @@ export default function Page({ params }: any) {
           <h2 className="text-2xl w-1/2  mb-6 mr-6">
             {property?.images[0] ? (
               <Image
-                width={128}
-                height={128}
+                width={1280}
+                height={768}
                 src={`${property.images[0]}`}
                 alt={"Imagem da Propriedade"}
                 className="
@@ -390,7 +390,7 @@ export default function Page({ params }: any) {
             </p>
             <p>{property?.description || "Descrição"}</p>
             <p>Capacidade total: {property?.totalCapacity || "0"} Vaga(as)</p>
-            <p>Avaliação: {reviews?.averageRating || 0}/5</p>
+            <p>Avaliação: {reviews?.averageRating || 1}/5</p>
 
             {/* TODO get all spots prices, return minnimum and maximum value of each one */}
             <h2 className="text-2xl font-semibold mt-6">R$ 0 / Reserva</h2>

@@ -26,7 +26,7 @@ export default function FormItem({
         <select name={name}>
           {items?.map((item) => {
             return (
-              <option key={item.value} value={item.value} selected>
+              <option key={item.value} value={item.value}>
                 {item.label}
               </option>
             );
