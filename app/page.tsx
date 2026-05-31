@@ -56,27 +56,28 @@ export default function Home() {
   }, [currentLocationSpotsResult, lastBookingLocationSpotsResult]);
 
   return (
-    <main className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
+    <main className="min-h-screen">
       <section className="section-default">
         <div className="container-default mt-6">
-          <div className="rounded-2xl shadow-sm p-6">
-            <CarouselContainer
-              title="Pontos de interesse com base na sua localização"
-              cards={currentLocationCards}
-            />
 
-            <div className="h-16"></div>
+          <div className="max-w-5xl mx-auto">
+            <div className="surface-elevated rounded-3xl p-8">
+              <CarouselContainer
+                title="Pontos de interesse com base na sua localização"
+                cards={currentLocationCards}
+              />
 
-            <CarouselContainer
-              title="Pontos de interesse com reservas anteriores"
-              cards={lastBookingLocationCards}
-            />
+              <div className="h-16"></div>
 
-            <div className="h-12"></div>
+              <CarouselContainer
+                title="Pontos de interesse com reservas anteriores"
+                cards={lastBookingLocationCards}
+              />
+            </div>
           </div>
+
         </div>
       </section>
-      <div className="h-12"></div>
     </main>
   );
 }

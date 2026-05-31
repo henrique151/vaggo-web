@@ -25,12 +25,13 @@ export function EntityCard({
   const titleFragment = (
     <h3
       className="
-    font-semibold
-    text-lg
-    text-gray-900
-    hover:text-black
-    transition
-  "
+        font-semibold
+        text-lg
+        text-primary
+        transition-colors
+        hover:text-blue-600
+        dark:hover:text-blue-400
+      "
     >
       {title}
     </h3>
@@ -39,59 +40,66 @@ export function EntityCard({
   return (
     <div
       className="
-      w-65
-      bg-white
-      border border-gray-200
-      rounded-2xl
-      shadow-sm
-      hover:shadow-md
-      transition
-    "
-      // overflow-hidden # this one keeps messy
+        w-65
+
+        bg-card
+        border
+        border-base
+
+        rounded-2xl
+
+        shadow-sm
+        hover:shadow-md
+
+        transition-all
+      "
     >
-      {/*Imagem */}
-      {image ? (
+      {/* Imagem */}
+      {image && (
         <div className="w-full h-[160px] overflow-hidden">
-          {/* TODO change to <Image> */}
           <Image
-            src={`${image.url}`}
-            // src={`/`}
+            src={image.url}
             width={400}
             height={400}
-            alt={"Card name"}
+            alt="Card name"
             className="
-              w-full h-full object-cover
-              hover:scale-105
-              transition duration-300
+              w-full
+              h-full
+              object-cover
+
               rounded-t-2xl
+
+              hover:scale-105
+              transition-transform
+              duration-300
             "
           />
-          {/*<img
-            src={`${image.url}`}
-            // src={`/`}
-            alt={"Card name"}
-            className="
-            w-full h-full object-cover
-            hover:scale-105
-            transition duration-300
-            rounded-t-2xl
-
-          "
-          />*/}
         </div>
-      ) : null}
+      )}
 
       {/* Conteúdo */}
       <div className="p-4">
         {redirectTo ? (
-          <Link href={`${redirectTo}`}>{titleFragment}</Link>
+          <Link href={redirectTo}>
+            {titleFragment}
+          </Link>
         ) : (
           titleFragment
         )}
 
-        <p className="text-sm text-gray-500 mt-1">{description}</p>
+        <p className="text-sm text-muted mt-1">
+          {description}
+        </p>
 
-        <div className="text-gray-900 font-semibold mt-3">{children}</div>
+        <div
+          className="
+            text-primary
+            font-semibold
+            mt-3
+          "
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import LoginCard from "./login_card";
 import BlurOverlay from "./blur_overlay";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTheme } from "@/context/ThemeProvider";
 
 interface HeaderProps {
   showSearch?: boolean;
@@ -16,6 +17,7 @@ export default function Header({ showSearch = false }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,12 +51,14 @@ export default function Header({ showSearch = false }: HeaderProps) {
   return (
     <>
       {/* HEADER */}
-      <header className="sticky top-0 z-50 w-full bg-gradient-to-b from-white to-gray-100 border-b border-gray-200">
+      <header className="app-header bg-base border-soft">
         <div className="container-default flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <img src="/icons/globe.ico" width={28} height={28} alt="Logo" />
-            <span className="font-semibold text-lg">Vaggo</span>
+            <img src="@/vaggo4.png" width={28} height={28} alt="Logo" />
+            <span className="font-semibold text-lg text-primary">
+              Vaggo
+            </span>
           </Link>
 
           {/* Search */}
@@ -69,62 +73,50 @@ export default function Header({ showSearch = false }: HeaderProps) {
             <button
               onClick={() => setOpen(!open)}
               className="
-                flex items-center justify-center
-                w-10 h-10
-                border border-gray-200
-                bg-gray-100
-                rounded-full
-                shadow-sm
-                hover:bg-gray-200 hover:shadow-md
-                transition-all duration-200
-              "
+            app-icon-button
+            bg-surface
+            border-soft
+            hover:bg-gray-200
+            dark:hover:bg-gray-700
+          "
             >
               <div className="flex flex-col gap-[3px]">
-                <span className="w-4 h-[2px] bg-gray-700"></span>
-                <span className="w-4 h-[2px] bg-gray-700"></span>
-                <span className="w-4 h-[2px] bg-gray-700"></span>
+                <span className="w-4 h-[2px] bg-gray-700 dark:bg-gray-300"></span>
+                <span className="w-4 h-[2px] bg-gray-700 dark:bg-gray-300"></span>
+                <span className="w-4 h-[2px] bg-gray-700 dark:bg-gray-300"></span>
               </div>
             </button>
 
             {/* Dropdown */}
             {open && (
-              <div
-                className="
-                  absolute right-0 mt-2
-                  w-52
-                  bg-white
-                  border border-gray-200
-                  rounded-xl
-                  shadow-lg
-                  overflow-hidden
-                "
-              >
-                {!localStorage.getItem("token") ? (
+              <div className="app-dropdown bg-card border-base">
+                {!localStorage.getItem("token") && (
                   <button
                     onClick={() => {
                       setShowLogin(true);
                       setOpen(false);
                     }}
                     className="
-                    w-full text-left
-                    px-4 py-3 text-sm
-                    hover:bg-gray-100
-                    transition
-                  "
+                  app-menu-item
+                  text-primary
+                  hover:bg-gray-100
+                  dark:hover:bg-gray-700
+                "
                   >
                     Entrar ou Cadastrar-se
                   </button>
-                ) : null}
+                )}
 
-                {localStorage.getItem("token") ? (
+                {localStorage.getItem("token") && (
                   <>
                     <Link
                       href="/user/dashboard"
                       className="
-                        block px-4 py-3 text-sm
-                        hover:bg-gray-100
-                        transition
-                      "
+                    app-menu-item
+                    text-primary
+                    hover:bg-gray-100
+                    dark:hover:bg-gray-700
+                  "
                     >
                       Dashboard
                     </Link>
@@ -132,27 +124,46 @@ export default function Header({ showSearch = false }: HeaderProps) {
                     <Link
                       href="/user/account"
                       className="
-                    block px-4 py-3 text-sm
+                    app-menu-item
+                    text-primary
                     hover:bg-gray-100
-                    transition
+                    dark:hover:bg-gray-700
                   "
                     >
                       Ajustes da Conta
                     </Link>
                   </>
-                ) : null}
+                )}
 
-                <div className="border-t border-gray-200"></div>
+                <div className="border-t border-base"></div>
 
                 <a
                   href="#"
                   className="
-                    block px-4 py-3 text-sm
-                    hover:bg-gray-100
-                    transition
-                  "
+                app-menu-item
+                text-primary
+                hover:bg-gray-100
+                dark:hover:bg-gray-700
+              "
                 >
                   Ajuda
+                </a>
+
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toggleTheme();
+                  }}
+                  className="
+               app-menu-item
+                text-primary
+                hover:bg-gray-100
+                dark:hover:bg-gray-700
+            
+              "
+                >
+                  Tema: {theme}
                 </a>
               </div>
             )}
@@ -164,30 +175,35 @@ export default function Header({ showSearch = false }: HeaderProps) {
       <BlurOverlay show={showLogin} onClick={() => setShowLogin(false)} />
 
       {/* LOGIN CARD */}
-      {showLogin && (
+      {showLogin && ( // Não mexi nisso ainda pq acho que seria componente sei la
         <div
           className="
-            fixed inset-0 z-50
-            flex items-center justify-center
-            px-4
-          "
+        fixed inset-0 z-50
+        flex items-center justify-center
+        px-4
+      "
         >
-          <div className="relative w-full max-w-sm">
-            <LoginCard onSubmit={handleLogin} loading={false} hasBlur={true} />
+          <div className="relative w-full max-w-sm ">
+            <LoginCard
+              onSubmit={handleLogin}
+              loading={false}
+              hasBlur={true}
+            />
 
-            {/* Fechar */}
             <button
               onClick={() => setShowLogin(false)}
               className="
-                absolute -top-3 -right-3
-                w-9 h-9
-                rounded-full
-                bg-white
-                border border-gray-200
-                shadow-md
-                hover:bg-gray-100
-                transition
-              "
+            absolute -top-3 -right-3
+            w-9 h-9
+            rounded-full
+            bg-card
+            border border-base
+            shadow-md
+            text-primary
+            hover:bg-gray-100
+            dark:hover:bg-gray-700
+            transition
+          "
             >
               ✕
             </button>

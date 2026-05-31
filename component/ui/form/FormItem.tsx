@@ -42,8 +42,8 @@ export default function FormItem({
           className="
           px-4 py-3
           rounded-lg
-          border border-gray-300
-          bg-white/90
+          border-base
+          app-input
           focus:outline-none
           focus:ring-2 focus:ring-gray-300
         "

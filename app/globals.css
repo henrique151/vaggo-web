@@ -1,30 +1,382 @@
 @import "tailwindcss";
 
-/*:root {
-  --background: #ffffff;
-  --foreground: #171717;
-} */
+@custom-variant dark (&:is(.dark *));
 
-/* html {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-} */
-/* body { */
-  /* Gradiente vertical: branco → azul claro */
-  /* background: linear-gradient(to bottom, #ffffff 0%, #ffffff 100%);
-  /* Alternativa com cor mais suave: linear-gradient(to bottom, #ffffff 0%, #e0f2fe 100%); */
-  
-  /* color: var(--foreground);
- /* font-family: Arial, Helvetica, sans-serif; */
-  
-  /* width: 100%; */
-/*  min-height: 100vh;
-  /* margin: 0; */
-  /* padding: 0; */
-/*/*} 
+/* ==================================================
+ * BASE
+ * ================================================== */
 
-/* .input {
-  @apply px-4 py-3 rounded-lg border border-gray-300 bg-white/70 
-         focus:outline-none focus:ring-2 focus:ring-blue-400 transition;
-} */
+@layer base {
+  body {
+    @apply
+      min-h-screen
+
+      /* tema claro */
+      text-zinc-900
+      bg-gradient-to-b
+      from-white
+      via-zinc-50
+      to-zinc-100
+
+      /* tema escuro */
+      dark:text-white
+      dark:from-zinc-950
+      dark:via-zinc-900
+      dark:to-zinc-800;
+  }
+}
+
+@layer components {
+
+  /* ==================================================
+   * PALETA SEMÂNTICA
+   * ================================================== */
+
+  /* Fundo principal da aplicação */
+  .bg-base {
+    @apply
+
+      /* tema claro */
+      bg-zinc-50
+
+      /* tema escuro */
+      dark:bg-zinc-900;
+  }
+
+  /* Áreas secundárias */
+  .bg-surface {
+    @apply
+
+      /* tema claro */
+      bg-zinc-50
+
+      /* tema escuro */
+      dark:bg-zinc-900;
+  }
+
+  /* Cards */
+  .bg-card {
+    @apply
+
+      /* tema claro */
+      bg-zinc-50
+
+      /* tema escuro */
+      dark:bg-zinc-900;
+  }
+
+  /* Dropdowns, modais e elementos acima do conteúdo */
+  .bg-popup {
+    @apply
+
+      /* tema claro */
+      bg-zinc-50
+
+      /* tema escuro */
+      dark:bg-zinc-800;
+  }
+
+  /* Hover genérico */
+  .bg-card-hover {
+    @apply
+
+      /* tema claro */
+      hover:bg-zinc-100
+
+      /* tema escuro */
+      dark:hover:bg-zinc-700;
+  }
+
+  /* ==================================================
+   * SUPERFÍCIES
+   * ================================================== */
+
+  /* Áreas elevadas (cards grandes, formulários, modais) */
+  .surface-elevated {
+    @apply
+
+      /* tema claro */
+      bg-zinc-100
+
+      /* tema escuro */
+      dark:bg-zinc-900;
+
+    border: 1px solid;
+
+    @apply
+
+      /* tema claro */
+      border-zinc-300
+
+      /* tema escuro */
+      dark:border-zinc-700
+
+      shadow-sm;
+  }
+
+  /* ==================================================
+   * TEXTOS
+   * ================================================== */
+
+  .text-primary {
+    @apply
+
+      /* tema claro */
+      text-zinc-900
+
+      /* tema escuro */
+      dark:text-white;
+  }
+
+  .text-muted {
+    @apply
+
+      /* tema claro */
+      text-zinc-500
+
+      /* tema escuro */
+      dark:text-zinc-400;
+  }
+
+  .text-subtle {
+    @apply
+
+      /* tema claro */
+      text-zinc-400
+
+      /* tema escuro */
+      dark:text-zinc-500;
+  }
+
+  /* ==================================================
+   * BORDAS
+   * ================================================== */
+
+  .border-base {
+    @apply
+
+      /* tema claro */
+      border-zinc-400
+
+      /* tema escuro */
+      dark:border-zinc-700;
+  }
+
+  .border-soft {
+    @apply
+
+      /* tema claro */
+      border-zinc-300
+
+      /* tema escuro */
+      dark:border-zinc-700;
+  }
+
+  /* ==================================================
+   * COMPONENTES GLOBAIS
+   * ================================================== */
+
+  /* Header principal */
+  .app-header {
+    @apply
+      sticky
+      top-0
+      z-50
+      w-full
+      border-b
+      backdrop-blur-sm;
+  }
+
+  /* Dropdowns */
+  .app-dropdown {
+    @apply
+
+      absolute
+      right-0
+      mt-2
+      w-52
+      rounded-xl
+      overflow-hidden
+      shadow-lg
+      border
+
+      /* tema claro */
+      bg-zinc-50
+      border-zinc-300
+
+      /* tema escuro */
+      dark:bg-zinc-800
+      dark:border-zinc-700;
+  }
+
+  /* Itens de menu */
+  .app-menu-item {
+    @apply
+
+      block
+      w-full
+      text-left
+      px-4
+      py-3
+      text-sm
+      transition-colors
+
+      /* tema claro */
+      text-zinc-900
+      hover:bg-zinc-100
+
+      /* tema escuro */
+      dark:text-white
+      dark:hover:bg-zinc-700;
+  }
+
+  /* Botões redondos (menu, fechar modal etc.) */
+  .app-icon-button {
+    @apply
+
+      flex
+      items-center
+      justify-center
+      w-10
+      h-10
+      rounded-full
+      border
+      shadow-sm
+      transition-all
+      duration-200
+
+      /* tema claro */
+      bg-zinc-100
+      border-zinc-300
+
+      /* tema escuro */
+      dark:bg-zinc-800
+      dark:border-zinc-700;
+  }
+
+  /* Card genérico */
+  .app-card {
+    @apply
+
+      rounded-xl
+      border
+      shadow-md
+
+      /* tema claro */
+      bg-zinc-50
+      border-zinc-300
+
+      /* tema escuro */
+      dark:bg-zinc-900
+      dark:border-zinc-700;
+  }
+
+  /* Input padrão */
+  .app-input {
+    @apply
+
+      px-4
+      py-3
+      rounded-xl
+      border
+
+      /* tema claro */
+      bg-zinc-100
+      border-zinc-400
+      text-zinc-900
+      placeholder:text-zinc-500
+      focus:border-zinc-500
+      focus:ring-zinc-300
+
+      /* tema escuro */
+      dark:bg-zinc-800
+      dark:border-zinc-700
+      dark:text-white
+      dark:placeholder:text-zinc-500
+      dark:focus:border-zinc-500
+      dark:focus:ring-zinc-700
+
+      transition-all
+      focus:outline-none
+      focus:ring-2;
+  }
+
+  /* Modal não testado */
+  .app-modal {
+    @apply
+
+      rounded-2xl
+      border
+      shadow-xl
+
+      /* tema claro */
+      bg-zinc-50
+      border-zinc-300
+
+      /* tema escuro */
+      dark:bg-zinc-800
+      dark:border-zinc-700;
+  }
+
+  /* Botão de fechar */
+  .app-close-button {
+    @apply
+
+      w-9
+      h-9
+      rounded-full
+      border
+      shadow-md
+      transition-colors
+
+      /* tema claro */
+      bg-zinc-100
+      border-zinc-300
+
+      /* tema escuro */
+      dark:bg-zinc-800
+      dark:border-zinc-700;
+  }
+
+  /* ==================================================
+   * BOTÕES
+   * ================================================== */
+
+  .btn-primary {
+    @apply
+
+      px-4
+      py-2
+      rounded-lg
+      text-white
+      transition-colors
+
+      /* tema claro */
+      bg-blue-600
+      hover:bg-blue-700
+
+      /* tema escuro */
+      dark:bg-blue-600
+      dark:hover:bg-blue-500;
+  }
+
+  .btn-secondary {
+    @apply
+
+      px-4
+      py-2
+      rounded-lg
+      border
+      transition-colors
+
+      /* tema claro */
+      text-zinc-900
+      border-zinc-400
+      hover:bg-zinc-100
+
+      /* tema escuro */
+      dark:text-white
+      dark:border-zinc-700
+      dark:hover:bg-zinc-800;
+  }
+}

@@ -28,81 +28,98 @@ export default function SearchBar() {
     <div className="w-full">
       <div
         className="
-          w-full
-          max-w-full
-          h-14
-          bg-white
-          border border-gray-200
-          rounded-full
-          shadow-sm
-          flex items-center
-          px-2
-          overflow-hidden
-        "
+      w-full
+      h-14
+
+      surface-elevated
+
+      rounded-full
+
+      flex items-center
+      px-2
+
+      overflow-hidden
+    "
       >
         {/* Onde */}
         <div className="flex-1 min-w-0 px-4">
-          <p className="text-[11px] font-semibold text-gray-900">Onde</p>
+          <p className="text-[11px] font-semibold text-primary">
+            Onde
+          </p>
 
           <input
             type="text"
             placeholder="Buscar vagas"
             id="search_bar_address"
             className="
-              w-full
-              text-sm
-              text-gray-700
-              placeholder:text-gray-500
-              bg-transparent
-              outline-none
-              truncate
-            "
+          w-full
+
+          text-sm
+          text-muted
+
+          placeholder:text-subtle
+
+          bg-transparent
+          outline-none
+
+          truncate
+        "
           />
         </div>
 
         {/* Divider */}
-        <div className="w-px h-7 bg-gray-200 shrink-0"></div>
+        <div className="w-px h-7 bg-surface border-soft shrink-0"></div>
 
         {/* Quando */}
         <div className="flex-1 min-w-0 px-4">
-          <p className="text-[11px] font-semibold text-gray-900">
-            Horario de Disp.
+          <p className="text-[11px] font-semibold text-primary">
+            Horário de Disp.
           </p>
 
           <input
             type="text"
             placeholder="Insira a data"
             className="
-              w-full
-              text-sm
-              text-gray-700
-              placeholder:text-gray-500
-              bg-transparent
-              outline-none
-              truncate
-            "
+          w-full
+
+          text-sm
+          text-muted
+
+          placeholder:text-subtle
+
+          bg-transparent
+          outline-none
+
+          truncate
+        "
           />
         </div>
 
         {/* Divider */}
-        <div className="w-px h-7 bg-gray-200 shrink-0"></div>
+        <div className="w-px h-7 bg-surface border-soft shrink-0"></div>
 
-        {/* Veículo */}
+        {/* Tipo */}
         <div className="flex-1 min-w-0 px-4">
-          <p className="text-[11px] font-semibold text-gray-900">Tipo</p>
+          <p className="text-[11px] font-semibold text-primary">
+            Tipo
+          </p>
 
           <input
             type="text"
             placeholder="Carro ou moto?"
             className="
-              w-full
-              text-sm
-              text-gray-700
-              placeholder:text-gray-500
-              bg-transparent
-              outline-none
-              truncate
-            "
+          w-full
+
+          text-sm
+          text-muted
+
+          placeholder:text-subtle
+
+          bg-transparent
+          outline-none
+
+          truncate
+        "
           />
         </div>
 
@@ -110,15 +127,17 @@ export default function SearchBar() {
         <button
           onClick={search}
           className="
-            w-10 h-10
-            rounded-full
-            bg-gray-100
-            hover:bg-gray
-            text-white
-            flex items-center justify-center
-            transition
-            shrink-0
-          "
+        app-icon-button
+
+        bg-surface
+        border-base
+
+        text-primary
+
+        hover:bg-card-hover
+
+        shrink-0
+      "
         >
           🔍
         </button>

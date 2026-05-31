@@ -68,19 +68,19 @@ export default function FormCard({
         (event) =>
           onSubmit
             ? onSubmit(event, {
-                endpoint,
-                method,
-                content,
-                useToken,
-                postSubmit,
-              })
+              endpoint,
+              method,
+              content,
+              useToken,
+              postSubmit,
+            })
             : SubmissionHandler(event, {
-                endpoint,
-                method,
-                content,
-                useToken,
-                postSubmit,
-              }) /* fallback to built-in handler if not declared*/
+              endpoint,
+              method,
+              content,
+              useToken,
+              postSubmit,
+            }) /* fallback to built-in handler if not declared*/
       }
     >
       {children}
@@ -102,19 +102,22 @@ export function GenericFormLayout({
   return (
     <section
       className="
-        w-full max-w-lg
-        bg-white
-        border border-gray-200
-        rounded-2xl
-        shadow-sm
-        px-8 py-8
+    w-full
+    max-w-lg
+    bg-card
+    border
+    border-base
+    rounded-2xl
+    shadow-sm
+    px-8
+    py-8
       "
     >
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+        <h1 className="text-2xl font-semibold text-primary">{title}</h1>
 
-        <p className="text-gray-500 text-sm mt-1">{subtitle}</p>
+        <p className="text-muted text-sm mt-1">{subtitle}</p>
       </div>
 
       <section className="flex flex-col gap-4">{children}</section>

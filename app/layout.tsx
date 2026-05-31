@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Ubuntu } from "next/font/google";
 import "./globals.css";
 import Header from "@/component/header";
+import { ThemeProvider } from "@/context/ThemeProvider";
 
 const ubuntu = Ubuntu({
   subsets: ["latin"],
@@ -22,11 +23,12 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${ubuntu.variable} font-sans antialiased bg-gradient-to-b from-white via-white to-gray-50 text-gray-900 min-h-screen`}
+        className={`${ubuntu.variable} font-sans antialiased`}
       >
-        <Header showSearch />
-
-        {children}
+        <ThemeProvider>
+          <Header showSearch />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
