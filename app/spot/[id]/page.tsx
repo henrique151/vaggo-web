@@ -32,6 +32,7 @@ import PropertyReviews from "@/classes/property/review/PropertyReviews";
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 import FormItem from "@/component/ui/form/FormItem";
 import { sendReport } from "@/services/report.service";
+import useWindow from "@/hooks/useWindow";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Page({ params }: any) {
@@ -57,8 +58,10 @@ export default function Page({ params }: any) {
 
   const [bookingStatus, setBookingStatus] = useState(false);
   const [bookingStatusWindow, setBookingStatusWindow] = useState(false);
+  const [windowTest] = useWindow(SpotAvailabilityWindow);
 
-  console.log(property);
+  // console.log("windowTest");
+  // console.log(windowTest);
 
   useEffect(() => {
     const load = async () => {
@@ -182,20 +185,14 @@ export default function Page({ params }: any) {
     );
   }
 
-  function SpotAvailabilityWindow({
-    property,
-    onExit,
-  }: {
-    property: Property;
-    onExit: MouseEventHandler;
-  }) {
+  function SpotAvailabilityWindow() {
     return (
       <>
         <BlurOverlay show={true} onClick={() => {}} />
         <GenericWindow
           title={"Vagas Disponíveis"}
           exitButton={true}
-          onExit={onExit}
+          onExit={windowTest?.hide || undefined}
         >
           {/* TODO insert scroll here */}
           <section className="overflow-y-scroll scroll-smooth h-64">
@@ -400,7 +397,8 @@ export default function Page({ params }: any) {
             <div className="w-full mt-3">
               <button
                 // onClick={() => setShowWindow(true)}
-                onClick={() => setShowSpotsWindow(true)}
+                // onClick={() => setShowSpotsWindow(true)}
+                onClick={windowTest.show}
                 className="w-full py-3 rounded-lg font-medium text-white bg-gray-900 hover:bg-black transition disabled:opacity-60"
               >
                 Vagas Disponíveis
@@ -421,7 +419,7 @@ export default function Page({ params }: any) {
       <section className="m-10">
         <PanelContainer title="Avaliações">
           <p className="mb-2">
-            Avaliação Geral: {reviews?.averageRating || 0}/5
+            Avaliação Geral: {reviews?.averageRating || 1}/5
           </p>
           {reviews?.reviews ? (
             <CarouselContainer title={""} cards={reviewCards} />
@@ -430,7 +428,7 @@ export default function Page({ params }: any) {
           )}
         </PanelContainer>
       </section>
-
+      {/*
       {showSpotsWindow && (
         <SpotAvailabilityWindow
           property={property}
@@ -440,6 +438,9 @@ export default function Page({ params }: any) {
           }}
         />
       )}
+      */}
+
+      {windowTest.component && <windowTest.component />}
 
       {showVehicleWindow && (
         <VehicleAvailabilityWindow

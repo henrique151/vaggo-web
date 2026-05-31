@@ -9,6 +9,8 @@ export default function FormItem({
   required,
   placeholder,
   items,
+  value,
+  className,
 }: {
   type?: HTMLInputTypeAttribute | "select";
   // type: string;
@@ -17,9 +19,11 @@ export default function FormItem({
   required?: boolean;
   placeholder?: string;
   items?: { value: string; label: string }[];
+  value?: string;
+  className?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className={`flex flex-col gap-1 ${className || ""}`}>
       <label className="text-sm text-gray-600">{label}</label>
 
       {type == "select" ? (
@@ -39,14 +43,13 @@ export default function FormItem({
           name={name}
           required={required}
           placeholder={placeholder}
-          className="
-          px-4 py-3
+          className={`px-4 py-3
           rounded-lg
           border border-gray-300
           bg-white/90
           focus:outline-none
-          focus:ring-2 focus:ring-gray-300
-        "
+          focus:ring-2 focus:ring-gray-300`}
+          defaultValue={value}
         />
       )}
     </div>

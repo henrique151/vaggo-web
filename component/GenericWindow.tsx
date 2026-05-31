@@ -5,11 +5,13 @@ export default function GenericWindow({
   onExit,
   exitButton = true,
   children,
+  backgroundBlur = false,
 }: {
   title: string;
   exitButton: boolean;
   onExit: MouseEventHandler;
   children: React.ReactNode;
+  backgroundBlur?: boolean;
 }) {
   return (
     <div
