@@ -55,10 +55,8 @@ export default function Header({ showSearch = false }: HeaderProps) {
         <div className="container-default flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <img src="@/vaggo4.png" width={28} height={28} alt="Logo" />
-            <span className="font-semibold text-lg text-primary">
-              Vaggo
-            </span>
+            {/*<img src="@/vaggo4.png" width={28} height={28} alt="Logo" />*/}
+            <span className="font-semibold text-lg text-primary">Vaggo</span>
           </Link>
 
           {/* Search */}
@@ -160,7 +158,7 @@ export default function Header({ showSearch = false }: HeaderProps) {
                 text-primary
                 hover:bg-gray-100
                 dark:hover:bg-gray-700
-            
+
               "
                 >
                   Tema: {theme}
@@ -184,11 +182,7 @@ export default function Header({ showSearch = false }: HeaderProps) {
       "
         >
           <div className="relative w-full max-w-sm ">
-            <LoginCard
-              onSubmit={handleLogin}
-              loading={false}
-              hasBlur={true}
-            />
+            <LoginCard onSubmit={handleLogin} loading={false} hasBlur={true} />
 
             <button
               onClick={() => setShowLogin(false)}
