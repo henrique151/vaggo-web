@@ -105,11 +105,11 @@ export default function Page() {
             />*/}
 
             <div className="flex justify-between text-sm mt-1">
-              <Link href="/register" className="text-gray-600 hover:text-black">
+              <Link href="/register" className="text-muted hover:text-sky-600">
                 Criar conta
               </Link>
 
-              <Link href="/template" className="text-gray-600 hover:text-black">
+              <Link href="/template" className="text-muted hover:text-sky-600">
                 Esqueci a senha
               </Link>
             </div>
@@ -123,8 +123,8 @@ export default function Page() {
                 rounded-lg
                 font-medium
                 text-white
-                bg-gray-900
-                hover:bg-black
+                btn-primary
+                btn-hover
                 transition
                 disabled:opacity-60
               "

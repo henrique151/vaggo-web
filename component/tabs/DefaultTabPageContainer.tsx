@@ -10,8 +10,8 @@ export default function DefaultTabPageContainer({
     <section className="lg:col-span-3">
       <div
         className="
-        bg-white
-        border border-gray-200
+        bg-base
+        border border-base
         rounded-3xl
         shadow-sm
         p-8

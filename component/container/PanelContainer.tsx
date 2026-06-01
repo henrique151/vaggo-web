@@ -7,7 +7,7 @@ export default function PanelContainer({ title, children }: any) {
       {/*<section className="">*/}
       <h2 className="text-2xl font-semibold mb-6">{title}</h2>
 
-      <div className="text-gray-500">{children}</div>
+      <div className="text-base">{children}</div>
       {/*</section>*/}
     </PanelLayout>
   );

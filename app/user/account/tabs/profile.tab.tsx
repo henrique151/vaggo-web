@@ -28,9 +28,9 @@ const Page = () => {
             rounded-xl
             text-sm
             font-medium
-            bg-gray-900
+            btn-primary
+            btn-hover
             text-white
-            hover:bg-black
             transition
             shrink-0
           "

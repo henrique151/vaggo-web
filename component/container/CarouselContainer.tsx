@@ -31,10 +31,10 @@ export default function CarouselContainer({
   const prev = () => index > 0 && setIndex(index - 1);
 
   return (
-    <section className="w-full">
+    <section className="w-full border-base surface-elevated rounded-lg p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>
+      <div className="flex items-center justify-between mb-4bg-white">
+        <h2 className="font-semibold text-lg text-primary">{title}</h2>
 
         <div className="flex gap-2">
           <button
@@ -43,7 +43,7 @@ export default function CarouselContainer({
             className="
               w-8 h-8
               rounded-full
-              bg-white
+              bg-base
               border border-gray-200
               shadow-sm
               hover:bg-gray-50
@@ -59,7 +59,7 @@ export default function CarouselContainer({
             className="
               w-8 h-8
               rounded-full
-              bg-white
+              bg-base
               border border-gray-200
               shadow-sm
               hover:bg-gray-50

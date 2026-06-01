@@ -130,8 +130,8 @@ export default function Page({ params }: any) {
     return (
       <div
         className="
-          bg-white
-          border border-gray-200
+          bg-card
+          border border-soft
           rounded-2xl
           shadow-sm
           p-5
@@ -139,11 +139,11 @@ export default function Page({ params }: any) {
           transition
         "
       >
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-base">
           {data.brand} {data.model}
         </h3>
 
-        <p className="text-sm text-gray-500 mt-2">Placa: {data.licensePlate}</p>
+        <p className="text-sm text-muted mt-2">Placa: {data.licensePlate}</p>
       </div>
     );
   }
@@ -166,14 +166,13 @@ export default function Page({ params }: any) {
             setShowVehicleWindow(true);
           }}
           className="
-            mt-4
-            py-3
-            rounded-lg
-            font-medium
-            text-white
-            bg-gray-900
-            hover:bg-black
-            transition
+             bg-card
+          border border-soft
+          rounded-2xl
+          shadow-sm
+          p-5
+          hover:shadow-md
+          transition
             disabled:opacity-60
             w-full
           "
@@ -188,7 +187,7 @@ export default function Page({ params }: any) {
   function SpotAvailabilityWindow() {
     return (
       <>
-        <BlurOverlay show={true} onClick={() => {}} />
+        <BlurOverlay show={true} onClick={() => { }} />
         <GenericWindow
           title={"Vagas Disponíveis"}
           exitButton={true}
@@ -233,7 +232,7 @@ export default function Page({ params }: any) {
     // if (!vehicles) return <></>;
     return (
       <>
-        <BlurOverlay show={true} onClick={() => {}} />
+        <BlurOverlay show={true} onClick={() => { }} />
         <GenericWindow
           title={"Selecione um veículo para esta vaga"}
           exitButton={true}
@@ -261,7 +260,7 @@ export default function Page({ params }: any) {
   function BookingStatusWindow({ onExit }: { onExit: MouseEventHandler }) {
     return (
       <>
-        <BlurOverlay show={true} onClick={() => {}} />
+        <BlurOverlay show={true} onClick={() => { }} />
         <GenericWindow
           title={
             bookingStatus ? "Sucesso!" : "Não foi possível realizar a reserva"
@@ -332,7 +331,7 @@ export default function Page({ params }: any) {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-lg font-medium text-white bg-gray-900 hover:bg-black transition disabled:opacity-60"
+            className="w-full py-3 rounded-lg font-medium text-white btn-primary btn-hover transition disabled:opacity-60"
           >
             Enviar
           </button>
@@ -342,7 +341,7 @@ export default function Page({ params }: any) {
 
     return (
       <>
-        <BlurOverlay show={true} onClick={() => {}} />
+        <BlurOverlay show={true} onClick={() => { }} />
         <GenericWindow title={"Denúncia"} exitButton={true} onExit={onExit}>
           {messages[String(messageState)]}
         </GenericWindow>
@@ -397,9 +396,8 @@ export default function Page({ params }: any) {
             <div className="w-full mt-3">
               <button
                 // onClick={() => setShowWindow(true)}
-                // onClick={() => setShowSpotsWindow(true)}
-                onClick={windowTest.show}
-                className="w-full py-3 rounded-lg font-medium text-white bg-gray-900 hover:bg-black transition disabled:opacity-60"
+                onClick={() => setShowSpotsWindow(true)}
+                className="w-full py-3 rounded-lg font-medium text-white btn-primary btn-hover transition disabled:opacity-60"
               >
                 Vagas Disponíveis
               </button>

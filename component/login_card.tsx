@@ -23,10 +23,9 @@ export default function LoginCard({
         border
         transition
 
-        ${
-          hasBlur
-            ? "bg-white/100 backdrop-blur-md border-white/40 shadow-xl"
-            : "bg-white border-gray-200"
+        ${hasBlur
+          ? "bg-white/100 backdrop-blur-md border-white/40 shadow-xl"
+          : "bg-white border-gray-200"
         }
       `}
     >
@@ -101,15 +100,15 @@ export default function LoginCard({
           type="submit"
           disabled={loading}
           className="
-            mt-4
-            py-3
-            rounded-lg
-            font-medium
-            text-white
-            bg-gray-900
-            hover:bg-black
-            transition
-            disabled:opacity-60
+                mt-4
+                py-3
+                rounded-lg
+                font-medium
+                text-white
+                btn-primary
+                btn-hover
+                transition
+                disabled:opacity-60
           "
         >
           {loading ? "Entrando..." : "Entrar"}

@@ -181,14 +181,15 @@ export default function RegisterCard({ type, onSubmit }: RegisterCardProps) {
         <button
           type="submit"
           className="
-            mt-4
-            py-3
-            rounded-lg
-            font-medium
-            text-white
-            bg-gray-900
-            hover:bg-black
-            transition
+              mt-4
+                py-3
+                rounded-lg
+                font-medium
+                text-white
+                btn-primary
+                btn-hover
+                transition
+                disabled:opacity-60
           "
         >
           {current.button}

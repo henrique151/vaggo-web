@@ -16,7 +16,17 @@ const Page = () => {
 
         <Link
           href="/user/vehicle/register"
-          className="px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-black transition"
+          className="
+            px-4 py-2
+            rounded-xl
+            text-sm
+            font-medium
+            btn-primary
+            btn-hover
+            text-white
+            transition
+            shrink-0
+          "
         >
           + Novo veículo
         </Link>

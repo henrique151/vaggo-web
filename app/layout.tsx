@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "@/component/header";
 import VLibras from "vlibras-nextjs";
 import Script from "next/script";
+import { ThemeProvider } from "@/context/ThemeProvider";
 
 const ubuntu = Ubuntu({
   subsets: ["latin"],
@@ -28,12 +29,12 @@ export default function RootLayout({
         <title>Vaggo</title>
       </head>
       <body
-        className={`${ubuntu.variable} font-sans antialiased bg-gradient-to-b from-white via-white to-gray-50 text-gray-900 min-h-screen`}
+        className={`${ubuntu.variable} font-sans antialiased`}
       >
-        <Header showSearch />
-        {children}
-
-        <VLibras forceOnload />
+        <ThemeProvider>
+          <Header showSearch />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
