@@ -11,7 +11,7 @@ const Page = () => {
 
   return (
     <TabPage label="Denúncias">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 bg-base">
         <h2 className="text-2xl font-semibold">Minhas Denúncias</h2>
       </div>
 

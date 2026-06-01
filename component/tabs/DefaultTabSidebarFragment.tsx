@@ -19,13 +19,12 @@ export default function DefaultTabSidebarFragment({
     <button
       onClick={() => activeTabSetter(tab)}
       className={`
-      w-full text-left px-4 py-3 rounded-2xl transition
-      ${
-        activeTab === tab
-          ? "bg-gray-900 text-white"
-          : "text-gray-700 hover:bg-gray-100"
-      }
-    `}
+    w-full text-left px-4 py-3 rounded-2xl transition
+    ${activeTab === tab
+          ? "tab-item-active"
+          : "tab-item-hover"
+        }
+  `}
     >
       {tab.getLabel("sidebar")}
     </button>

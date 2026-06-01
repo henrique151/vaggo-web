@@ -9,7 +9,7 @@ export default function PanelLayout({
 }) {
   return (
     <section
-      className={`bg-white rounded-3xl border border-gray-200 shadow-sm ${className || ""}`}
+      className={`bg-card rounded-3xl border border-soft shadow-sm ${className || ""}`}
     >
       {children}
     </section>

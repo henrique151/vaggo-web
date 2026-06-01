@@ -29,8 +29,8 @@ export function EntityCard({
         text-lg
         text-primary
         transition-colors
-        hover:text-blue-600
-        dark:hover:text-blue-400
+        hover:text-sky-600
+        dark:hover:text-sky-400
       "
     >
       {title}

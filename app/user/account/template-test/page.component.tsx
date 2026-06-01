@@ -47,7 +47,7 @@ export default function PageComponent() {
               fixed inset-0
               z-50
               flex items-center justify-center
-              bg-black/30
+              bg-red/30
               backdrop-blur-sm
             "
             onClick={() => setIsEditing(false)}

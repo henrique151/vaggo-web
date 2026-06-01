@@ -15,28 +15,28 @@ export default function PageComponent() {
 
   return (
     <PageContextProvider>
-      <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-        {/*<Header />*/}
+      <main className="min-h-screen">
+        <section className="max-w-7xl mx-auto px-6 py-8">
+          <div className="surface-elevated rounded-4xl p-8">
+            <div className="mb-8">
+              <h1 className="text-4xl font-semibold text-primary">
+                Minha Conta
+              </h1>
 
-        <section className="max-w-7xl mx-auto px-6 py-10">
-          <div className="mb-8">
-            <h1 className="text-4xl font-semibold text-gray-900">
-              Minha Conta
-            </h1>
+              <p className="text-muted mt-2">
+                Gerencie suas informações e preferências
+              </p>
+            </div>
 
-            <p className="text-gray-500 mt-2">
-              Gerencie suas informações e preferências
-            </p>
-          </div>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              <DefaultTabSidebar
+                tabs={pageTabs}
+                activeTab={activeTab}
+                activeTabSetter={setActiveTab}
+              />
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <DefaultTabSidebar
-              tabs={pageTabs}
-              activeTab={activeTab}
-              activeTabSetter={setActiveTab}
-            />
-
-            <DefaultTabPageContainer activeTab={activeTab} />
+              <DefaultTabPageContainer activeTab={activeTab} />
+            </div>
           </div>
         </section>
 
@@ -44,12 +44,12 @@ export default function PageComponent() {
         {isEditing && (
           <div
             className="
-              fixed inset-0
-              z-50
-              flex items-center justify-center
-              bg-black/30
-              backdrop-blur-sm
-            "
+          fixed inset-0
+          z-50
+          flex items-center justify-center
+          bg-black/30
+          backdrop-blur-sm
+        "
             onClick={() => setIsEditing(false)}
           >
             <div onClick={(e) => e.stopPropagation()}></div>

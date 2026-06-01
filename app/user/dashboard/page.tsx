@@ -66,113 +66,113 @@ export default function Page() {
   }, [nextBookings]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      {/*<Header />*/}
+    <main className="min-h-screen">
+      <div className="container-default mt-6 mb-12">
+        <section
+          className="
+          surface-elevated
+          max-w-6xl
+          mx-auto
+          rounded-4xl
+          p-8
+        "
+        >
+          {/* TOPO */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
+            <div className="flex flex-row">
+              <Image
+                alt="Foto de Perfil do Usuário"
+                width={128}
+                height={128}
+                src={userData?.userPicture.url || "/"}
+                className="mr-6 rounded-4xl"
+              />
 
-      <section className="max-w-7xl mx-auto px-6 py-10">
-        {/* TOPO */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
-          <div className="flex flex-row">
-            <Image
-              alt="Foto de Perfil do Usuário"
-              width={128}
-              height={128}
-              src={userData?.userPicture.url || "/"}
-              className="mr-6 rounded-4xl"
-            />
+              <div className="flex flex-col justify-center">
+                <h1 className="text-4xl font-semibold text-primary">
+                  Olá, {userData?.person.name}!
+                </h1>
 
-            <div className="flex-col">
-              <h1 className="text-4xl font-semibold text-gray-900">
-                Olá, {userData?.person.name}!
-              </h1>
-
-              <p className="text-gray-500 mt-2 text-lg">{GreetUser()}</p>
+                <p className="text-muted mt-2 text-lg">
+                  {GreetUser()}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/*<Link
-            href="/user/vehicle/register"
-            className="
-              px-6 py-4
-              rounded-2xl
-              bg-gray-900
-              text-white
-              font-medium
-              hover:bg-black
-              transition
-              shadow-sm
-            "
-          >
-            Registrar veículo
-          </Link>*/}
-        </div>
+          {/* GRID */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* ESQUERDA */}
+            <div className="lg:col-span-2 space-y-8">
+              <PanelContainer title="Próximas Reservas">
+                {nextBookingsCards ? (
+                  <CarouselContainer
+                    title=""
+                    cards={nextBookingsCards}
+                  />
+                ) : (
+                  <p className="text-muted">
+                    Não há reservas agendadas no momento.
+                  </p>
+                )}
+              </PanelContainer>
 
-        {/* GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* ESQUERDA */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Paineis de Reservas */}
+              <PanelContainer title="Reservas anteriores">
+                <p className="text-muted">
+                  Por enquanto não há reservas no histórico.
+                </p>
+              </PanelContainer>
 
-            {/* Próximas Reservas */}
-            <PanelContainer title={"Próximas Reservas"}>
-              {nextBookingsCards ? (
-                <CarouselContainer title={""} cards={nextBookingsCards} />
-              ) : (
-                <p>Não há reservas agendadas no momento.</p>
-              )}
-            </PanelContainer>
+              <PanelContainer title="Solicitações de Reservas">
+                {bookingSolicitations?.length !== 0 ? (
+                  bookingSolicitations?.map(mapSolicitationFrames)
+                ) : (
+                  <p className="text-muted">
+                    Nenhuma Solicitação no momento.
+                  </p>
+                )}
+              </PanelContainer>
+            </div>
 
-            {/* Histórico de Reservas */}
-            <PanelContainer title={"Reservas anteriores"}>
-              <p>Por enquanto não há reservas no histórico.</p>
-              {/*<PanelLayout>oi!</PanelLayout>*/}
-            </PanelContainer>
-
-            {/* Solicitações de Reservas */}
-            <PanelContainer title={"Solicitações de Reservas"}>
-              {/* TODO insert length checker */}
-              {bookingSolicitations?.length != 0 ? (
-                bookingSolicitations?.map(mapSolicitationFrames)
-              ) : (
-                <p>Nenhuma Solicitação no momento.</p>
-              )}
-            </PanelContainer>
-          </div>
-
-          {/* DIREITA */}
-          <div className="space-y-8">
-            <PanelContainer title={"Seu(s) veículo(os)"}>
-              {carsData?.map((car) => {
-                // return <VehicleCard key={car.id} raw_data={car} />;
-                return (
+            {/* DIREITA */}
+            <div className="space-y-8">
+              <PanelContainer title="Seu(s) veículo(os)">
+                {carsData?.map((car) => (
                   <EntityFrame key={car.id}>
                     <DefaultEntityFrame
                       title={`${car.brand} ${car.model}`}
                       description={`Placa: ${car.licensePlate}`}
                     />
                   </EntityFrame>
-                );
-              }) || "Não há Veículos cadastrado no momento"}
-            </PanelContainer>
-            <PanelContainer title={"Mensagens"}>
-              {chats?.map((chat) => {
-                return (
+                )) || (
+                    <p className="text-muted">
+                      Não há veículos cadastrados no momento.
+                    </p>
+                  )}
+              </PanelContainer>
+
+              <PanelContainer title="Mensagens">
+                {chats?.map((chat) => (
                   <EntityFrame key={chat.id}>
                     <DefaultEntityFrame
                       title={`${chat.user.name} - ${chat.subtitle}`}
                       description={
-                        chat.lastContent || "Nenhuma mensagem no momento."
+                        chat.lastContent ||
+                        "Nenhuma mensagem no momento."
                       }
                       redirectTo={`/chat/${chat.id}`}
                     />
                   </EntityFrame>
-                );
-              }) || <p>Nenhuma mensagem no momento.</p>}
-              {/*<p>Nenhuma mensagem recente</p>*/}
-            </PanelContainer>
+                )) || (
+                    <p className="text-muted">
+                      Nenhuma mensagem no momento.
+                    </p>
+                  )}
+              </PanelContainer>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
@@ -187,4 +187,4 @@ function GreetUser() {
   }
 }
 
-function mapBookingCards(d: any) {}
+function mapBookingCards(d: any) { }

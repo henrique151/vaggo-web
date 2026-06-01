@@ -32,8 +32,8 @@ export default function DefaultTabSidebar({
     >
       <aside
         className="
-      bg-white
-      border border-gray-200
+      bg-card
+      border border-base
       rounded-3xl
       shadow-sm
       p-4

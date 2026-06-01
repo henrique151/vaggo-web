@@ -4,8 +4,8 @@ import { HTMLAttributes } from "react";
 type stateColors = "green" | "yellow" | "red" | "gray";
 
 const statusModes: Record<stateColors, string> = {
-  green: "bg-green-100 text-green-700",
-  red: "bg-red-100 text-red-700",
+  green: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+  red: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
   yellow: "",
   gray: "",
 };
