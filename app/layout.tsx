@@ -24,6 +24,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
+      <head>
+        <title>Vaggo</title>
+      </head>
       <body
         className={`${ubuntu.variable} font-sans antialiased bg-gradient-to-b from-white via-white to-gray-50 text-gray-900 min-h-screen`}
       >

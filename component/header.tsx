@@ -6,6 +6,10 @@ import LoginCard from "./login_card";
 import BlurOverlay from "./blur_overlay";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+
+// import logo from "@/public/assets/logo/vaggo3.png";
+import logo from "@/public/assets/logo/logo.png";
 
 interface HeaderProps {
   showSearch?: boolean;
@@ -50,11 +54,18 @@ export default function Header({ showSearch = false }: HeaderProps) {
     <>
       {/* HEADER */}
       <header className="sticky top-0 z-50 w-full bg-gradient-to-b from-white to-gray-100 border-b border-gray-200">
-        <div className="container-default flex items-center justify-between h-16 gap-4">
+        <div className="container-default flex items-center justify-between h-16 gap-4 mx-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <img src="/icons/globe.ico" width={28} height={28} alt="Logo" />
-            <span className="font-semibold text-lg">Vaggo</span>
+            <Image src={logo} width={46} height={46} quality={100} alt="Logo" />
+            {/*<Image
+              src={logo}
+              width={160}
+              height={64}
+              quality={100}
+              alt="Logo"
+            />*/}
+            {/*<span className="font-semibold text-lg">Vaggo</span>*/}
           </Link>
 
           {/* Search */}
