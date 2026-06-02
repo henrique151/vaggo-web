@@ -9,6 +9,14 @@ export default class City {
   constructor(data: any) {
     this.id = data.id;
     this.name = data.name;
-    this.state = new State(data.state);
+    console.log(data.state);
+    if (typeof State == typeof data.state) {
+      console.log("yes it is!");
+      this.state = data.state;
+    } else {
+      if (data.state) {
+        this.state = new State(data.state);
+      }
+    }
   }
 }

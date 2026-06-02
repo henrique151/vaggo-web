@@ -5,6 +5,7 @@ import { getToken } from "@/services/user.service";
 import { useState } from "react";
 import { PageContext } from "./page.context";
 import useGetMyReports from "@/hooks/api/report/useGetMyReports";
+import { useGetMyProperties } from "@/hooks/api/property/useGetMyProperties";
 
 export default function PageContextProvider({
   children,
@@ -19,12 +20,14 @@ export default function PageContextProvider({
   });
   const [vehicles] = useGetMyVehicles();
   const [reports] = useGetMyReports();
+  const [properties] = useGetMyProperties();
 
   console.log("from context page");
   // console.log(user);
-  console.log(reports);
+  // console.log(reports);
+  console.log(properties);
 
-  const provider = { token, user, vehicles, reports };
+  const provider = { token, user, vehicles, reports, properties };
   return (
     <>
       <PageContext.Provider value={provider}>{children}</PageContext.Provider>

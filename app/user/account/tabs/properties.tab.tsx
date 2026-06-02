@@ -1,9 +1,14 @@
 import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import Link from "next/link";
+import { usePageContext } from "../page.context";
+import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 
 const Page = () => {
-  // const { vehicles } = usePageContext();
+  const { properties } = usePageContext();
+
+  console.log("properties");
+  console.log(properties);
 
   return (
     <TabPage label="Propriedades">
@@ -28,10 +33,18 @@ const Page = () => {
         </Link>
       </div>
 
-      <div className="space-y-4">
-        {/*{properties?.map((property) => {
-          return <EntityCard title={""} description={""} />;
-        }) || "Vazio"}*/}
+      <div className="space-y-4 flex flex-row">
+        {properties?.map((property) => {
+          return (
+            <div key={property.id} className="mr-3">
+              <EntityCard
+                title={property.name}
+                description={property.description}
+                // image={property.images[0]}
+              />
+            </div>
+          );
+        }) || ""}
       </div>
     </TabPage>
   );
