@@ -33,6 +33,8 @@ import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 import FormItem from "@/component/ui/form/FormItem";
 import { sendReport } from "@/services/report.service";
 import useWindow from "@/hooks/useWindow";
+import StatusBadge from "@/component/ui/StatusDisplay";
+import TagContainer from "@/component/container/TagContainer";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Page({ params }: any) {
@@ -49,16 +51,19 @@ export default function Page({ params }: any) {
   const [reviews, setReviews] = useState<PropertyReviews>(undefined);
   const [reviewCards, setReviewCards] = useState<React.ReactNode[]>([]);
 
-  const [showSpotsWindow, setShowSpotsWindow] = useState(false);
-  const [showVehicleWindow, setShowVehicleWindow] = useState(false);
-  const [reportWindow, setReportWindow] = useState(false);
+  // const [showSpotsWindow, setShowSpotsWindow] = useState(false);
+  // const [showVehicleWindow, setShowVehicleWindow] = useState(false);
+  // const [reportWindow, setReportWindow] = useState(false);
 
   const [selectedSpot, setSelectedSpot] = useState(-1);
-  const [selectedVehicle, setSelectedVehicle] = useState(-1);
+  // const [selectedVehicle, setSelectedVehicle] = useState(-1);
 
   const [bookingStatus, setBookingStatus] = useState(false);
-  const [bookingStatusWindow, setBookingStatusWindow] = useState(false);
-  const [windowTest] = useWindow(SpotAvailabilityWindow);
+  // const [bookingStatusWindow, setBookingStatusWindow] = useState(false);
+
+  const [availableSpotsWindow] = useWindow(SpotAvailabilityWindow);
+  const [availableVehiclesWindow] = useWindow(VehicleAvailabilityWindow);
+  const [bookingStatusWindow] = useWindow(BookingStatusWindow);
 
   // console.log("windowTest");
   // console.log(windowTest);
@@ -117,8 +122,10 @@ export default function Page({ params }: any) {
     } else {
       setBookingStatus(false);
     }
-    setShowVehicleWindow(false);
-    setBookingStatusWindow(true);
+    availableVehiclesWindow.hide();
+    bookingStatusWindow.show();
+    // setShowVehicleWindow(false);
+    // setBookingStatusWindow(true);
 
     // return res;
   };
@@ -149,21 +156,52 @@ export default function Page({ params }: any) {
   }
 
   function SpotAvailabilityCard({ spot }: { spot: Spot }) {
+    console.log(spot);
     return (
-      <section className="bg-white w-full rounded-3xl border border-gray-200 shadow-sm p-8 w-100 mb-4">
-        <h2 className="font-semibold mb-6">{spot.identifier}</h2>
+      <section className="surface-elevated w-full rounded-3xl p-8 w-100 mb-4">
+        <div className="flex flex-row w-full">
+          <div className="w-1/2">
+            <Image
+              className="rounded-3xl"
+              src={spot.image.url}
+              width={128}
+              height={128}
+              alt={""}
+            />
+          </div>
+          <div className="flex flex-col items-end w-1/2">
+            <h2 className="font-semibold mb-6">{spot.identifier}</h2>
 
-        <div className="flex flex-col items-end">
-          <p>{spot.status}</p>
-          <p>Tamanho: {spot.size}</p>
-          <p>{spot.allowedVehicles}</p>
+            {/*<p>{spot.status}</p>*/}
+            <StatusBadge
+              conditionValue={spot.status}
+              conditionTable={{ DISPONIVEL: "green" }}
+              statusLabelTable={{ green: "Disponível", gray: "Desconhecido" }}
+              defaultValue={"gray"}
+            />
+
+            <div className="h-2" />
+            <div className="flex flex-row my-2">
+              {spot.allowedVehicles.map((allowed) => {
+                return (
+                  <TagContainer key={allowed} className="ml-2">
+                    {allowed}
+                  </TagContainer>
+                );
+              })}
+            </div>
+            <p>Tamanho: {spot.size}</p>
+            <p>Preço: R${spot.price}</p>
+          </div>
         </div>
 
         <button
           onClick={() => {
             setSelectedSpot(spot.id);
-            setShowSpotsWindow(false);
-            setShowVehicleWindow(true);
+            availableSpotsWindow.hide();
+            availableVehiclesWindow.show();
+            // setShowSpotsWindow(false);
+            // setShowVehicleWindow(true);
           }}
           className="
              bg-card
@@ -187,14 +225,14 @@ export default function Page({ params }: any) {
   function SpotAvailabilityWindow() {
     return (
       <>
-        <BlurOverlay show={true} onClick={() => { }} />
+        <BlurOverlay show={true} onClick={() => {}} />
         <GenericWindow
           title={"Vagas Disponíveis"}
           exitButton={true}
-          onExit={windowTest?.hide || undefined}
+          onExit={availableSpotsWindow?.hide || undefined}
         >
           {/* TODO insert scroll here */}
-          <section className="overflow-y-scroll scroll-smooth h-64">
+          <section className="overflow-y-scroll scroll-smooth h-120 w-full">
             {spots.map((spot: Spot) => {
               // TODO change to EntityFrame
               if (spot.status != "INDISPONIVEL" && spot.status != "OCUPADA") {
@@ -232,11 +270,11 @@ export default function Page({ params }: any) {
     // if (!vehicles) return <></>;
     return (
       <>
-        <BlurOverlay show={true} onClick={() => { }} />
+        <BlurOverlay show={true} onClick={() => {}} />
         <GenericWindow
           title={"Selecione um veículo para esta vaga"}
           exitButton={true}
-          onExit={onExit}
+          onExit={availableVehiclesWindow.hide}
         >
           {vehicles?.map((vehicle) => {
             return (
@@ -260,13 +298,13 @@ export default function Page({ params }: any) {
   function BookingStatusWindow({ onExit }: { onExit: MouseEventHandler }) {
     return (
       <>
-        <BlurOverlay show={true} onClick={() => { }} />
+        <BlurOverlay show={true} onClick={() => {}} />
         <GenericWindow
           title={
             bookingStatus ? "Sucesso!" : "Não foi possível realizar a reserva"
           }
           exitButton={true}
-          onExit={onExit}
+          onExit={bookingStatusWindow.hide}
         >
           {bookingStatus ? (
             <p>Sua vaga está reservada e aguardando aprovação do dono</p>
@@ -341,7 +379,7 @@ export default function Page({ params }: any) {
 
     return (
       <>
-        <BlurOverlay show={true} onClick={() => { }} />
+        <BlurOverlay show={true} onClick={() => {}} />
         <GenericWindow title={"Denúncia"} exitButton={true} onExit={onExit}>
           {messages[String(messageState)]}
         </GenericWindow>
@@ -355,7 +393,7 @@ export default function Page({ params }: any) {
       {/*<Header />*/}
       {/* TODO transform into ImageCarousel */}
       <section className="m-10 flex flex-row">
-        <section className="bg-white w-full rounded-3xl border border-gray-200 shadow-sm p-8 flex flex-row">
+        <section className="surface-elevated w-full rounded-3xl p-8 flex flex-row">
           <h2 className="text-2xl w-1/2  mb-6 mr-6">
             {property?.images[0] ? (
               <Image
@@ -389,14 +427,17 @@ export default function Page({ params }: any) {
             <p>Avaliação: {reviews?.averageRating || 1}/5</p>
 
             {/* TODO get all spots prices, return minnimum and maximum value of each one */}
-            <h2 className="text-2xl font-semibold mt-6">R$ 0 / Reserva</h2>
+            {/*<h2 className="text-2xl font-semibold mt-6">R$ 0 / Reserva</h2>*/}
 
             {/* TODO responsive: make buttons go down each other when resizing to small screen */}
             {/*<div className="grid grid-cols-2 w-full mt-3">*/}
             <div className="w-full mt-3">
               <button
                 // onClick={() => setShowWindow(true)}
-                onClick={() => setShowSpotsWindow(true)}
+                onClick={() => {
+                  availableSpotsWindow.show();
+                  console.log("ojad");
+                }}
                 className="w-full py-3 rounded-lg font-medium text-white btn-primary btn-hover transition disabled:opacity-60"
               >
                 Vagas Disponíveis
@@ -416,11 +457,13 @@ export default function Page({ params }: any) {
 
       <section className="m-10">
         <PanelContainer title="Avaliações">
-          <p className="mb-2">
-            Avaliação Geral: {reviews?.averageRating || 1}/5
-          </p>
-          {reviews?.reviews ? (
-            <CarouselContainer title={""} cards={reviewCards} />
+          {reviews?.reviews.length > 0 ? (
+            <>
+              <p className="mb-2">
+                Avaliação Geral: {reviews?.averageRating || 1}/5
+              </p>
+              <CarouselContainer title={""} cards={reviewCards} />
+            </>
           ) : (
             <p>No momento, nenhuma avaliação foi registrada.</p>
           )}
@@ -438,9 +481,13 @@ export default function Page({ params }: any) {
       )}
       */}
 
-      {windowTest.component && <windowTest.component />}
+      {availableSpotsWindow.component && <availableSpotsWindow.component />}
+      {availableVehiclesWindow.component && (
+        <availableVehiclesWindow.component />
+      )}
+      {bookingStatusWindow.component && <bookingStatusWindow.component />}
 
-      {showVehicleWindow && (
+      {/*{showVehicleWindow && (
         <VehicleAvailabilityWindow
           onExit={() => {
             setShowVehicleWindow(false);
@@ -473,7 +520,7 @@ export default function Page({ params }: any) {
             setReportWindow(false);
           }}
         />
-      )}
+      )}*/}
     </main>
   );
 }

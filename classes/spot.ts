@@ -1,3 +1,4 @@
+import { Image } from "./data/Image";
 import Property from "./property";
 import { VehicleTypes } from "./vehicle";
 
@@ -9,9 +10,11 @@ export class Spot {
   public isCovered: boolean;
   public approvalStatus: string;
   public allowedVehicles: VehicleTypes[];
+  public image: Image;
   // public operatingHours: OperatingHours
   public isActive: boolean;
   public property?: Property;
+  public price: string;
   constructor(
     data: any,
     //TODO insert Availability properties here, and check an efficient way of putting mass variables in a single way
@@ -25,5 +28,7 @@ export class Spot {
     this.allowedVehicles = data.allowedVehicles;
     this.isActive = data.isActive;
     this.property = data.property;
+    this.image = data.image;
+    this.price = data.price;
   }
 }

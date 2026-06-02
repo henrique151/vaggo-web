@@ -68,16 +68,25 @@ export default function Page() {
     if (nextBookings) {
       console.log("nextBookings: ");
       console.log(nextBookings);
-
+      const nextBookingCardsList = [...nextBookings].filter(
+        (booking) =>
+          booking.status === "APROVADA" || booking.status === "PENDENTE",
+      );
+      const latestBookingCardsList = [...nextBookings].filter(
+        (booking) => booking.status === "APROVADA",
+      );
       setnextBookingsCards(
-        nextBookings
-          .filter((booking) => booking.status === "APROVADA")
+        nextBookingCardsList
+          // nextBookings
+          // .filter((booking) => booking.status === "APROVADA" || "PENDENTE")
           .map(mapNextBookingCards),
       );
 
       setLatestBookingsCards(
-        nextBookings
+        // nextBookings
+        latestBookingCardsList
           // .filter((booking) => booking.status === "RECUSADA" || "PENDENTE")
+          // .filter((booking) => booking.status === "APROVADA")
           .map((d) => {
             return mapLatestBookingCards(d, {
               windowSetter: setWindow,
@@ -192,9 +201,7 @@ export default function Page() {
                   Olá, {userData?.person.name}!
                 </h1>
 
-                <p className="text-muted mt-2 text-lg">
-                  {GreetUser()}
-                </p>
+                <p className="text-muted mt-2 text-lg">{GreetUser()}</p>
               </div>
             </div>
           </div>
@@ -204,11 +211,8 @@ export default function Page() {
             {/* ESQUERDA */}
             <div className="lg:col-span-2 space-y-8">
               <PanelContainer title="Próximas Reservas">
-                {nextBookingsCards ? (
-                  <CarouselContainer
-                    title=""
-                    cards={nextBookingsCards}
-                  />
+                {nextBookingsCards.length > 0 ? (
+                  <CarouselContainer title="" cards={nextBookingsCards} />
                 ) : (
                   <p className="text-muted">
                     Não há reservas agendadas no momento.
@@ -217,18 +221,21 @@ export default function Page() {
               </PanelContainer>
 
               <PanelContainer title="Reservas anteriores">
-                <p className="text-muted">
-                  Por enquanto não há reservas no histórico.
-                </p>
+                {latestBookingsCards.length > 0 ? (
+                  <CarouselContainer title="" cards={latestBookingsCards} />
+                ) : (
+                  <p className="text-muted">
+                    Por enquanto não há reservas no histórico.
+                  </p>
+                )}
+                <p className="text-muted"></p>
               </PanelContainer>
 
               <PanelContainer title="Solicitações de Reservas">
                 {bookingSolicitations?.length !== 0 ? (
                   bookingSolicitations?.map(mapSolicitationFrames)
                 ) : (
-                  <p className="text-muted">
-                    Nenhuma Solicitação no momento.
-                  </p>
+                  <p className="text-muted">Nenhuma Solicitação no momento.</p>
                 )}
               </PanelContainer>
             </div>
@@ -236,37 +243,40 @@ export default function Page() {
             {/* DIREITA */}
             <div className="space-y-8">
               <PanelContainer title="Seu(s) veículo(os)">
-                {carsData?.map((car) => (
-                  <EntityFrame key={car.id}>
-                    <DefaultEntityFrame
-                      title={`${car.brand} ${car.model}`}
-                      description={`Placa: ${car.licensePlate}`}
-                    />
-                  </EntityFrame>
-                )) || (
-                    <p className="text-muted">
-                      Não há veículos cadastrados no momento.
-                    </p>
-                  )}
+                {carsData?.length > 0 ? (
+                  carsData?.map((car) => (
+                    <EntityFrame key={car.id}>
+                      <DefaultEntityFrame
+                        title={`${car.brand} ${car.model}`}
+                        description={`Placa: ${car.licensePlate}`}
+                      />
+                    </EntityFrame>
+                  ))
+                ) : (
+                  <p className="text-muted">
+                    Não há veículos cadastrados no momento.
+                  </p>
+                )}
               </PanelContainer>
 
               <PanelContainer title="Mensagens">
-                {chats?.map((chat) => (
-                  <EntityFrame key={chat.id}>
-                    <DefaultEntityFrame
-                      title={`${chat.user.name} - ${chat.subtitle}`}
-                      description={
-                        chat.lastContent ||
-                        "Nenhuma mensagem no momento."
-                      }
-                      redirectTo={`/chat/${chat.id}`}
-                    />
-                  </EntityFrame>
-                )) || (
-                    <p className="text-muted">
-                      Nenhuma mensagem no momento.
-                    </p>
-                  )}
+                {chats.length > 0 ? (
+                  chats?.map((chat) => (
+                    <section key={chat.id} className="mb-3">
+                      <EntityFrame>
+                        <DefaultEntityFrame
+                          title={`${chat.user.name} - ${chat.subtitle}`}
+                          description={
+                            chat.lastContent || "Nenhuma mensagem no momento."
+                          }
+                          redirectTo={`/chat/${chat.id}`}
+                        />
+                      </EntityFrame>
+                    </section>
+                  ))
+                ) : (
+                  <p className="text-muted">Nenhuma mensagem no momento.</p>
+                )}
               </PanelContainer>
             </div>
           </div>
@@ -286,4 +296,4 @@ function GreetUser() {
   }
 }
 
-function mapBookingCards(d: any) { }
+function mapBookingCards(d: any) {}

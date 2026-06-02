@@ -1,11 +1,13 @@
-"use client";
+// "use client";
 import type { Metadata } from "next";
 import { Ubuntu } from "next/font/google";
 import "./globals.css";
 import Header from "@/component/header";
-import VLibras from "vlibras-nextjs";
-import Script from "next/script";
+// import VLibras from "vlibras-nextjs";
+// import Script from "next/script";
 import { ThemeProvider } from "@/context/ThemeProvider";
+import VLibrasPlugin from "./VLibras.component";
+// import VLibras from "vlibras-nextjs/dist/types";
 
 const ubuntu = Ubuntu({
   subsets: ["latin"],
@@ -13,10 +15,10 @@ const ubuntu = Ubuntu({
   variable: "--font-ubuntu",
 });
 
-// export const metadata: Metadata = {
-//   title: "Vaggo",
-//   description: "Sistema de vagas",
-// };
+export const metadata: Metadata = {
+  title: "Vaggo",
+  description: "Sistema de vagas",
+};
 
 export default function RootLayout({
   children,
@@ -28,12 +30,11 @@ export default function RootLayout({
       <head>
         <title>Vaggo</title>
       </head>
-      <body
-        className={`${ubuntu.variable} font-sans antialiased`}
-      >
+      <body className={`${ubuntu.variable} font-sans antialiased`}>
         <ThemeProvider>
           <Header showSearch />
           {children}
+          {/*<VLibrasPlugin />*/}
         </ThemeProvider>
       </body>
     </html>

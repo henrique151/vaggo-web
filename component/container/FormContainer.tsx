@@ -7,5 +7,9 @@ export default function FormContainer({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <form className={`${className || ""}`}>{children}</form>;
+  return (
+    <form className={`${className || ""}`} onSubmit={onSubmit}>
+      {children}
+    </form>
+  );
 }

@@ -4,9 +4,12 @@ import { useState } from "react";
 import SearchBar from "./search_bar";
 import LoginCard from "./login_card";
 import BlurOverlay from "./blur_overlay";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTheme } from "@/context/ThemeProvider";
+import Image from "next/image";
+
+import logo from "@/public/assets/logo/logo.png";
 
 interface HeaderProps {
   showSearch?: boolean;
@@ -18,6 +21,7 @@ export default function Header({ showSearch = false }: HeaderProps) {
   const [showLogin, setShowLogin] = useState(false);
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
+  const pathName = usePathname();
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,15 +52,18 @@ export default function Header({ showSearch = false }: HeaderProps) {
     router.push("/user/dashboard");
   }
 
+  const bannedPages = ["/login"];
+  if (bannedPages.find((page) => pathName === page)) return null;
+
   return (
     <>
       {/* HEADER */}
       <header className="app-header bg-base border-soft">
-        <div className="container-default flex items-center justify-between h-16 gap-4">
+        <div className="container-default flex items-center justify-between h-16 gap-4 mx-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            {/*<img src="@/vaggo4.png" width={28} height={28} alt="Logo" />*/}
-            <span className="font-semibold text-lg text-primary">Vaggo</span>
+            <Image src={logo} width={46} height={46} alt="Logo" />
+            {/*<span className="font-semibold text-lg text-primary">Vaggo</span>*/}
           </Link>
 
           {/* Search */}
