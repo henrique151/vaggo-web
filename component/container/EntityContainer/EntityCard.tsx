@@ -37,6 +37,9 @@ export function EntityCard({
     </h3>
   );
 
+  console.log("image");
+  console.log(image);
+
   return (
     <div
       className="
@@ -80,16 +83,12 @@ export function EntityCard({
       {/* Conteúdo */}
       <div className="p-4">
         {redirectTo ? (
-          <Link href={redirectTo}>
-            {titleFragment}
-          </Link>
+          <Link href={redirectTo}>{titleFragment}</Link>
         ) : (
           titleFragment
         )}
 
-        <p className="text-sm text-muted mt-1">
-          {description}
-        </p>
+        <p className="text-sm text-muted mt-1">{description}</p>
 
         <div
           className="

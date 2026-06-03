@@ -40,7 +40,7 @@ const Page = () => {
               <EntityCard
                 title={property.name}
                 description={property.description}
-                // image={property.images[0]}
+                image={property.images[0]}
               />
             </div>
           );
