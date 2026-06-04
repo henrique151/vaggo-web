@@ -16,7 +16,7 @@ const Page = () => {
         <h2 className="text-2xl font-semibold">Minhas Propriedades</h2>
 
         <Link
-          href="/property/register"
+          href="property/register"
           className="
             px-4 py-2
             rounded-xl
@@ -34,17 +34,19 @@ const Page = () => {
       </div>
 
       <div className="space-y-4 flex flex-row">
-        {properties?.map((property) => {
-          return (
-            <div key={property.id} className="mr-3">
-              <EntityCard
-                title={property.name}
-                description={property.description}
-                image={property.images[0]}
-              />
-            </div>
-          );
-        }) || ""}
+        {(properties &&
+          properties.map((property) => {
+            return (
+              <div key={property.id} className="mr-3">
+                <EntityCard
+                  title={property.name}
+                  description={property.description}
+                  image={property.images[0]}
+                />
+              </div>
+            );
+          })) ||
+          null}
       </div>
     </TabPage>
   );

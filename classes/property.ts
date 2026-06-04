@@ -18,17 +18,24 @@ export default class Property {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(data: any) {
+    // console.log("data");
+    // console.log(data.images);
     this.id = data.id;
     this.name = data.name;
     this.type = data.type;
     this.description = data.description;
     this.isActive = data.isActive;
     this.totalCapacity = data.totalCapacity;
-    this.images = data.images;
+    this.images =
+      data.images &&
+      data.images.map((image: string) => {
+        return new Image(image);
+      });
+    // this.images = data.images;
     this.latitude = data.latitude;
     this.longitude = data.longitude;
     this.zipCode = data.zipCode;
-    this.address = data.address;
+    this.address = new Address(data.address);
     this.spots = data.spots;
   }
 
