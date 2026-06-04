@@ -1,65 +1,77 @@
-"use client";
-import Header from "@/component/header";
-import RegisterCard from "@/component/register_card";
-import { The_Nautigal } from "next/font/google";
-import Link from "next/link";
-// import Image from "next/image";
-import { useRouter, redirect } from "next/navigation";
-// import { redirect } from "next/navigation"
-import { useEffect, useState } from "react";
+import FormContainer from "@/component/container/FormContainer";
+import InfoLayout from "@/component/layout/InfoLayout";
+import FormItem from "@/component/ui/form/FormItem";
 
 export default function Page() {
-  const handleRegister = (e: any) => {
-    e.preventDefault();
-
-    // validar  CPF
-    // validar e-mail
-    // validar telefone
-    // validar senha
-    const formData = new FormData(e.currentTarget);
-    const values = Object.fromEntries(formData);
-
-    console.log(values);
-    let result;
-
-    delete values.passConfirm;
-
-    fetch("http://localhost:3000/vehicles", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify(values),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data));
-
-    //     {
-    //   "brand": "Toyota",
-    //   "model": "Corolla",
-    //   "color": "Prata",
-    //   "licensePlate": "ABC1D24",
-    //   "manufactureYear": "2022-01-01"
-    //     }
-
-    // se resposta da api for 200, loga o usuário com a senha criada pelo forms e leva o usuário para a página dashboard
-
-    // transformar dados registro em JSON
-
-    // enviar JSON pra API ->
-    // <- API envia mensagem 200 (message: true, new_id: token)
-
-    // router.push('/user/dashboard')
-  };
-
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/*<Header />*/}
+    <main>
+      <InfoLayout
+        title={"Registrar novo Veículo"}
+        description={
+          "Insira as informações de seu veículo para usar com a plataforma"
+        }
+      >
+        <FormContainer>
+          <FormItem
+            label={"Marca"}
+            name={"brand"}
+            type="text"
+            className="mb-5"
+            placeholder="CarroX"
+            required
+          />
 
-      <div className="flex justify-center py-10 px-4">
-        <RegisterCard type="vehicle" onSubmit={handleRegister} />
-      </div>
+          <FormItem
+            type="text"
+            label={"Modelo"}
+            name={"model"}
+            className="mb-5"
+            required
+          />
+
+          <FormItem
+            label={"Placa do Veículo"}
+            name={"licensePlate"}
+            type="text"
+            className="mb-5"
+            required
+          />
+
+          <FormItem
+            type="number"
+            label="Ano de Fabricação"
+            name="manufactureYear"
+            className="mb-5"
+            placeholder="2000"
+            required
+          />
+
+          <FormItem
+            type="select"
+            label="Tipo do Veículo"
+            name="type"
+            className="mb-5"
+            items={[
+              { value: "CARRO", label: "Carro" },
+              { value: "MOTO", label: "Moto" },
+            ]}
+            required
+          />
+
+          <FormItem
+            type="select"
+            label="Porte"
+            name="type"
+            className="mb-5"
+            items={[
+              { value: "PEQUENO", label: "Pequeno" },
+              { value: "MEDIO", label: "Médio" },
+              { value: "GRANDE", label: "Grande" },
+            ]}
+            required
+          />
+        </FormContainer>
+      </InfoLayout>
     </main>
   );
 }
