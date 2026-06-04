@@ -26,7 +26,12 @@ export default async function request({ url, useToken, req }: requestProps) {
 
   if (res.status == 429) redirect("/error/429", "replace");
 
-  if (res.status == 401) redirect("/login", "replace");
+  if (res.status == 401) {
+    const data = await res.json();
+    if (data.message != "E-mail ou senha incorretos.") {
+      redirect("/login", "replace");
+    }
+  }
 
   return res;
 }

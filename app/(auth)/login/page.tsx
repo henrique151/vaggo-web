@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 // import { useApi } from "@/hooks/api/useApi";
 // import { useAuthenticateUser } from "@/hooks/api/user/useAuthenticateUser";
-import { authenticate } from "@/services/auth.service";
+// import { authenticate } from "@/services/auth.service";
+import { authenticate } from "@/controllers/user.controller";
 import FormItem from "@/component/ui/form/FormItem";
 import AccessToken from "@/classes/AccessToken";
 import FormContainer from "@/component/container/FormContainer";
@@ -16,30 +17,63 @@ import FormContainer from "@/component/container/FormContainer";
 import background from "@/public/vaggoLoginTest.png";
 import loginLogo from "@/public/assets/logo/logo_single/v1.png";
 import Image from "next/image";
+import { useActionState } from "react";
+// import InvalidCredentialsError from "@/classes/errors/api/InvalidCredentialsError";
 
 export default function Page() {
   const loading = false;
   // const [loading, setLoading] = useState(false);
   // const [request, setRequest] = useState({});
   // const [data, loaded] = useAuthenticateUser(request);
+  const submissionAction = async (prevState, form: FormData) => {
+    console.log(form.get("email"));
+    console.log(form.get("password"));
+    /**
+     * {
+     *  success: boolean,
+     *  message: string,
+     *  errors?: {
+     *    fieldName: {
+     *      type: ValidationError,
+     *      message: "Something needs to be like this"
+     *    }
+     *  },
+     *  fields: {
+     *    fieldName: fieldValue
+     *  }
+     * }
+     */
+    return { message: "hello!", errors: [] };
+  };
+  const [state, dispacthAction, pending] = useActionState(submissionAction, {
+    message: "",
+    errors: [],
+  });
 
   const router = useRouter();
 
   const handleSubmission = async (e: any) => {
     e.preventDefault();
-    console.log("hello!");
+    // console.log("hello!");
 
-    const formData = new FormData(e.currentTarget);
+    // const formData = new FormData(e.currentTarget);
 
-    const res = await authenticate({
-      email: (formData.get("email") as string) || "",
-      password: (formData.get("password") as string) || "",
-    });
+    // console.log(formData);
+    // const res = await authenticate(
+    //   formData.get("email") as string,
+    //   formData.get("password") as string,
+    // );
+    // const err = new InvalidCredentialsError();
+    // console.log(err.constructor);
+    // const res = await authenticate({
+    //   email: (formData.get("email") as string) || "",
+    //   password: (formData.get("password") as string) || "",
+    // });
 
-    if (res) {
-      localStorage.setItem("token", JSON.stringify(new AccessToken(res)));
-      router.push("/user/dashboard");
-    }
+    // if (res) {
+    //   localStorage.setItem("token", JSON.stringify(new AccessToken(res)));
+    //   router.push("/user/dashboard");
+    // }
 
     // setRequest(Object.fromEntries(formData));
   };
@@ -77,12 +111,14 @@ export default function Page() {
             Bem-vindo ao Vaggo
           </h1>
           <div className="h-6" />
-          <FormContainer onSubmit={handleSubmission}>
+          {/*<FormContainer onSubmit={handleSubmission} action={dispacthAction}>*/}
+          <FormContainer action={dispacthAction}>
             <FormItem
               type={"email"}
               label={"Email"}
               name={"email"}
               placeholder={"seu@email.com"}
+              value={state?.message || "email"}
             />
 
             <div className="h-3" />
@@ -110,7 +146,7 @@ export default function Page() {
                 w-full
               "
             >
-              {loading ? "Entrando..." : "Entrar"}
+              {pending ? "Entrando..." : "Entrar"}
             </button>
           </FormContainer>
         </div>
