@@ -6,61 +6,64 @@ export default function Page() {
   return (
     <main>
       <InfoLayout
-        title={"Registrar novas Vagas"}
+        title={"Registrar nova Propriedade"}
         description={
-          "Preencha o formulário para criar novas vagas para sua propriedade"
+          "Preencha os dados a seguir para registrar uma nova propriedade"
         }
       >
         <FormContainer>
           <FormItem
-            label={"Quantidade"}
-            name={"count"}
+            label={"Nome da Propriedade"}
+            name={"name"}
+            placeholder="Propriedade Fulano de Tal"
+            className="mb-5"
+            required
+          />
+
+          <FormItem
+            type="select"
+            items={[
+              { label: "Residencial", value: "Residencial" },
+              { label: "Comercial", value: "Comercial" },
+            ]}
+            label={"Tipo de Propriedade"}
+            name={"type"}
+            className="mb-5"
+            required
+          />
+
+          <FormItem
+            label={"Descrição"}
+            name={"description"}
+            placeholder="Casa com boa cobertura e perto de diversos lugares"
+            className="mb-5"
+            required
+          />
+
+          <FormItem
             type="number"
-            className="mb-5"
-            value="1"
-            required
-          />
-
-          <FormItem
-            type="text"
-            label={"Tamanho da(as) vaga(as)"}
-            name={"size"}
-            className="mb-5"
-            required
-          />
-
-          <FormItem
-            label={"Preço Geral"}
-            name={"price"}
-            type="number"
-            className="mb-5"
-            required
-          />
-
-          <FormItem
-            type="checkbox"
-            label="Vaga coberta?"
-            name="isCovered"
+            label="Capacidade"
+            name="totalCapacity"
             className="mb-5"
             placeholder="10 Vagas"
             required
           />
 
           <FormItem
-            type="text"
-            label="Prefixo da(as) Vaga(as)"
-            name="prefix"
+            type="number"
+            label="Número"
+            name="number"
             className="mb-5"
-            placeholder="Vaga-A"
+            placeholder="3001"
             required
           />
 
           <FormItem
-            type="text"
-            label="Veículos Permitidos"
-            name="allowedVehicles"
+            type="number"
+            label="CEP"
+            name="zipCode"
             className="mb-5"
-            placeholder="CARRO OU MOTO"
+            placeholder="0100100-000"
             required
           />
 
@@ -73,16 +76,8 @@ export default function Page() {
           />
 
           <FormItem
-            type="text"
-            label="Coloque formulário sobre período de data aqui"
-            name="date"
-            className="mb-5"
-            multiple
-          />
-
-          <FormItem
             type="file"
-            label="Imagem(ns) da(as) vaga(as)"
+            label="Imagem"
             name="images"
             className="mb-5"
             multiple
