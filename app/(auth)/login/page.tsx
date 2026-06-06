@@ -1,16 +1,16 @@
 "use client";
 // import Header from "@/component/header";
 // import LoginCard from "@/component/login_card";
-import FormCard, { GenericFormLayout } from "@/component/form_card";
+// import FormCard, { GenericFormLayout } from "@/component/form_card";
 // import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+// import Link from "next/link";
 // import { useApi } from "@/hooks/api/useApi";
 // import { useAuthenticateUser } from "@/hooks/api/user/useAuthenticateUser";
 // import { authenticate } from "@/services/auth.service";
-import { authenticate } from "@/controllers/user.controller";
+// import { authenticate } from "@/controllers/user.controller";
 import FormItem from "@/component/ui/form/FormItem";
-import AccessToken from "@/classes/AccessToken";
+// import AccessToken from "@/classes/AccessToken";
 import FormContainer from "@/component/container/FormContainer";
 // import { UserDAO } from "@/entity/user";
 
@@ -18,65 +18,68 @@ import background from "@/public/vaggoLoginTest.png";
 import loginLogo from "@/public/assets/logo/logo_single/v1.png";
 import Image from "next/image";
 import { useActionState } from "react";
+import action from "./authentication.action";
 // import InvalidCredentialsError from "@/classes/errors/api/InvalidCredentialsError";
 
 export default function Page() {
-  const loading = false;
+  // const loading = false;
   // const [loading, setLoading] = useState(false);
   // const [request, setRequest] = useState({});
   // const [data, loaded] = useAuthenticateUser(request);
-  const submissionAction = async (prevState, form: FormData) => {
-    console.log(form.get("email"));
-    console.log(form.get("password"));
-    /**
-     * {
-     *  success: boolean,
-     *  message: string,
-     *  errors?: {
-     *    fieldName: {
-     *      type: ValidationError,
-     *      message: "Something needs to be like this"
-     *    }
-     *  },
-     *  fields: {
-     *    fieldName: fieldValue
-     *  }
-     * }
-     */
-    return { message: "hello!", errors: [] };
-  };
-  const [state, dispacthAction, pending] = useActionState(submissionAction, {
-    message: "",
-    errors: [],
+  // const submissionAction = async (prevState, form: FormData) => {
+  //   console.log(form.get("email"));
+  //   console.log(form.get("password"));
+  //   /**
+  //    * {
+  //    *  success: boolean,
+  //    *  message: string,
+  //    *  errors?: {
+  //    *    fieldName: {
+  //    *      type: ValidationError,
+  //    *      message: "Something needs to be like this"
+  //    *    }
+  //    *  },
+  //    *  fields: {
+  //    *    fieldName: fieldValue
+  //    *  }
+  //    * }
+  //    */
+  //   return { message: "hello!", errors: [] };
+  // };
+  const [state, dispacthAction, pending] = useActionState(action, {
+    success: undefined,
+    message: undefined,
+    error: false,
+    fields: {},
   });
 
-  const router = useRouter();
+  // const router = useRouter();
 
-  const handleSubmission = async (e: any) => {
-    e.preventDefault();
-    // console.log("hello!");
+  // const handleSubmission = async (e: any) => {
+  // e.preventDefault();
+  // console.log("hello!");
 
-    // const formData = new FormData(e.currentTarget);
+  // const formData = new FormData(e.currentTarget);
 
-    // console.log(formData);
-    // const res = await authenticate(
-    //   formData.get("email") as string,
-    //   formData.get("password") as string,
-    // );
-    // const err = new InvalidCredentialsError();
-    // console.log(err.constructor);
-    // const res = await authenticate({
-    //   email: (formData.get("email") as string) || "",
-    //   password: (formData.get("password") as string) || "",
-    // });
+  // console.log(formData);
+  // const res = await authenticate(
+  //   formData.get("email") as string,
+  //   formData.get("password") as string,
+  // );
+  // const err = new InvalidCredentialsError();
+  // console.log(err.constructor);
+  // const res = await authenticate({
+  //   email: (formData.get("email") as string) || "",
+  //   password: (formData.get("password") as string) || "",
+  // });
 
-    // if (res) {
-    //   localStorage.setItem("token", JSON.stringify(new AccessToken(res)));
-    //   router.push("/user/dashboard");
-    // }
+  // if (res) {
+  //   localStorage.setItem("token", JSON.stringify(new AccessToken(res)));
+  //   router.push("/user/dashboard");
+  // }
 
-    // setRequest(Object.fromEntries(formData));
-  };
+  // setRequest(Object.fromEntries(formData));
+  // };
 
   // useEffect(() => {
   //   if (data) {
@@ -98,7 +101,7 @@ export default function Page() {
           <div className="w-full flex flex-col items-center">
             <Image
               src={loginLogo}
-              alt={""}
+              alt={"Logo da Vaggo"}
               width={86}
               height={86}
               className="object-cover"
@@ -114,11 +117,13 @@ export default function Page() {
           {/*<FormContainer onSubmit={handleSubmission} action={dispacthAction}>*/}
           <FormContainer action={dispacthAction}>
             <FormItem
-              type={"email"}
+              type={"text"}
               label={"Email"}
               name={"email"}
               placeholder={"seu@email.com"}
-              value={state?.message || "email"}
+              error={state?.error ?? state?.errors?.email ?? false}
+              errorMessage={state?.errors?.email ?? ""}
+              value={state?.fields?.email || ""}
             />
 
             <div className="h-3" />
@@ -127,12 +132,16 @@ export default function Page() {
               type={"password"}
               label={"Senha"}
               name={"password"}
+              error={state?.error ?? state?.errors?.password ?? false}
+              errorMessage={state?.errors?.password}
+              value={state?.fields?.password ?? ""}
               placeholder={"••••••••"}
             />
+            <p className="text-rose-400">{state?.errorMessage}</p>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={pending}
               className="
                 mt-8
                 py-3

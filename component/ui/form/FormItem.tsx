@@ -14,6 +14,8 @@ export default function FormItem({
   value,
   className,
   multiple,
+  error,
+  errorMessage,
 }: {
   type?: HTMLInputTypeAttribute | HTMLInputExtraParameters;
   // type: string;
@@ -25,14 +27,15 @@ export default function FormItem({
   value?: string;
   className?: string;
   multiple?: boolean;
+  error?: boolean;
+  errorMessage?: string;
 }) {
   const baseStyle: string = `
     px-4 py-3
     rounded-lg
     border-base
-    app-input
-    focus:outline-none
-    focus:ring-2 focus:ring-gray-300
+    ${error ? "app-input-error" : "app-input"}
+
     `;
 
   const formItemTable = {
@@ -63,9 +66,12 @@ export default function FormItem({
 
   return (
     <div className={`flex flex-col gap-1 ${className || ""}`}>
-      <label className="text-sm text-gray-600">{label}</label>
+      <label className={`text-sm ${error ? "text-rose-600" : "text-gray-600"}`}>
+        {label}
+      </label>
 
       {type in formItemTable ? formItemTable[type] : GenericFormInput}
+      <p className="text-xs text-rose-500">{errorMessage}</p>
     </div>
   );
 }

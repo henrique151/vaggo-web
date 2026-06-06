@@ -2,6 +2,7 @@
 
 import InvalidCredentialsError from "@/classes/errors/api/InvalidCredentialsError";
 import * as auth from "@/services/auth.service";
+import { setToken } from "@/services/browser.service";
 import * as z from "zod";
 
 // general?
@@ -31,6 +32,38 @@ export async function authenticate(
   email: string,
   password: string,
 ): Promise<any> {
+  const Credentials = z.object({
+    email: z.email("Insira um formato válido para e-mail."),
+    // .min(8, "A senha precisa possuir no mínimo 8 caractéres"),
+
+    password: z
+      .string()
+      .min(8, "A senha precisa possuir no mínimo 8 caractéres"),
+  });
+
+  const res = Credentials.safeParse({
+    email: email,
+    password: password,
+  });
+
+  console.log("before validator error");
+  if (!res.success) {
+    const map = {};
+    for (const issue of res.error.issues) {
+      map[issue.path[0]] = issue.message;
+    }
+    // if zod returns ValidationError, map all zod.error.issues to return::{errors:{}}
+    return {
+      success: false,
+      zod: res.error.issues,
+      errors: map,
+      fields: {
+        email: email,
+        password: password,
+      },
+    };
+  }
+  console.log("outside validator error");
   // validate arguments here
   // if anything passes, proceeds with request
   //  if auth.service returns InvalidCredentialsError, returns global message saying that email or pass invalid
@@ -39,11 +72,24 @@ export async function authenticate(
     console.log(
       "validation complete, requesting service from auth.service ...",
     );
-    const token = await auth.authenticate({ email: email, password: password });
-    console.log(token);
+    const token = await auth.authenticate({
+      email: email,
+      password: password,
+    });
+
+    // console.log("from controller");
+    // console.log(token);
+    // setToken("osokdosdk");
+    // localStorage.setItem("token", JSON.stringify(token));
+    // console.log("from controller after storage");
+    // console.log(token);
+    return {
+      success: true,
+      token: token,
+    };
   } catch (e) {
     // console.log("error!");
-    // console.log(e);
+    console.log(e);
     // console.log(e.message);
     // console.log(e.stack);
     // console.log(e.constructor);
@@ -52,9 +98,30 @@ export async function authenticate(
     // }
     switch (e.constructor) {
       case InvalidCredentialsError:
-        console.log("Credenciais inválidas de constrctor!");
+        // console.log("Credenciais inválidas de constrctor!");
         // invalid credentials for user
-        break;
+        return {
+          success: false,
+          error: true,
+          errorMessage:
+            "E-mail ou senha incorretos. Verifique e tente novamente.",
+          fields: {
+            email: email,
+            password: password,
+          },
+        };
+      // break;
+      case Error:
+        return {
+          success: false,
+          error: true,
+          errorMessage:
+            "Algo aconteceu com o nosso servidor, tente novamente mais tarde. Pedimos desculpas pelo transtorno.",
+          field: {
+            email: email,
+            password: password,
+          },
+        };
     }
   }
 }
