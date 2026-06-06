@@ -2,9 +2,9 @@ import ControllerError from "./ControllerError";
 
 export default class ControllerStatus {
   public success: boolean;
-  public message: string;
-  private error: ControllerError | undefined;
-  private fields;
+  public message: string; //possibly more for internal messages or smth, check later if it get unused or not
+  private error: ControllerError | undefined; //global message for forms or anything else
+  private fields; //field properties and individual error messages
 
   constructor({
     success,
@@ -26,5 +26,9 @@ export default class ControllerStatus {
   public setError(error: ControllerError, successValueOverride?: boolean) {
     this.success = successValueOverride ?? false;
     this.error = error;
+  }
+
+  public setFields() {
+    
   }
 }
