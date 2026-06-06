@@ -3,6 +3,7 @@ import TabPage from "@/component/container/TabContainer/TabPage";
 import { usePageContext } from "../_context/page.context";
 import EntityItem from "@/component/container/EntityContainer/EntityItem";
 import StatusBadge from "@/component/ui/StatusDisplay";
+import { redirect } from "next/navigation";
 
 const Page = () => {
   const { property } = usePageContext();
@@ -24,7 +25,7 @@ const Page = () => {
 
           <button
             // onClick={() => setIsEditing(true)}
-            onClick={() => console.log("setIsEditing")}
+            onClick={() => redirect(`${property.id}/edit`)}
             className="
             px-4 py-2
             rounded-xl
@@ -54,7 +55,9 @@ const Page = () => {
         <EntityItem label="Tipo" value={property?.type || "Tipo"} />
         <EntityItem
           label="Capacidadde"
-          value={(property?.totalCapacity as unknown as string) || "0"}
+          value={
+            (property?.totalCapacity as unknown as string) + " Vagas" || "0"
+          }
         />
         {/*<EntityItem
           label="Nascimento"

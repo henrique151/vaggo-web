@@ -12,6 +12,8 @@ import useTabController from "@/hooks/useTabController";
 export default function Page() {
   const { property } = usePageContext();
   const [activeTab, setActiveTab] = useTabController({ tabs: pageTabs });
+
+  console.log(property);
   return (
     <InfoLayout
       title={`${property?.name || "Propriedade [XXX]"}`}

@@ -4,6 +4,7 @@ import { usePageContext } from "../_context/page.context";
 import EntityItem from "@/component/container/EntityContainer/EntityItem";
 import StatusBadge from "@/component/ui/StatusDisplay";
 import { useRouter } from "next/navigation";
+import map from "./spotFrame.mapper";
 
 const Page = () => {
   const { property } = usePageContext();
@@ -37,7 +38,7 @@ const Page = () => {
         </div>
       </div>
 
-      <div></div>
+      <div>{property.spots?.map(map)}</div>
     </TabPage>
   );
 };

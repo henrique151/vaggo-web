@@ -7,7 +7,7 @@ import { Vehicle } from "@/classes/vehicle";
 import { createContext, useContext } from "react";
 
 type PageContextProps = {
-  token: AccessToken | undefined;
+  // token: AccessToken | undefined;
   user: User | undefined;
   vehicles: Vehicle | undefined;
   reports: Report | undefined;
@@ -15,7 +15,7 @@ type PageContextProps = {
 };
 
 export const PageContext = createContext<PageContextProps>({
-  token: undefined,
+  // token: undefined,
   user: undefined,
   vehicles: undefined,
   reports: undefined,

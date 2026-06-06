@@ -40,6 +40,8 @@ export function useGetPropertyById({
       const property = new Property(data);
 
       setProperty(property);
+      // console.log("property");
+      // console.log(property);
       setLoading(false);
     }
   }, [data, loading]);

@@ -64,6 +64,7 @@ export default function Page({ params }: any) {
   const [availableSpotsWindow] = useWindow(SpotAvailabilityWindow);
   const [availableVehiclesWindow] = useWindow(VehicleAvailabilityWindow);
   const [bookingStatusWindow] = useWindow(BookingStatusWindow);
+  const [reportWindow] = useWindow(ReportWindow);
 
   // console.log("windowTest");
   // console.log(windowTest);
@@ -380,13 +381,18 @@ export default function Page({ params }: any) {
     return (
       <>
         <BlurOverlay show={true} onClick={() => {}} />
-        <GenericWindow title={"Denúncia"} exitButton={true} onExit={onExit}>
+        <GenericWindow
+          title={"Denúncia"}
+          exitButton={true}
+          onExit={reportWindow.hide}
+        >
           {messages[String(messageState)]}
         </GenericWindow>
       </>
     );
   }
 
+  console.log(property);
   if (property === undefined) return <section></section>;
   return (
     <main>
@@ -399,7 +405,7 @@ export default function Page({ params }: any) {
               <Image
                 width={1280}
                 height={768}
-                src={`${property.images[0]}`}
+                src={`${property.images[0].url}`}
                 alt={"Imagem da Propriedade"}
                 className="
                   w-full h-full object-cover
@@ -411,7 +417,7 @@ export default function Page({ params }: any) {
           <div className="flex w-1/2 flex-col items-end">
             <button
               className="cursor-pointer text-sm text-red-300 mb-3"
-              onClick={() => setReportWindow(true)}
+              onClick={reportWindow.show}
             >
               Denunciar
             </button>
@@ -486,6 +492,8 @@ export default function Page({ params }: any) {
         <availableVehiclesWindow.component />
       )}
       {bookingStatusWindow.component && <bookingStatusWindow.component />}
+
+      {reportWindow.component && <reportWindow.component />}
 
       {/*{showVehicleWindow && (
         <VehicleAvailabilityWindow

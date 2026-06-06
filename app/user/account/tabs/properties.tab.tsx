@@ -42,6 +42,7 @@ const Page = () => {
                   title={property.name}
                   description={property.description}
                   image={property.images[0]}
+                  redirectTo={`/user/property/${property.id}`}
                 />
               </div>
             );
