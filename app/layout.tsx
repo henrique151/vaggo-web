@@ -32,7 +32,7 @@ export default function RootLayout({
       </head>
       <body className={`${ubuntu.variable} font-sans antialiased`}>
         <ThemeProvider>
-          <Header showSearch />
+          {/*<Header showSearch />*/}
           {children}
           {/*<VLibrasPlugin />*/}
         </ThemeProvider>

@@ -1,5 +1,6 @@
 import AccessToken from "@/classes/AccessToken";
-import request from "./api.service";
+import request, { requestTest } from "./api.service";
+// import { keyof } from "zod";
 // import { cookies } from "next/headers";
 
 //encrypt user token when creating object?
@@ -84,4 +85,28 @@ export async function editUser(id, formData) {
     const data = await res.json();
     return data;
   }
+}
+
+export async function getUser(token: AccessToken): Promise<any>;
+export async function getUser(token: AccessToken, id: number): Promise<any>;
+export async function getUser(token: AccessToken, id?: number): Promise<any> {
+  //gets any user details. your token is for authentication
+  const url = `users/${id ?? token.id}`;
+
+  const res = await requestTest(url, token, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  console.log("hello from user.service");
+  // const data = await res.json();
+  // console.log(data);
+}
+
+export class UserService {
+  public static async register(form: FormData) {}
+
+  public static async edit(token: AccessToken, form: FormData) {}
 }

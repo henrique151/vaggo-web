@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import CarouselContainer from "@/component/container/CarouselContainer";
 import DatePeriod from "@/classes/data/DatePeriod";
 import PanelContainer from "@/component/container/PanelContainer";
+import Header from "@/component/header";
 
 export default function Home() {
   const [currentLocationSpotsResult, currentLocationSpotsLoading] =
@@ -58,6 +59,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      <Header showSearch />
+
       <section className="section-default">
         <div className="container-default mt-6">
           <div className="max-w-5xl mx-auto">

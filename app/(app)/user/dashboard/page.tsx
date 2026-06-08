@@ -31,6 +31,8 @@ import BlurOverlay from "@/component/blur_overlay";
 import GenericWindow from "@/component/GenericWindow";
 import FormItem from "@/component/ui/form/FormItem";
 import { sendReview } from "@/services/review.service";
+import useGetUserDetails from "@/hooks/api/user/useGetUserDetails";
+import { getToken } from "@/services/browser.service";
 
 export default function Page() {
   const [carsData] = useGetMyVehicles();
@@ -38,6 +40,9 @@ export default function Page() {
   const [bookingSolicitations] = useGetMySolicitations();
   const [chats] = useGetMyChats();
   const [chatTest] = useGetChat(1);
+  // const [user] = useGetUserDetails(getToken());
+  console.log("UserDetails");
+  // console.log(user);
 
   const [nextBookings] = useGetMyNextBookings();
 

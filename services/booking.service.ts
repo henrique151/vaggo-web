@@ -1,5 +1,6 @@
 import DatePeriod from "@/classes/data/DatePeriod";
 import request from "./api.service";
+import AccessToken from "@/classes/AccessToken";
 
 export async function changeBookingSolicitationStatus(
   id: number,
@@ -62,4 +63,26 @@ export async function bookSpot({
   }
 
   return false;
+}
+
+export default class BookingService {
+  public static async book(form: FormData) {
+
+  }
+
+  public static async getFromUser(token: AccessToken) {
+
+  }
+
+  public static async getFromProperties(token: AccessToken) {
+
+  }
+
+  public static async changeBookStatus(id: number, status: "approve" | "reject" | "cancel") {
+
+  }
+
+  public static async delete(id: number) {
+
+  }
 }

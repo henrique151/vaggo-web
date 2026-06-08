@@ -7,7 +7,15 @@ import AccessToken from "@/classes/AccessToken";
 import InvalidCredentialsError from "@/classes/errors/api/InvalidCredentialsError";
 import { setRefreshToken } from "./cookie.service";
 import { setToken } from "./browser.service";
+import BadRequestError from "@/classes/errors/api/BadRequestError";
 
+
+/**
+ * Authenticates User. Throws InvalidCredentialsError if invalid credentials
+ * @param email Email
+ * @param password Password 
+ * @returns AccessToken Object
+ */
 export async function authenticate({
   email,
   password,
@@ -34,34 +42,87 @@ export async function authenticate({
 
   // console.log(res);
 
-  if (res.status == 400) throw new Error("E-mail ou senha não inseridos");
+  if (res.status == 400) throw new BadRequestError();
   if (res.status == 401) throw new InvalidCredentialsError();
 
   if (res.ok) {
     const cookieHeader = res.headers.getSetCookie();
+
     setRefreshToken(cookieHeader[0]);
+    
     console.log("success!");
-    // cookieStore.set({
-    //   name: "refreshToken",
-    //   value: cookieHeader[0],
-    //   httpOnly: true,
-    //   secure: true,
-    //   path: "/",
-    // });
 
     const data = await res.json();
     console.log(data);
-    // setToken("data");
-    // const token = new AccessToken(data.data);
-    // setToken("hello!");
     return data.data;
-    console.log("token from auth.service (server)");
-    console.log(token);
-    return token;
   } else {
     throw new Error(
       "Something happened With api, please check output for more information",
     );
   }
-  return undefined;
+  // return undefined;
+}
+
+/**
+ * Registers a user to the system. 
+ * @returns void. A confirmation code will be sent to Whatsapp for phone validation.
+ */
+export async function register() {
+
+}
+
+/** 
+ * Sends confirmation code to API
+ * @returns void. User gets registered to platform
+ */
+export async function sendConfirmationCode(email:string ,code: string) {
+
+}
+
+/**
+ * Resends confirmation code for User
+ * @param email identifier
+ */
+export async function resendConfirmationCode(email:string) {
+
+}
+
+/**
+ * Refreshes user's token for prolonged access
+ * @param cookieToken http auth token
+ */
+export async function refreshToken(cookieToken: string) {
+
+}
+
+/**
+ * Logouts user from website
+ */
+export async function logout() {
+
+}
+
+/**
+ * Requests password reset. A code will be sent to user for confirming authenticity
+ * @param email user's email
+ */
+export async function requestPasswordReset(email:string) {
+
+}
+
+/**
+ * sends password reset code to server for confirmation
+ * @param email user's email
+ */
+export async function sendPasswordResetCode(email:string) {
+
+}
+
+/**
+ * resets user password to a new one
+ * @param resetToken Reset token
+ * @param password new password
+ */
+export async function resetPassword(resetToken: string, password: string) {
+
 }
