@@ -1,17 +1,20 @@
 export default function TagContainer({
   children,
+  className,
 }: {
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <span
-      className="
+      className={`
         px-3 py-1
         rounded-full
         text-xs
-        bg-gray-100
+        surface-elevated
         text-gray-700
-      "
+        ${className}
+          `}
     >
       {children}
     </span>

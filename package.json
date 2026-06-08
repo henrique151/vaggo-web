@@ -11,7 +11,9 @@
   "dependencies": {
     "next": "^16.2.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "vlibras-nextjs": "^1.1.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -6,6 +6,8 @@ import { SearchResult } from "@/classes/SearchResult";
 import { useEffect, useState } from "react";
 import CarouselContainer from "@/component/container/CarouselContainer";
 import DatePeriod from "@/classes/data/DatePeriod";
+import PanelContainer from "@/component/container/PanelContainer";
+import Header from "@/component/header";
 
 export default function Home() {
   const [currentLocationSpotsResult, currentLocationSpotsLoading] =
@@ -57,25 +59,37 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      <Header showSearch />
+
       <section className="section-default">
         <div className="container-default mt-6">
-
           <div className="max-w-5xl mx-auto">
             <div className="surface-elevated rounded-3xl p-8">
-              <CarouselContainer
-                title="Pontos de interesse com base na sua localização"
-                cards={currentLocationCards}
-              />
+              {currentLocationCards.length > 0 ? (
+                <CarouselContainer
+                  title="Pontos de interesse com base na sua localização"
+                  cards={currentLocationCards}
+                />
+              ) : (
+                <PanelContainer title="Pontos de interesse com base na sua localização">
+                  Carregando...
+                </PanelContainer>
+              )}
 
               <div className="h-16"></div>
 
-              <CarouselContainer
-                title="Pontos de interesse com reservas anteriores"
-                cards={lastBookingLocationCards}
-              />
+              {lastBookingLocationCards.length > 0 ? (
+                <CarouselContainer
+                  title="Pontos de interesse com reservas anteriores"
+                  cards={lastBookingLocationCards}
+                />
+              ) : (
+                <PanelContainer title="Pontos de interesse com reservas anteriores">
+                  Carregando...
+                </PanelContainer>
+              )}
             </div>
           </div>
-
         </div>
       </section>
     </main>

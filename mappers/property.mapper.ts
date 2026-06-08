@@ -3,15 +3,23 @@
 import { Address } from "@/classes/address/address";
 import Property from "@/classes/property";
 import { map as mapImages } from "./image.mapper";
+import State from "@/classes/address/state";
+import { Image } from "@/classes/data/Image";
 
+// export function map(d: any, stateData: any) {
 export function map(d: any) {
-  d.images = d.images.map(mapImages);
+  // d.images = d.images.map(mapImages);
+  // const imageList = d.images.map((image) => {
+  // return new Image(image);
+  // });
+  // d.images = imageList;
 
   // d.address.city.state = State.getFromList(d.address.city.stateId, stateData);
+  // console.log(d.address.city);
 
   // d.address.city = new City(d.address.city);
 
-  d.address = new Address(d.address);
+  // d.address = new Address(d.address);
 
   return new Property(d);
 }

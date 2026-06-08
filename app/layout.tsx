@@ -1,8 +1,13 @@
+// "use client";
 import type { Metadata } from "next";
 import { Ubuntu } from "next/font/google";
 import "./globals.css";
 import Header from "@/component/header";
+// import VLibras from "vlibras-nextjs";
+// import Script from "next/script";
 import { ThemeProvider } from "@/context/ThemeProvider";
+import VLibrasPlugin from "./VLibras.component";
+// import VLibras from "vlibras-nextjs/dist/types";
 
 const ubuntu = Ubuntu({
   subsets: ["latin"],
@@ -22,12 +27,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body
-        className={`${ubuntu.variable} font-sans antialiased`}
-      >
+      <head>
+        <title>Vaggo</title>
+      </head>
+      <body className={`${ubuntu.variable} font-sans antialiased`}>
         <ThemeProvider>
-          <Header showSearch />
+          {/*<Header showSearch />*/}
           {children}
+          {/*<VLibrasPlugin />*/}
         </ThemeProvider>
       </body>
     </html>

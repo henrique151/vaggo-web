@@ -5,11 +5,13 @@ export default function GenericWindow({
   onExit,
   exitButton = true,
   children,
+  backgroundBlur = false,
 }: {
   title: string;
   exitButton: boolean;
   onExit: MouseEventHandler;
   children: React.ReactNode;
+  backgroundBlur?: boolean;
 }) {
   return (
     <div
@@ -20,8 +22,8 @@ export default function GenericWindow({
       "
     >
       <div className="relative w-1/2">
-        <section className="bg-white w-full rounded-3xl border border-gray-200 shadow-sm p-8 flex flex-col">
-          <h2 className="text-2xl w-1/2  mb-6 mr-6">{title}</h2>
+        <section className="surface-elevated w-full rounded-3xl p-8 flex flex-col">
+          <h2 className="text-2xl w-1/2  mb-6 mr-6 text-primary">{title}</h2>
 
           <div className="flex flex-col w-[100%] items-center">{children}</div>
         </section>
@@ -33,10 +35,7 @@ export default function GenericWindow({
             absolute -top-3 -right-3
             w-9 h-9
             rounded-full
-            bg-white
-            border border-gray-200
-            shadow-md
-            hover:bg-gray-100
+            surface-elevated
             transition
           "
         >

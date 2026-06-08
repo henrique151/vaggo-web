@@ -25,6 +25,10 @@ export function useGetMyProperties(): stateReturnProps {
 
   useEffect(() => {
     if (data && stateData) {
+      // const apiData = { ...data, stateData: stateData };
+      // console.log("stateData");
+      console.log(data);
+      // console.log(stateData);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setProperties(data.map(map));
       setLoading(false);

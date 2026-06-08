@@ -1,5 +1,6 @@
 "use client";
 
+// import { randomInt } from "crypto";
 import { useEffect, useState } from "react";
 // import SpotCard from "./spot_card";
 // import * as api from "@/app/api";
@@ -78,8 +79,8 @@ export default function CarouselContainer({
             transform: `translateX(-${index * STEP}px)`,
           }}
         >
-          {cards.map((card) => {
-            return <>{card}</>;
+          {cards.map((card, index) => {
+            return <section key={`card_${index}`}>{card}</section>;
           })}
         </div>
       </div>
