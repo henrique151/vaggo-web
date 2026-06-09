@@ -33,6 +33,7 @@ import FormItem from "@/component/ui/form/FormItem";
 import { sendReview } from "@/services/review.service";
 import useGetUserDetails from "@/hooks/api/user/useGetUserDetails";
 import { getToken } from "@/services/browser.service";
+import { VehicleController } from "@/controllers/vehicle.controller";
 
 export default function Page() {
   const [carsData] = useGetMyVehicles();
@@ -41,7 +42,7 @@ export default function Page() {
   const [chats] = useGetMyChats();
   const [chatTest] = useGetChat(1);
   // const [user] = useGetUserDetails(getToken());
-  console.log("UserDetails");
+  // console.log("UserDetails");
   // console.log(user);
 
   const [nextBookings] = useGetMyNextBookings();
@@ -66,13 +67,22 @@ export default function Page() {
   // console.log("NextSolicitations");
   // console.log(bookingSolicitations);
 
-  console.log("chat with Pedro");
-  console.log(chatTest);
+  // console.log("chat with Pedro");
+  // console.log(chatTest);
+
+  useEffect(() => {
+    const test = async () => {
+      // const v = await getVehicle(getToken());
+      // console.log("VehicleController");
+      // console.log(v);
+    };
+    test();
+  }, []);
 
   useEffect(() => {
     if (nextBookings) {
-      console.log("nextBookings: ");
-      console.log(nextBookings);
+      // console.log("nextBookings: ");
+      // console.log(nextBookings);
       const nextBookingCardsList = [...nextBookings].filter(
         (booking) =>
           booking.status === "APROVADA" || booking.status === "PENDENTE",

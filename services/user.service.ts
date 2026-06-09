@@ -1,5 +1,6 @@
 import AccessToken from "@/classes/AccessToken";
 import request, { requestTest } from "./api.service";
+import { UserClassInterface } from "@interfaces";
 // import { keyof } from "zod";
 // import { cookies } from "next/headers";
 
@@ -87,9 +88,15 @@ export async function editUser(id, formData) {
   }
 }
 
-export async function getUser(token: AccessToken): Promise<any>;
-export async function getUser(token: AccessToken, id: number): Promise<any>;
-export async function getUser(token: AccessToken, id?: number): Promise<any> {
+export async function getUser(token: AccessToken): Promise<UserClassInterface>;
+export async function getUser(
+  token: AccessToken,
+  id: number,
+): Promise<UserClassInterface>;
+export async function getUser(
+  token: AccessToken,
+  id?: number,
+): Promise<UserClassInterface> {
   //gets any user details. your token is for authentication
   const url = `users/${id ?? token.id}`;
 
@@ -101,12 +108,38 @@ export async function getUser(token: AccessToken, id?: number): Promise<any> {
   });
 
   console.log("hello from user.service");
-  // const data = await res.json();
-  // console.log(data);
-}
+  const { data } = await res.json(); // TODO turn sucess schema into parser tool
 
-export class UserService {
-  public static async register(form: FormData) {}
+  console.log("RawData");
+  console.log(data);
 
-  public static async edit(token: AccessToken, form: FormData) {}
+  const user: UserClassInterface = {
+    id: data.id,
+    email: data.email,
+    avatar: { url: data.avatarUrl },
+    lastTime: {
+      login: data.lastLogin,
+      online: data.lastOnline,
+    },
+    permissionLevel: data.permissionLevel,
+    status: {
+      blocked: data.isBlocked,
+      admin: data.isAdmin,
+    },
+    person: {
+      id: data.person.id,
+      name: data.person.name,
+      cpf: data.person.cpf,
+      gender: data.person.gender,
+      phone: data.person.phone,
+      date: {
+        birth: data.person.birthDate,
+        registration: data.person.registrationDate,
+      },
+      status: {
+        active: data.person.isActive,
+      },
+    },
+  };
+  return user;
 }

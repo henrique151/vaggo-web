@@ -22,10 +22,10 @@ export default function PageContextProvider({
   const [reports] = useGetMyReports();
   const [properties] = useGetMyProperties();
 
-  console.log("from context page");
+  // console.log("from context page");
   // console.log(user);
   // console.log(reports);
-  console.log(properties);
+  // console.log(properties);
 
   const provider = { token, user, vehicles, reports, properties };
   return (

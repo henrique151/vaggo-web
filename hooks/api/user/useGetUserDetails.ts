@@ -6,6 +6,8 @@ import AccessToken from "@/classes/AccessToken";
 import { useEffect, useState } from "react";
 import { get } from "@/controllers/user.controller";
 import { getToken } from "@/services/browser.service";
+import UserClassInterface from "@/interfaces/class/user.interface";
+import UserTest from "@/classes/UserTest";
 
 // type stateProps = {
 // id: number;
@@ -18,16 +20,33 @@ import { getToken } from "@/services/browser.service";
 // ];
 
 export default function useGetUserDetails(idOrToken: number | AccessToken) {
-  const [user, setUser] = useState<User | undefined>(undefined);
+  const [user, setUser] = useState<UserTest | undefined>(undefined);
   const id = typeof idOrToken === "number" ? idOrToken : idOrToken.id;
   const token = typeof idOrToken === "object" ? idOrToken : getToken();
 
   useEffect(() => {
     const load = async () => {
-      const res = await get(token, id);
+      const res: UserClassInterface = await get(token, id);
       // setUser(new User(res));
       console.log("from hookDetails");
+      setUser(new UserTest(res));
+      // setUser(new UserTest({id)
       console.log(res);
+      console.log(user);
+
+      // const test: UserInterface = {
+      //   id: 2,
+      //   avatar: {
+      //     url: "https://google.com",
+      //   },
+      //   person: {
+      //     name: "someone else",
+      //   },
+      // };
+      // const userTest = new UserTest(test);
+      // console.log("user with anything optional");
+
+      // console.log(userTest);
     };
 
     if (id && token) {

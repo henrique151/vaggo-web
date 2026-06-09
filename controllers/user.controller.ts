@@ -8,8 +8,7 @@ import * as z from "zod";
 import UserSchema from "./schemas/user.schemas";
 import AccessToken from "@/classes/AccessToken";
 import { APIService } from "@/services/api.service";
-import { getUser, UserService } from "@/services/user.service";
-
+import { getUser } from "@/services/user.service";
 // general?
 //  -> function receives raw input from form (FormData only?)
 //  -> controller process, transforms and validate data based on what has been put, and use that data on services
@@ -141,14 +140,15 @@ export async function edit(token: AccessToken, form: FormData) {
 export async function get(token: AccessToken): Promise<any>;
 export async function get(token: AccessToken, id: number): Promise<any>;
 export async function get(token: AccessToken, id?: number): Promise<any> {
-  console.log("hello from user.controller!");
-  console.log(token);
+  // console.log(token);
   const res = await getUser(AccessToken.fromInterface(token), id);
+
+  // console.log("hello from user.controller!");
   // console.log(res);
   // const data = await res.json();
   // console.log(data);
   // return await res.json().data;
-  return 1;
+  return res;
 }
 
 // export async function getMyInformation(token: AccessToken) {}
