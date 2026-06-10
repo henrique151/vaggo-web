@@ -140,3 +140,17 @@ ex: text-base, sempre utiliza um tamnho fixo de texto, evite criar classes com e
 
 
 Começei a implementação de testes em algumas paginas/componentes
+
+
+Em nosso sistema, o acesso é simples e direto: o usuário pode efetuar o login como em qualquer outra plataforma. Uma vez conectado, ele tem a liberdade de pesquisar vagas disponíveis de acordo com sua localização ou interesse, onde as propriedades cadastradas são exibidas com todas as informações relevantes, permitindo uma análise rápida das melhores opções.
+
+Ao selecionar uma propriedade, o usuário consegue visualizar cada detalhe da vaga, incluindo a disponibilidade e as informações específicas inseridas pelo proprietário. E caso a oportunidade atenda às suas necessidades, o próximo passo é realizar a solicitação, dando início ao processo de reserva entre ambas as partes.
+
+Após esse pedido, a reserva fica devidamente registrada no sistema, o que permite ao usuário acompanhar o status em tempo real. Tudo isso acontece dentro do painel do usuário, um espaço dedicado para gerenciar as reservas realizadas, conferir avisos importantes e acessar rapidamente os recursos que ele mais utiliza no dia a dia.
+
+Mas a experiência não para por aí, pois o usuário também pode atuar como proprietário. Nessa modalidade, é possível gerenciar as propriedades cadastradas, acompanhar as solicitações recebidas e ter o controle total para aprovar ou recusar reservas conforme a disponibilidade.
+A plataforma oferece um sistema de mensagens integrado, ideal para esclarecer dúvidas e alinhar detalhes. Além disso, o sistema conta com integração total a serviços de notificação, via Whatsapp, onde o usuário é notificado sobre a atividade de sua conta.
+
+Para finalizar, o usuário consegue ajustar seus dados sempre que precisar, desde as informações do perfil até os detalhes dos seus veículos e propriedades cadastrados.
+
+E a plataforma se adapta ao que você precisa no momento: você pode escolher entre ser apenas quem reserva as vagas com praticidade ou, passar a oferecer seus próprios espaços para outras pessoas como visto anteriormente.
