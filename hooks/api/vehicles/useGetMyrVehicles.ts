@@ -8,7 +8,7 @@ import { map } from "@/mappers/vehicle.mapper";
 import { useGetMyUser } from "../user/useGetMyUser";
 // import { VehicleController } from "@/controllers/vehicle.controller";
 import VehicleClassInterface from "@/interfaces/class/vehicle.interface";
-import { getVehicle } from "@/controllers/vehicle.controller";
+import { get } from "@/modules/vehicle/vehicle.controller";
 import { getToken } from "@/services/browser.service";
 
 type stateReturnProps = [
@@ -30,7 +30,7 @@ export function useGetMyVehicles(): stateReturnProps {
   const [vehicles, setVehicles] = useState<Vehicle[]>();
 
   useEffect(() => {
-    getVehicle(token).then((data) => {
+    get(token).then((data) => {
       setVehicles(
         data.map((v) => {
           return new Vehicle(v);

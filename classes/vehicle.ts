@@ -2,7 +2,7 @@ import VehicleClassInterface, {
   VehicleStructureInterface,
 } from "@/interfaces/class/vehicle.interface";
 // import User from "./user";
-import UserClassInterface from "@/interfaces/class/user.interface";
+import UserClassInterface from "@/modules/user/user.interface";
 // import { UserInfoOptionsWithBufferEncoding } from "node:os";
 
 export class Vehicle implements VehicleClassInterface {

@@ -1,116 +1,136 @@
 "use client";
 
-import Link from "next/link";
-import { MouseEvent, MouseEventHandler, useEffect, useState } from "react";
+// import Link from "next/link";
+import { MouseEventHandler, useEffect, useState } from "react";
 import Image from "next/image";
 
 import CarouselContainer from "@/component/container/CarouselContainer";
-import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
-import Header from "@/component/header";
+// import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
+// import Header from "@/component/header";
 
 // import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
-import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetMyrVehicles";
-import { useGetMyNextBookings } from "@/hooks/api/booking/useGetMyNextBookings";
-import { useGetMySolicitations } from "@/hooks/api/booking/useGetMySolicitations";
+// import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetMyrVehicles";
+// import { useGetMyNextBookings } from "@/hooks/api/booking/useGetMyNextBookings";
+// import { useGetMySolicitations } from "@/hooks/api/booking/useGetMySolicitations";
 import PanelContainer from "@/component/container/PanelContainer";
 import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
 import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
 // import ConfirmationEntityCard from "@/component/cards/ConfirmationEntityCard";
-import ConfirmationEntityFrame from "@/component/frames/ConfirmationEntityFrame";
-import { changeBookingSolicitationStatus } from "@/services/booking.service";
-import { useGetMyUser } from "@/hooks/api/user/useGetMyUser";
+// import ConfirmationEntityFrame from "@/component/frames/ConfirmationEntityFrame";
+// import { changeBookingSolicitationStatus } from "@/services/booking.service";
+// import { useGetMyUser } from "@/hooks/api/user/useGetMyUser";
 import {
   mapLatestBookingCards,
   mapNextBookingCards,
   mapSolicitationFrames as mapSolicitationFrames,
 } from "./components.mapper";
-import PanelLayout from "@/component/layout/PanelLayout";
+// import PanelLayout from "@/component/layout/PanelLayout";
 import { useGetMyChats } from "@/hooks/api/chat/useGetMyChats";
-import { useGetChat } from "@/hooks/api/chat/useGetChat";
+// import { useGetChat } from "@/hooks/api/chat/useGetChat";
 import BlurOverlay from "@/component/blur_overlay";
 import GenericWindow from "@/component/GenericWindow";
 import FormItem from "@/component/ui/form/FormItem";
 import { sendReview } from "@/services/review.service";
-import useGetUserDetails from "@/hooks/api/user/useGetUserDetails";
-import { getToken } from "@/services/browser.service";
-import { VehicleController } from "@/controllers/vehicle.controller";
+// import { getToken } from "@/services/browser.service";
+// import { VehicleController } from "@/modules/vehicle/vehicle.controller";
+
+import useGetUserDetails from "@/modules/user/hooks/useGetUserDetails";
+import useGetReservations from "@/modules/reservation/hooks/useGetReservations";
+import useGetVehicleDetails from "@/modules/vehicle/hooks/useGetVehicleDetails";
+import useComponentMapper from "@/hooks/useComponentMapper";
+// import useGetReviews from "@/modules/review/hooks/useGetReviews";
+
+// import { BrowserService } from "@services";
 
 export default function Page() {
-  const [carsData] = useGetMyVehicles();
-  const [userData] = useGetMyUser();
-  const [bookingSolicitations] = useGetMySolicitations();
+  // const token = BrowserService.getToken();
+  // const [carsData] = useGetMyVehicles();
+  // const [userData] = useGetMyUser();
+
+  const [user] = useGetUserDetails();
+  const [reservations] = useGetReservations();
+  // const [reviews] = useGetReviews();
+  //
+  // console.log(reservations);
+
+  // const [bookingSolicitations] = useGetMySolicitations();
   const [chats] = useGetMyChats();
-  const [chatTest] = useGetChat(1);
+  const [vehicles] = useGetVehicleDetails();
+  // const [chatTest] = useGetChat(1);
   // const [user] = useGetUserDetails(getToken());
   // console.log("UserDetails");
-  // console.log(user);
+  console.log(vehicles);
+  const test = useComponentMapper(
+    ["asdasdasd", "osdkosdfkosdfko", "odaksodskaodkadkaosdk"],
+    (d) => {
+      return <p>{d}</p>;
+    },
+  );
 
-  const [nextBookings] = useGetMyNextBookings();
+  // console.log(test);
+  // const [nextBookings] = useGetMyNextBookings();
 
-  const [nextBookingsCards, setnextBookingsCards] = useState<
-    React.ReactNode[] | undefined
-  >([]);
+  // const [nextBookingsCards, setnextBookingsCards] = useState<
+  //   React.ReactNode[] | undefined
+  // >([]);
 
-  const [latestBookingsCards, setLatestBookingsCards] = useState<
-    React.ReactNode[] | undefined
-  >([]);
+  // const [latestBookingsCards, setLatestBookingsCards] = useState<
+  //   React.ReactNode[] | undefined
+  // >([]);
 
   const [window, setWindow] = useState(false);
   const [reservationId, setReservationId] = useState(0);
 
-  // const [result, resultsLoading] = useSearchProperties({
-  //   address: "São Paulo",
-  // });
+  const nextBookingsCards = useComponentMapper(
+    reservations?.filter(
+      (booking) =>
+        booking.status === "APROVADA" || booking.status === "PENDENTE",
+    ),
+    mapNextBookingCards,
+  );
 
-  // const [loading, setLoading] = useState(true);
-  //
-  // console.log("NextSolicitations");
-  // console.log(bookingSolicitations);
+  const latestBookingsCards = useComponentMapper(
+    reservations?.filter((booking) => booking.status === "APROVADA"),
+    (d) => {
+      return mapLatestBookingCards(d, {
+        windowSetter: setWindow,
+        reservationSetter: setReservationId,
+      });
+    },
+  );
+  // useEffect(() => {
+  //   const test = async () => {};
+  //   test();
+  // }, []);
 
-  // console.log("chat with Pedro");
-  // console.log(chatTest);
+  // console.log(reviews);
 
-  useEffect(() => {
-    const test = async () => {
-      // const v = await getVehicle(getToken());
-      // console.log("VehicleController");
-      // console.log(v);
-    };
-    test();
-  }, []);
+  // useEffect(() => {
+  //   if (reservations) {
+  //     // const latestBookingCardsList = [...reservations].filter(
+  //     //   (booking) => booking.status === "APROVADA",
+  //     // );
+  //     // setnextBookingsCards(
+  //     //   nextBookingCardsList
+  //     //     // nextBookings
+  //     //     // .filter((booking) => booking.status === "APROVADA" || "PENDENTE")
+  //     //     .map(mapNextBookingCards),
+  //     // );
 
-  useEffect(() => {
-    if (nextBookings) {
-      // console.log("nextBookings: ");
-      // console.log(nextBookings);
-      const nextBookingCardsList = [...nextBookings].filter(
-        (booking) =>
-          booking.status === "APROVADA" || booking.status === "PENDENTE",
-      );
-      const latestBookingCardsList = [...nextBookings].filter(
-        (booking) => booking.status === "APROVADA",
-      );
-      setnextBookingsCards(
-        nextBookingCardsList
-          // nextBookings
-          // .filter((booking) => booking.status === "APROVADA" || "PENDENTE")
-          .map(mapNextBookingCards),
-      );
-
-      setLatestBookingsCards(
-        // nextBookings
-        latestBookingCardsList
-          // .filter((booking) => booking.status === "RECUSADA" || "PENDENTE")
-          // .filter((booking) => booking.status === "APROVADA")
-          .map((d) => {
-            return mapLatestBookingCards(d, {
-              windowSetter: setWindow,
-              reservationSetter: setReservationId,
-            });
-          }),
-      );
-    }
-  }, [nextBookings]);
+  //     // setLatestBookingsCards(
+  //     //   // nextBookings
+  //     //   latestBookingCardsList
+  //     //     // .filter((booking) => booking.status === "RECUSADA" || "PENDENTE")
+  //     //     // .filter((booking) => booking.status === "APROVADA")
+  //     //     .map((d) => {
+  //     //       return mapLatestBookingCards(d, {
+  //     //         windowSetter: setWindow,
+  //     //         reservationSetter: setReservationId,
+  //     //       });
+  //     //     }),
+  //     // );
+  //   }
+  // }, [reservations]);
 
   function ReviewWindow({ onExit }: { onExit: MouseEventHandler }) {
     const [messageState, setMessageState] = useState<boolean | undefined>(
@@ -151,11 +171,11 @@ export default function Page() {
             label={"Qual sua avaliação para esta reserva?:"}
             name={"rating"}
             items={[
-              { label: "Péssimo", value: "1" },
-              { label: "Ruim", value: "2" },
-              { label: "Regular", value: "3" },
-              { label: "Bom", value: "4" },
-              { label: "Ótimo", value: "5" },
+              { label: "Péssimo", value: String("1") },
+              { label: "Ruim", value: String("2") },
+              { label: "Regular", value: String("3") },
+              { label: "Bom", value: String("4") },
+              { label: "Ótimo", value: String("5") },
             ]}
           />
 
@@ -207,15 +227,16 @@ export default function Page() {
                 alt="Foto de Perfil do Usuário"
                 width={128}
                 height={128}
-                src={userData?.userPicture.url || "/"}
+                src={
+                  user?.avatar.url || "/" /** TODO fallback to default pfp  */
+                }
                 className="mr-6 rounded-4xl"
               />
 
               <div className="flex flex-col justify-center">
                 <h1 className="text-4xl font-semibold text-primary">
-                  Olá, {userData?.person.name}!
+                  Olá, {user?.person.name ?? "Usuário!"}!
                 </h1>
-
                 <p className="text-muted mt-2 text-lg">{GreetUser()}</p>
               </div>
             </div>
@@ -226,9 +247,10 @@ export default function Page() {
             {/* ESQUERDA */}
             <div className="lg:col-span-2 space-y-8">
               <PanelContainer title="Próximas Reservas">
-                {nextBookingsCards.length > 0 ? (
-                  <CarouselContainer title="" cards={nextBookingsCards} />
+                {nextBookingsCards ? (
+                  <CarouselContainer title="" cards={nextBookingsCards ?? []} />
                 ) : (
+                  // <>
                   <p className="text-muted">
                     Não há reservas agendadas no momento.
                   </p>
@@ -247,8 +269,8 @@ export default function Page() {
               </PanelContainer>
 
               <PanelContainer title="Solicitações de Reservas">
-                {bookingSolicitations?.length !== 0 ? (
-                  bookingSolicitations?.map(mapSolicitationFrames)
+                {reservations?.length !== 0 ? (
+                  reservations?.map(mapSolicitationFrames)
                 ) : (
                   <p className="text-muted">Nenhuma Solicitação no momento.</p>
                 )}
@@ -258,8 +280,8 @@ export default function Page() {
             {/* DIREITA */}
             <div className="space-y-8">
               <PanelContainer title="Seu(s) veículo(os)">
-                {carsData?.length > 0 ? (
-                  carsData?.map((car) => (
+                {vehicles?.length > 0 ? (
+                  vehicles?.map((car) => (
                     <EntityFrame key={car.id}>
                       <DefaultEntityFrame
                         title={`${car.brand} ${car.model}`}
@@ -311,4 +333,4 @@ function GreetUser() {
   }
 }
 
-function mapBookingCards(d: any) {}
+// function mapBookingCards(d: any) {}

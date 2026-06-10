@@ -4,7 +4,7 @@ import { useApi } from "../useApi";
 import { Image } from "@/classes/data/Image";
 import { map } from "@/mappers/property.mapper";
 import { useGetAllStates } from "../location/useGeAllStates";
-import { get } from "@/controllers/property.controller";
+import { get } from "@/modules/property/property.controller";
 import { getToken } from "@/services/browser.service";
 
 type stateReturnProps = [properties: Property[] | undefined, loading: boolean];

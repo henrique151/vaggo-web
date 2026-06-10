@@ -27,14 +27,19 @@ import Link from "next/link";
 import PanelLayout from "@/component/layout/PanelLayout";
 import PanelContainer from "@/component/container/PanelContainer";
 import CarouselContainer from "@/component/container/CarouselContainer";
-import { getReviewsFromProperty } from "@/services/review.service";
-import PropertyReviews from "@/classes/property/review/PropertyReviews";
+// import { getReviewsFromProperty } from "@/services/review.service";
+// import PropertyReviews from "@/classes/property/review/PropertyReviews";
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 import FormItem from "@/component/ui/form/FormItem";
 import { sendReport } from "@/services/report.service";
 import useWindow from "@/hooks/useWindow";
 import StatusBadge from "@/component/ui/StatusDisplay";
 import TagContainer from "@/component/container/TagContainer";
+import useGetPropertyDetails from "@/modules/property/hooks/useGetPropertyDetails";
+import useGetReviews from "@/modules/review/hooks/useGetReviews";
+import useComponentMapper from "@/hooks/useComponentMapper";
+import { Review } from "@classes";
+import useGetVehicleDetails from "@/modules/vehicle/hooks/useGetVehicleDetails";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Page({ params }: any) {
@@ -43,13 +48,31 @@ export default function Page({ params }: any) {
   const [spots, setSpots] = useState<Spot[]>([]);
   const [showWindow, setShowWindow] = useState(false);
 
-  const [property, propertyLoading] = useGetPropertyById({
-    id: params.id,
-    withSpots: true,
-  }); //TODO REPLACE WITH TYPES
+  // const [property, propertyLoading] = useGetPropertyById({
+  //   id: params.id,
+  //   withSpots: true,
+  // }); //TODO REPLACE WITH TYPES
+
+  const [property, loaded, refresh] = useGetPropertyDetails(params.id, true); //TODO REPLACE WITH TYPES
+  const [reviews] = useGetReviews("property", params.id);
+  // const [vehicles] = useGetVehicleDetails()
+
+  // const [test] = useComponentMapper([], () => {});
+
   const [vehicles, setVehicles] = useGetMyVehicles();
-  const [reviews, setReviews] = useState<PropertyReviews>(undefined);
-  const [reviewCards, setReviewCards] = useState<React.ReactNode[]>([]);
+  // const [reviews, setReviews] = useState<PropertyReviews>(undefined);
+  // const [reviewCards, setReviewCards] = useState<React.ReactNode[]>([]);
+  const reviewCards = useComponentMapper(reviews, (review: Review) => {
+    return (
+      <EntityCard
+        key={review.id}
+        title={`${review.info.rating}/5`}
+        description={`${review.info.comment}`}
+        image={review.info.author.avatar}
+      />
+    );
+  });
+  // setRev
 
   // const [showSpotsWindow, setShowSpotsWindow] = useState(false);
   // const [showVehicleWindow, setShowVehicleWindow] = useState(false);
@@ -67,30 +90,30 @@ export default function Page({ params }: any) {
   const [reportWindow] = useWindow(ReportWindow);
 
   // console.log("windowTest");
-  // console.log(windowTest);
+  console.log(property);
 
-  useEffect(() => {
-    const load = async () => {
-      setSpots(await getSpotsByPropertyId(params.id));
-      const reviews = await getReviewsFromProperty(params.id);
-      if (reviews) {
-        setReviews(reviews);
+  // useEffect(() => {
+  // const load = async () => {
+  //   setSpots(await getSpotsByPropertyId(params.id));
+  //   const reviews = await getReviewsFromProperty(params.id);
+  //   if (reviews) {
+  //     setReviews(reviews);
 
-        const cards = reviews.reviews.map((review) => {
-          return (
-            <EntityCard
-              key={review.id}
-              title={`${review.rating}/5`}
-              description={`${review.comment}`}
-              image={review.user.avatar}
-            />
-          );
-        });
-        setReviewCards(cards);
-      }
-    };
-    load();
-  }, []);
+  //     const cards = reviews.reviews.map((review) => {
+  //       return (
+  //         <EntityCard
+  //           key={review.id}
+  //           title={`${review.rating}/5`}
+  //           description={`${review.comment}`}
+  //           image={review.user.avatar}
+  //         />
+  //       );
+  //     });
+  //     setReviewCards(cards);
+  //   }
+  // };
+  // load();
+  // }, []);
 
   const handleReserve = async (spotId: number, vehicleId: number) => {
     const datePeriod = new DatePeriod(
@@ -147,7 +170,7 @@ export default function Page({ params }: any) {
           transition
         "
       >
-        <h3 className="text-lg font-semibold text-base">
+        <h3 className="font-semibold text-base">
           {data.brand} {data.model}
         </h3>
 
@@ -159,7 +182,7 @@ export default function Page({ params }: any) {
   function SpotAvailabilityCard({ spot }: { spot: Spot }) {
     console.log(spot);
     return (
-      <section className="surface-elevated w-full rounded-3xl p-8 w-100 mb-4">
+      <section className="surface-elevated w-full rounded-3xl p-8 mb-4">
         <div className="flex flex-row w-full">
           <div className="w-1/2">
             <Image
@@ -354,7 +377,7 @@ export default function Page({ params }: any) {
             name={"targetId"}
             items={
               spots?.map((spot) => {
-                return { value: spot.id, label: spot.identifier };
+                return { value: String(spot.id), label: spot.identifier };
               }) ?? []
             }
           />
@@ -401,17 +424,17 @@ export default function Page({ params }: any) {
       <section className="m-10 flex flex-row">
         <section className="surface-elevated w-full rounded-3xl p-8 flex flex-row">
           <h2 className="text-2xl w-1/2  mb-6 mr-6">
-            {property?.images[0] ? (
+            {property?.info?.images[0] && (
               <Image
                 width={1280}
                 height={768}
-                src={`${property.images[0].url}`}
+                src={`${property?.info?.images[0].url}`}
                 alt={"Imagem da Propriedade"}
                 className="
                   w-full h-full object-cover
               "
               />
-            ) : null}
+            )}
           </h2>
 
           <div className="flex w-1/2 flex-col items-end">
@@ -423,14 +446,16 @@ export default function Page({ params }: any) {
             </button>
 
             <h1 className="text-2xl font-semibold">
-              {property?.name || "Propriedade"}
+              {property?.info.name || "Propriedade"}
             </h1>
             <p className="text-sm mb-4 text-gray-400">
-              {property?.type || "Tipo"}
+              {property?.info.type || "Tipo"}
             </p>
-            <p>{property?.description || "Descrição"}</p>
-            <p>Capacidade total: {property?.totalCapacity || "0"} Vaga(as)</p>
-            <p>Avaliação: {reviews?.averageRating || 1}/5</p>
+            <p>{property?.info.description || "Descrição"}</p>
+            <p>
+              Capacidade total: {property?.info.totalCapacity || "0"} Vaga(as)
+            </p>
+            <p>Avaliação: {0 || 1}/5</p>
 
             {/* TODO get all spots prices, return minnimum and maximum value of each one */}
             {/*<h2 className="text-2xl font-semibold mt-6">R$ 0 / Reserva</h2>*/}
@@ -463,11 +488,10 @@ export default function Page({ params }: any) {
 
       <section className="m-10">
         <PanelContainer title="Avaliações">
-          {reviews?.reviews.length > 0 ? (
+          {reviews?.length > 0 ? (
             <>
-              <p className="mb-2">
-                Avaliação Geral: {reviews?.averageRating || 1}/5
-              </p>
+              {/* TODO make controller return averageRating */}
+              <p className="mb-2">Avaliação Geral: {0 || 1}/5</p>
               <CarouselContainer title={""} cards={reviewCards} />
             </>
           ) : (

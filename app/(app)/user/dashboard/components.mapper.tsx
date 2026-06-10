@@ -1,6 +1,7 @@
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 import ConfirmationEntityFrame from "@/component/frames/ConfirmationEntityFrame";
 import { changeBookingSolicitationStatus } from "@/services/booking.service";
+import { Reservation } from "@classes";
 
 const handleSolicitation = async (
   id: number,
@@ -18,15 +19,15 @@ const handleSolicitation = async (
   return false;
 };
 
-export function mapSolicitationFrames(d: any) {
+export function mapSolicitationFrames(d: Reservation) {
   return (
     <section
       key={`booking_solicitation_${d.id}`}
       id={`booking_solicitation_${d.id}`}
     >
       <ConfirmationEntityFrame
-        title={d.spot.identifier}
-        description={`Código: ${d.code} Solicitante: ${d?.user?.person?.name || "Desconhecido"}`}
+        title={d.info.spot.info.identifier}
+        description={`Código: ${d.code} Solicitante: ${d?.info.user?.person?.name || "Desconhecido"}`}
         onConfirm={async (e) => {
           const res = await handleSolicitation(d.id, "approve");
           if (res) e.currentTarget.style.display = "none";
@@ -40,24 +41,24 @@ export function mapSolicitationFrames(d: any) {
   );
 }
 
-export function mapNextBookingCards(d: any) {
+export function mapNextBookingCards(d: Reservation) {
   return (
     <EntityCard
       key={`next_booking_${d.id}`}
-      title={d.spot.identifier}
-      description={`Data: ${d.datePeriod.start.toLocaleDateString()}, Status: ${d.status}`}
+      title={d.info.spot.info.identifier}
+      description={`Data: ${d.info.date.period.start.toLocaleDateString()}, Status: ${d.status}`}
       redirectTo={""}
     />
   );
 }
 
-export function mapLatestBookingCards(d: any, window: any) {
+export function mapLatestBookingCards(d: Reservation, window: any) {
   // export function mapLatestBookingCards(d: any) {
   return (
     <LatestBookingCard
       id={d.id}
-      identifier={d.spot.identifier}
-      datePeriod={d.datePeriod}
+      identifier={d.info.spot.info.identifier}
+      datePeriod={d.info.date.period}
       status={d.status}
       window={window}
     />

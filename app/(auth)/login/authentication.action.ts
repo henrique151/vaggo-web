@@ -1,6 +1,11 @@
-import { authenticate } from "@/controllers/user.controller";
+import { authenticate } from "@/modules/user/user.controller";
 import { setToken } from "@/services/browser.service";
+import * as BrowserService from "@/modules/browser/browser.service";
 import { redirect } from "next/navigation";
+import {
+  AccessTokenClassInterface,
+  AccessTokenStructureInterface,
+} from "@/modules/browser/browser.interface";
 // import { redirect } from "next/navigation";
 
 export default async function action(prevState, form: FormData) {
@@ -27,9 +32,16 @@ export default async function action(prevState, form: FormData) {
   console.log(res);
 
   if (res.success) {
+    const api = res.data;
     console.log("Seja bem vindo!");
-    setToken(res.data);
-    console.log(res.data);
+    const data: AccessTokenStructureInterface = {
+      token: api.accessToken,
+      expiration: new Date(api.expiresIn),
+      user: { id: api.user.id },
+    };
+    // setToken(res.data);
+    BrowserService.setToken(data);
+    console.log(data);
     redirect("/user/dashboard");
   }
   return res;
