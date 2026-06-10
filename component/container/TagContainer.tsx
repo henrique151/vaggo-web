@@ -12,7 +12,7 @@ export default function TagContainer({
         rounded-full
         text-xs
         surface-elevated
-        text-gray-700
+        text-muted
         ${className}
           `}
     >

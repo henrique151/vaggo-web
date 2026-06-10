@@ -21,8 +21,8 @@ export default function GenericWindow({
         px-4
       "
     >
-      <div className="relative w-1/2">
-        <section className="surface-elevated w-full rounded-3xl p-8 flex flex-col">
+      <div className="relative w-1/2 max-w-[1400px] max-h-[85vh]">
+        <section className="surface-elevated w-full max-h-[85vh] overflow-y-auto rounded-3xl p-8 flex flex-col">
           <h2 className="text-2xl w-1/2  mb-6 mr-6 text-primary">{title}</h2>
 
           <div className="flex flex-col w-[100%] items-center">{children}</div>
@@ -58,7 +58,7 @@ export function ConfirmWindow({
   onCancel: () => void;
 }) {
   return (
-    <GenericWindow title={title} exitButton={false} onExit={() => {}}>
+    <GenericWindow title={title} exitButton={false} onExit={() => { }}>
       <p>{description}</p>
       <section className="flex flex-row">
         <button

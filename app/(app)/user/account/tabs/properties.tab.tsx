@@ -2,13 +2,11 @@ import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import Link from "next/link";
 import { usePageContext } from "../page.context";
-import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
+import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
+import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
 
 const Page = () => {
   const { properties } = usePageContext();
-
-  console.log("properties");
-  console.log(properties);
 
   return (
     <TabPage label="Propriedades">
@@ -33,21 +31,34 @@ const Page = () => {
         </Link>
       </div>
 
-      <div className="space-y-4 flex flex-row">
+      <div className="space-y-4">
         {(properties &&
-          properties.map((property) => {
-            return (
-              <div key={property.id} className="mr-3">
-                <EntityCard
-                  title={property.name}
-                  description={property.description}
-                  image={property.images[0]}
-                  redirectTo={`/user/property/${property.id}`}
-                />
-              </div>
-            );
-          })) ||
-          null}
+          properties.map((property) => (
+            <EntityFrame
+              key={property.id}
+              editTitle={`Editar ${property.name}`}
+              editFields={[
+                { label: "Nome", name: "name", type: "text", placeholder: "Nome da propriedade", defaultValue: property.name, required: true },
+                { label: "Descrição", name: "description", type: "text", placeholder: "Descreva a propriedade", defaultValue: property.description },
+              ]}
+              onEdit={(formData) => {
+                // TODO: wire to update property action
+                console.log("edit property", property.id, Object.fromEntries(formData));
+              }}
+              deleteTitle="Excluir propriedade"
+              deleteDescription={`Deseja excluir a propriedade "${property.name}"? Todas as vagas associadas também serão removidas.`}
+              onDelete={() => {
+                // TODO: wire to delete property action
+                console.log("delete property", property.id);
+              }}
+            >
+              <DefaultEntityFrame
+                title={property.name}
+                description={property.description}
+                redirectTo={`/user/property/${property.id}`}
+              />
+            </EntityFrame>
+          ))) || null}
       </div>
     </TabPage>
   );

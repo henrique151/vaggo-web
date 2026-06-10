@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,50 +11,123 @@ import loginLogo from "@/public/assets/logo/logo_single/v1.png";
 import FormContainer from "@/component/container/FormContainer";
 import FormItem from "@/component/ui/form/FormItem";
 
-import action from "./register.action"; // não criado, vai dar erro, mas é só um placeholder
+import GenericWindow from "@/component/GenericWindow";
+import BlurOverlay from "@/component/blur_overlay";
+
+import action from "./register.action";
 import useForm from "@/hooks/useForm";
 
-export default function Page() {
-  const [state, dispatchAction, pending] = useForm(action);
-
-  //   const router = useRouter();
-  // const [state, dispatchAction, pending] = useForm(action);
-
-  // const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //
-  //   const formData = new FormData(e.currentTarget);
-  //
-  //   const values = Object.fromEntries(formData) as {
-  //     name: string;
-  //     cpf: string;
-  //     gender: string;
-  //     phone: string;
-  //     birthDate: string;
-  //     email: string;
-  //     password: string;
-  //     avatarUrl: File;
-  //     passConfirm: string;
-  //   };
-  //
-  //   delete values.passConfirm;
-  //
-  //   const res = await register(values);
-  //
-  //   if (res.data.email) {
-  //     const resLogin = await authenticate({
-  //       email: values.email,
-  //       password: values.password,
-  //     });
-  //
-  //     if (resLogin) {
-  //       localStorage.setItem("token", JSON.stringify(resLogin));
-  //       router.push("/user/dashboard");
-  //     }
-  //   }
-  // };
+function VerificationCodeWindow({
+  onClose,
+}: {
+  onClose: () => void;
+}) {
   return (
-    <main className="relative min-h-screen flex items-center justify-center overflow-hidden ">
+    <>
+      <BlurOverlay
+        show={true}
+        onClick={() => {}}
+      />
+
+      <GenericWindow
+        title="Confirmar Cadastro"
+        exitButton={true}
+        onExit={onClose}
+      >
+        <div className="w-full max-w-md">
+
+          <p
+            className="
+              text-center
+              text-muted
+              mb-6
+            "
+          >
+            Digite o código de 6 dígitos enviado
+            para seu email.
+          </p>
+
+          <div
+            className="
+              flex
+              justify-center
+              gap-3
+              mb-6
+            "
+          >
+            {[...Array(6)].map((_, index) => (
+              <input
+                key={index}
+                type="text"
+                maxLength={1}
+                className="
+                  w-12
+                  h-14
+                  rounded-xl
+                  border
+                  border-soft
+                  bg-card
+                  text-center
+                  text-xl
+                  opacity-60
+                  cursor-not-allowed
+                "
+              />
+            ))}
+          </div>
+
+          {/* TODO:
+              Implementar envio e validação do código.
+              Atualmente a janela serve apenas como
+              placeholder visual para o fluxo.
+          */}
+
+          <button
+            disabled
+            className="
+              w-full
+              py-3
+              rounded-xl
+              btn-primary
+              opacity-50
+              cursor-not-allowed
+            "
+          >
+            Confirmar Código
+          </button>
+
+          <button
+            disabled
+            className="
+              w-full
+              mt-3
+              text-sm
+              text-muted
+              opacity-50
+              cursor-not-allowed
+            "
+          >
+            Reenviar Código
+          </button>
+
+        </div>
+      </GenericWindow>
+    </>
+  );
+}
+
+export default function Page() {
+  const [state, dispatchAction, pending] =
+    useForm(action);
+
+  const [
+    showVerificationWindow,
+    setShowVerificationWindow,
+  ] = useState(false);
+
+  return (
+    <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
+
       {/* Background */}
       <Image
         src={background}
@@ -68,18 +143,23 @@ export default function Page() {
       {/* Card */}
       <div
         className="
-          relative z-10
-          w-full max-w-lg
+          relative
+          z-10
+          w-full
+          max-w-lg
           mx-auto
           surface-elevated
           rounded-4xl
-          p-8 md:p-10
-          scrollbar-thumb-sky-700 scrollbar-track-sky-100 overflow-auto
+          p-8
+          md:p-10
+          overflow-auto
           max-h-[90vh]
         "
       >
+
         {/* Logo */}
         <div className="w-full flex flex-col items-center">
+
           <Image
             src={loginLogo}
             alt="Logo da Vaggo"
@@ -87,6 +167,7 @@ export default function Page() {
             height={86}
             className="object-cover"
           />
+
         </div>
 
         <div className="h-6" />
@@ -98,6 +179,7 @@ export default function Page() {
         <div className="h-6" />
 
         <FormContainer action={dispatchAction}>
+
           <FormItem
             type="text"
             label="Nome Completo"
@@ -109,6 +191,7 @@ export default function Page() {
           <div className="h-3" />
 
           <div className="grid grid-cols-2 gap-4">
+
             <FormItem
               type="text"
               label="CPF"
@@ -118,6 +201,7 @@ export default function Page() {
             />
 
             <div className="flex flex-col gap-2">
+
               <label className="text-muted text-sm">
                 Gênero
               </label>
@@ -127,15 +211,23 @@ export default function Page() {
                 defaultValue="M"
                 className="app-input"
               >
-                <option value="M">Masculino</option>
-                <option value="F">Feminino</option>
+                <option value="M">
+                  Masculino
+                </option>
+
+                <option value="F">
+                  Feminino
+                </option>
               </select>
+
             </div>
+
           </div>
 
           <div className="h-3" />
 
           <div className="grid grid-cols-2 gap-4">
+
             <FormItem
               type="date"
               label="Nascimento"
@@ -150,6 +242,7 @@ export default function Page() {
               placeholder="(11) 99999-9999"
               controller={state}
             />
+
           </div>
 
           <div className="h-3" />
@@ -165,6 +258,7 @@ export default function Page() {
           <div className="h-3" />
 
           <div className="grid grid-cols-2 gap-4">
+
             <FormItem
               type="password"
               label="Senha"
@@ -180,11 +274,13 @@ export default function Page() {
               placeholder="••••••••"
               controller={state}
             />
+
           </div>
 
           <div className="h-3" />
 
           <div className="flex flex-col gap-2">
+
             <label className="text-muted text-sm">
               Foto de Perfil
             </label>
@@ -194,6 +290,7 @@ export default function Page() {
               name="avatarUrl"
               className="app-input"
             />
+
           </div>
 
           <p className="text-rose-400">
@@ -201,8 +298,11 @@ export default function Page() {
           </p>
 
           <button
-            type="submit"
+            type="button"
             disabled={pending}
+            onClick={() =>
+              setShowVerificationWindow(true)
+            }
             className="
               mt-8
               py-3
@@ -220,9 +320,11 @@ export default function Page() {
               ? "Criando conta..."
               : "Criar Conta"}
           </button>
+
         </FormContainer>
 
         <div className="mt-6 text-center">
+
           <Link
             href="/login"
             className="
@@ -233,8 +335,19 @@ export default function Page() {
           >
             Já possui uma conta? Entrar
           </Link>
+
         </div>
+
       </div>
+
+      {showVerificationWindow && (
+        <VerificationCodeWindow
+          onClose={() =>
+            setShowVerificationWindow(false)
+          }
+        />
+      )}
+
     </main>
   );
 }

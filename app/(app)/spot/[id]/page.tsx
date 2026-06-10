@@ -755,19 +755,20 @@ export default function Page({ params }: any) {
         </div>
 
         {/* Ver mais vagas */}
-        <div className="mt-4 justify-start surface-elevated p-4">
-          <span
+        <div className="mt-4 justify-start p-4">
+          <p
             onClick={availableSpotsWindow.show}
             className="
               text-sm
               text-muted
               cursor-pointer
+              text-end
               hover:text-primary
               transition-colors
             "
           >
-            Ver mais vagas - Arrumar pra direita dps
-          </span>
+            Ver mais vagas
+          </p>
         </div>
 
       </section >
