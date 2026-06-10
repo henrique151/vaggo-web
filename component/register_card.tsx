@@ -37,7 +37,7 @@ export default function RegisterCard({ type, onSubmit }: RegisterCardProps) {
     <section
       className="
       w-full max-w-lg
-      bg-white
+      bg-base
       border border-gray-200
       rounded-2xl
       shadow-sm

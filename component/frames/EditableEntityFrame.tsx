@@ -14,7 +14,7 @@ export function EditableEntityFrame({
   const [showEntityEditForm, setShowEntityForm] = useState(editForm);
 
   return (
-    <section className="border border-gray-200 rounded-2xl p-5 bg-white shadow-sm hover:shadow-md transition">
+    <section className="border border-gray-200 rounded-2xl p-5 bg-base shadow-sm hover:shadow-md transition">
       <div className="flex items-start justify-between gap-4">
         {/*<Context.Provider value={data}>*/}
         <div className="flex-1">{children}</div>

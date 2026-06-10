@@ -35,6 +35,11 @@ import { sendReport } from "@/services/report.service";
 import useWindow from "@/hooks/useWindow";
 import StatusBadge from "@/component/ui/StatusDisplay";
 import TagContainer from "@/component/container/TagContainer";
+import SpotInfoCard from "@/component/temp_componentes/SpotInfoCard";
+import ReservationPeriodCard from "@/component/temp_componentes/ReservationPeriodCard";
+import VehicleSelectionCard from "@/component/temp_componentes/VehicleSelectionCard";
+
+
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Page({ params }: any) {
@@ -65,7 +70,6 @@ export default function Page({ params }: any) {
   const [availableVehiclesWindow] = useWindow(VehicleAvailabilityWindow);
   const [bookingStatusWindow] = useWindow(BookingStatusWindow);
   const [reportWindow] = useWindow(ReportWindow);
-
   // console.log("windowTest");
   // console.log(windowTest);
 
@@ -226,7 +230,7 @@ export default function Page({ params }: any) {
   function SpotAvailabilityWindow() {
     return (
       <>
-        <BlurOverlay show={true} onClick={() => {}} />
+        <BlurOverlay show={true} onClick={() => { }} />
         <GenericWindow
           title={"Vagas Disponíveis"}
           exitButton={true}
@@ -251,46 +255,244 @@ export default function Page({ params }: any) {
     );
   }
 
-  function VehicleAvailabilityWindow({
-    onExit,
-  }: {
-    onExit: MouseEventHandler;
-  }) {
-    // useEffect(() => {
-    //   const load = async () => {
-    //     if (!vehicles) {
-    //       const vehicles = await VehicleDAO.getFromUser();
-    //       setVehicles(vehicles);
-    //     }
-    //   };
+  function VehicleAvailabilityWindow() {
+    const spot = spots.find((s) => s.id === selectedSpot);
 
-    //   load();
+    if (!spot) return null;
 
-    //   console.log(vehicles);
-    // }, []);
-    // if (!vehicles) return <></>;
     return (
       <>
-        <BlurOverlay show={true} onClick={() => {}} />
+        <BlurOverlay show={true} onClick={() => { }} />
+
         <GenericWindow
-          title={"Selecione um veículo para esta vaga"}
+          title="Reserva"
           exitButton={true}
           onExit={availableVehiclesWindow.hide}
         >
-          {vehicles?.map((vehicle) => {
-            return (
-              <button
-                key={vehicle.id}
-                onClick={async () => {
-                  console.log(vehicle.id);
-                  await handleReserve(selectedSpot, vehicle.id);
-                }}
+          <div
+            className="
+          w-full
+          max-w-[550px]
+          overflow-hidden
+        "
+          >
+            <div className="flex flex-col gap-4">
+
+              {/* Dados da vaga */}
+              <section
+                className="
+              surface-elevated
+              rounded-3xl
+              p-4
+              overflow-hidden
+            "
               >
-                <VehicleCard raw_data={vehicle} />
-              </button>
-            );
-          }) || "Não há veículos disponíveis para esta vaga."}
-          {/*<p>Map all vehicles here</p>*/}
+                <div
+                  className="
+                flex
+                flex-col
+                md:flex-row
+                gap-4
+                w-full
+                min-w-0
+              "
+                >
+                  <Image
+                    src={spot.image.url}
+                    width={180}
+                    height={125}
+                    alt=""
+                    className="
+                  rounded-2xl
+                  object-cover
+                  w-full
+                  md:w-[180px]
+                  h-[125px]
+                  shrink-0
+                "
+                  />
+
+                  <div
+                    className="
+                  flex
+                  flex-col
+                  gap-3
+                  flex-1
+                  min-w-0
+                "
+                  >
+                    <h2 className="text-xl font-semibold break-words">
+                      {spot.identifier}
+                    </h2>
+
+                    <p className="text-sm">
+                      Tamanho: {spot.size}
+                    </p>
+
+                    <p className="text-sm">
+                      Preço: R$ {spot.price}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1">
+                      {spot.allowedVehicles.map((allowed) => (
+                        <TagContainer key={allowed}>
+                          {allowed}
+                        </TagContainer>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Parte inferior */}
+              <div
+                className="
+              grid
+              grid-cols-1
+              lg:grid-cols-2
+              gap-4
+              w-full
+            "
+              >
+
+                {/* Datas */}
+                <section
+                  className="
+                surface-elevated
+                rounded-3xl
+                p-4
+                min-w-0
+              "
+                >
+                  <h3 className="font-semibold text-base mb-3">
+                    Período da reserva
+                  </h3>
+
+                  <div className="space-y-3">
+
+                    <div>
+                      <label className="block text-sm text-muted mb-2">
+                        Entrada
+                      </label>
+
+                      <input
+                        type="date"
+                        disabled
+                        className="
+                      w-full
+                      rounded-xl
+                      border border-soft
+                      bg-card
+                      px-3
+                      py-2
+                      opacity-60
+                      cursor-not-allowed
+                    "
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm text-muted mb-2">
+                        Saída
+                      </label>
+
+                      <input
+                        type="date"
+                        disabled
+                        className="
+                      w-full
+                      rounded-xl
+                      border border-soft
+                      bg-card
+                      px-3
+                      py-2
+                      opacity-60
+                      cursor-not-allowed
+                    "
+                      />
+                    </div>
+
+                  </div>
+                </section>
+
+                {/* Veículos */}
+                <section
+                  className="
+                surface-elevated
+                rounded-3xl
+                p-4
+                flex
+                flex-col
+                h-[300px]
+                overflow-hidden
+                min-w-0
+              "
+                >
+                  <h3 className="font-semibold text-base mb-3">
+                    Selecione um veículo
+                  </h3>
+
+                  <div
+                    className="
+                  flex-1
+                  overflow-y-auto
+                  overflow-x-hidden
+                  pr-2
+                  min-w-0
+                "
+                  >
+                    {vehicles?.map((vehicle) => (
+                      <button
+                        key={vehicle.id}
+                        onClick={async () => {
+                          await handleReserve(
+                            spot.id,
+                            vehicle.id
+                          );
+                        }}
+                        className="
+                      w-full
+                      p-3
+                      mb-2
+                      rounded-xl
+                      border
+                      border-soft
+                      text-left
+                      transition
+                      hover:border-blue-400
+                    "
+                      >
+                        <h4 className="text-sm font-medium break-words">
+                          {vehicle.brand} {vehicle.model}
+                        </h4>
+
+                        <p className="text-xs text-muted break-words">
+                          {vehicle.licensePlate}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    disabled
+                    className="
+                  w-full
+                  mt-3
+                  py-2
+                  rounded-xl
+                  font-medium
+                  btn-primary
+                  opacity-50
+                  cursor-not-allowed
+                "
+                  >
+                    Reservar Vaga
+                  </button>
+                </section>
+
+              </div>
+            </div>
+          </div>
         </GenericWindow>
       </>
     );
@@ -299,7 +501,7 @@ export default function Page({ params }: any) {
   function BookingStatusWindow({ onExit }: { onExit: MouseEventHandler }) {
     return (
       <>
-        <BlurOverlay show={true} onClick={() => {}} />
+        <BlurOverlay show={true} onClick={() => { }} />
         <GenericWindow
           title={
             bookingStatus ? "Sucesso!" : "Não foi possível realizar a reserva"
@@ -380,7 +582,7 @@ export default function Page({ params }: any) {
 
     return (
       <>
-        <BlurOverlay show={true} onClick={() => {}} />
+        <BlurOverlay show={true} onClick={() => { }} />
         <GenericWindow
           title={"Denúncia"}
           exitButton={true}
@@ -397,77 +599,190 @@ export default function Page({ params }: any) {
   return (
     <main>
       {/*<Header />*/}
+
       {/* TODO transform into ImageCarousel */}
-      <section className="m-10 flex flex-row">
-        <section className="surface-elevated w-full rounded-3xl p-8 flex flex-row">
-          <h2 className="text-2xl w-1/2  mb-6 mr-6">
+      <section className="max-w-7xl mx-auto px-6 py-8">
+
+        {/* Nome da propriedade */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-semibold text-primary">
+            {property?.name || "Propriedade"}
+          </h1>
+
+          <button
+            className="cursor-pointer text-sm text-rose-400 hover:text-rose-500 transition-colors"
+            onClick={reportWindow.show}
+          >
+            Denunciar
+          </button>
+        </div>
+
+        {/* Grid de imagens */}
+        <div
+          className="
+          grid
+          grid-cols-3
+          gap-2
+          h-[500px]
+          rounded-4xl
+          overflow-hidden
+        "
+        >
+          {/* Imagem principal */}
+          <div className="col-span-2 relative">
             {property?.images[0] ? (
               <Image
-                width={1280}
-                height={768}
-                src={`${property.images[0].url}`}
-                alt={"Imagem da Propriedade"}
+                fill
+                src={property.images[0].url}
+                alt="Imagem principal da propriedade"
                 className="
-                  w-full h-full object-cover
+                object-cover
+                hover:scale-[1.02]
+                transition-transform
+                duration-300
               "
               />
-            ) : null}
-          </h2>
+            ) : (
+              <div className="w-full h-full bg-card" />
+            )}
+          </div>
 
-          <div className="flex w-1/2 flex-col items-end">
-            <button
-              className="cursor-pointer text-sm text-red-300 mb-3"
-              onClick={reportWindow.show}
-            >
-              Denunciar
-            </button>
+          {/* Imagens secundárias */}
+          <div className="grid grid-rows-2 gap-2">
+            {/* Imagem secundária */}
+            <div className="relative">
+              {property?.images[1] ? (
+                <Image
+                  fill
+                  src={property.images[1].url}
+                  alt="Imagem da propriedade"
+                  className="
+                  object-cover
+                  hover:scale-[1.02]
+                  transition-transform
+                  duration-300
+                "
+                />
+              ) : (
+                <div className="w-full h-full bg-card" />
+              )}
+            </div>
 
-            <h1 className="text-2xl font-semibold">
-              {property?.name || "Propriedade"}
-            </h1>
-            <p className="text-sm mb-4 text-gray-400">
-              {property?.type || "Tipo"}
-            </p>
-            <p>{property?.description || "Descrição"}</p>
-            <p>Capacidade total: {property?.totalCapacity || "0"} Vaga(as)</p>
-            <p>Avaliação: {reviews?.averageRating || 1}/5</p>
-
-            {/* TODO get all spots prices, return minnimum and maximum value of each one */}
-            {/*<h2 className="text-2xl font-semibold mt-6">R$ 0 / Reserva</h2>*/}
-
-            {/* TODO responsive: make buttons go down each other when resizing to small screen */}
-            {/*<div className="grid grid-cols-2 w-full mt-3">*/}
-            <div className="w-full mt-3">
-              <button
-                // onClick={() => setShowWindow(true)}
-                onClick={() => {
-                  availableSpotsWindow.show();
-                  console.log("ojad");
-                }}
-                className="w-full py-3 rounded-lg font-medium text-white btn-primary btn-hover transition disabled:opacity-60"
-              >
-                Vagas Disponíveis
-              </button>
-              {/*<Link href={`${params.id}/chat`} className="ml-2">
-                <button
-                  // onClick={() => setShowWindow(true)}
-                  className="w-full py-3 rounded-lg font-medium text-white bg-gray-900 hover:bg-black transition disabled:opacity-60"
-                >
-                  Conversar
-                </button>
-              </Link>*/}
+            {/* Imagem terciária */}
+            <div className="relative">
+              {property?.images[2] ? (
+                <Image
+                  fill
+                  src={property.images[2].url}
+                  alt="Imagem da propriedade"
+                  className="
+                  object-cover
+                  hover:scale-[1.02]
+                  transition-transform
+                  duration-300
+                "
+                />
+              ) : (
+                <div className="w-full h-full bg-card" />
+              )}
             </div>
           </div>
-        </section>
-      </section>
+        </div>
 
-      <section className="m-10">
+        {/* Detalhes + Vagas */}
+        <div
+          className="
+    grid
+    grid-cols-1
+    lg:grid-cols-3
+    gap-6
+    mt-6
+  "
+        >
+          {/* Dados da propriedade */}
+          <div
+            className="
+      lg:col-span-2
+      surface-elevated
+      rounded-4xl
+      p-8
+    "
+          >
+            <p className="text-sm text-muted mb-2">
+              {property?.type || "Tipo"}
+            </p>
+
+            <p className="text-primary mb-6">
+              {property?.description || "Descrição"}
+            </p>
+
+            <div className="flex flex-wrap gap-6 text-sm">
+              <span className="text-muted">
+                🚗 Capacidade total: {property?.totalCapacity || "0"} vaga(as)
+              </span>
+
+              <span className="text-muted">
+                ⭐ Avaliação: {reviews?.averageRating || 1}/5
+              </span>
+            </div>
+          </div>
+
+          {/* Lista de vagas */}
+          <div
+            className="
+      surface-elevated
+      rounded-4xl
+      p-4
+      max-h-[600px]
+      overflow-y-auto
+    "
+          >
+            <h2 className="text-xl font-semibold mb-4">
+              Vagas Disponíveis
+            </h2>
+
+            {spots
+              .filter(
+                (spot) =>
+                  spot.status !== "INDISPONIVEL" &&
+                  spot.status !== "OCUPADA"
+              )
+              .map((spot) => (
+                <SpotAvailabilityCard
+                  key={`available_spot_${spot.id}`}
+                  spot={spot}
+                />
+              ))}
+
+          </div>
+        </div>
+
+        {/* Ver mais vagas */}
+        <div className="mt-4 justify-start surface-elevated p-4">
+          <span
+            onClick={availableSpotsWindow.show}
+            className="
+              text-sm
+              text-muted
+              cursor-pointer
+              hover:text-primary
+              transition-colors
+            "
+          >
+            Ver mais vagas - Arrumar pra direita dps
+          </span>
+        </div>
+
+      </section >
+
+      <section className="max-w-7xl mx-auto px-6 pb-8">
         <PanelContainer title="Avaliações">
           {reviews?.reviews.length > 0 ? (
             <>
-              <p className="mb-2">
+              <p className="mb-4">
                 Avaliação Geral: {reviews?.averageRating || 1}/5
               </p>
+
               <CarouselContainer title={""} cards={reviewCards} />
             </>
           ) : (
@@ -475,61 +790,49 @@ export default function Page({ params }: any) {
           )}
         </PanelContainer>
       </section>
-      {/*
-      {showSpotsWindow && (
-        <SpotAvailabilityWindow
-          property={property}
-          onExit={() => {
-            setShowSpotsWindow(false);
-            // console.log("hello!");
-          }}
-        />
-      )}
-      */}
 
       {availableSpotsWindow.component && <availableSpotsWindow.component />}
-      {availableVehiclesWindow.component && (
-        <availableVehiclesWindow.component />
-      )}
+      {
+        availableVehiclesWindow.component && (
+          <availableVehiclesWindow.component />
+        )
+      }
       {bookingStatusWindow.component && <bookingStatusWindow.component />}
 
       {reportWindow.component && <reportWindow.component />}
 
       {/*{showVehicleWindow && (
-        <VehicleAvailabilityWindow
-          onExit={() => {
-            setShowVehicleWindow(false);
-            // console.log("hello!");
-          }}
-        />
-      )}
+      <VehicleAvailabilityWindow
+        onExit={() => {
+          setShowVehicleWindow(false);
+        }}
+      />
+    )}
 
-      {bookingStatusWindow && (
-        <BookingStatusWindow
-          onExit={() => {
-            setBookingStatusWindow(false);
-            // console.log("hello!");
-          }}
-        />
-      )}
+    {bookingStatusWindow && (
+      <BookingStatusWindow
+        onExit={() => {
+          setBookingStatusWindow(false);
+        }}
+      />
+    )}
 
-      {bookingStatusWindow && (
-        <BookingStatusWindow
-          onExit={() => {
-            setBookingStatusWindow(false);
-            // console.log("hello!");
-          }}
-        />
-      )}
+    {bookingStatusWindow && (
+      <BookingStatusWindow
+        onExit={() => {
+          setBookingStatusWindow(false);
+        }}
+      />
+    )}
 
-      {reportWindow && (
-        <ReportWindow
-          onExit={() => {
-            setReportWindow(false);
-          }}
-        />
-      )}*/}
-    </main>
+    {reportWindow && (
+      <ReportWindow
+        onExit={() => {
+          setReportWindow(false);
+        }}
+      />
+    )}*/}
+    </main >
   );
 }
 
