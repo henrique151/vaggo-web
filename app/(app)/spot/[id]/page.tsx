@@ -35,9 +35,6 @@ import { sendReport } from "@/services/report.service";
 import useWindow from "@/hooks/useWindow";
 import StatusBadge from "@/component/ui/StatusDisplay";
 import TagContainer from "@/component/container/TagContainer";
-import SpotInfoCard from "@/component/temp_componentes/SpotInfoCard";
-import ReservationPeriodCard from "@/component/temp_componentes/ReservationPeriodCard";
-import VehicleSelectionCard from "@/component/temp_componentes/VehicleSelectionCard";
 
 
 
