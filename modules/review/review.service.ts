@@ -2,6 +2,7 @@
 import { AccessTokenClassInterface } from "@interfaces";
 import * as APIService from "../api/api.service";
 import map from "./mappers/review.service.interface.mapper";
+import { FormUtils } from "@utils";
 
 export async function get(token: AccessTokenClassInterface): Promise<any>;
 export async function get(
@@ -25,4 +26,34 @@ export async function get(
   const { data } = await res.json();
 
   return data.map(map);
+}
+
+export async function edit(
+  token: AccessTokenClassInterface,
+  id: number,
+  form: FormData,
+) {
+  const data = FormUtils.toObject(form);
+
+  try {
+    const res = await APIService.request(`reviews/${id}`, token, {
+      method: "PUT",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return res.ok;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function deleteById(token: AccessTokenClassInterface, id: number) {
+  try {
+    const res = await APIService.genericDeleteRequest(token, `reviews`, id);
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
 }

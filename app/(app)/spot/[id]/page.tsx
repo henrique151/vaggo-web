@@ -2,7 +2,7 @@
 // import Link from "next/link"
 import Image from "next/image";
 
-import Header from "@/component/header";
+// import Header from "@/component/header";
 // import * as api from "@/app/api";
 // import { PropertyResponse } from "@/interface/api/property";
 import { MouseEventHandler, useEffect, useState } from "react";
@@ -11,20 +11,20 @@ import { useParams } from "next/navigation";
 import BlurOverlay from "@/component/blur_overlay";
 // import { Spot } from "@/entity/spot";
 // import Property, { PropertyDAO, useFetchProperty } from "@/entity/property";
-import { useGetPropertyById } from "@/hooks/api/property/useGetPropertyById";
+// import { useGetPropertyById } from "@/hooks/api/property/useGetPropertyById";
 import GenericWindow from "@/component/GenericWindow";
 // import { Vehicle, VehicleDAO } from "@/entity/vehicle";
 // import { BookingDAO } from "@/entity/booking";
 import DatePeriod from "@/classes/data/DatePeriod";
-import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetMyrVehicles";
+// import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetMyrVehicles";
 // import { useApi } from "@/hooks/api/useApi";
-import { bookSpot } from "@/services/booking.service";
+// import { bookSpot } from "@/services/booking.service";
 import { Spot } from "@classes";
-import { getSpotsByPropertyId } from "@/services/spot.service";
-import Property from "@/classes/property";
+// import { getSpotsByPropertyId } from "@/services/spot.service";
+// import Property from "@/classes/property";
 import { Vehicle } from "@/classes/vehicle";
-import Link from "next/link";
-import PanelLayout from "@/component/layout/PanelLayout";
+// import Link from "next/link";
+// import PanelLayout from "@/component/layout/PanelLayout";
 import PanelContainer from "@/component/container/PanelContainer";
 import CarouselContainer from "@/component/container/CarouselContainer";
 // import { getReviewsFromProperty } from "@/services/review.service";
@@ -40,28 +40,22 @@ import useGetReviews from "@/modules/review/hooks/useGetReviews";
 import useComponentMapper from "@/hooks/useComponentMapper";
 import { Review } from "@classes";
 import useGetVehicleDetails from "@/modules/vehicle/hooks/useGetVehicleDetails";
+import { ReportController, ReservationController } from "@controllers";
+import { BrowserService } from "@services";
+import { FormUtils } from "@utils";
+import { da } from "zod/v4/locales";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Page({ params }: any) {
   params = useParams() as unknown as { id: number };
 
-  const [spots, setSpots] = useState<Spot[]>([]);
-  const [showWindow, setShowWindow] = useState(false);
-
-  // const [property, propertyLoading] = useGetPropertyById({
-  //   id: params.id,
-  //   withSpots: true,
-  // }); //TODO REPLACE WITH TYPES
-
-  const [property, loaded, refresh] = useGetPropertyDetails(params.id, true); //TODO REPLACE WITH TYPES
+  const [property, loaded, refreshSpots] = useGetPropertyDetails(
+    params.id,
+    true,
+  ); //TODO REPLACE WITH TYPES
   const [reviews] = useGetReviews("property", params.id);
   const [vehicles] = useGetVehicleDetails();
 
-  // const [test] = useComponentMapper([], () => {});
-
-  // const [vehicles, setVehicles] = useGetMyVehicles();
-  // const [reviews, setReviews] = useState<PropertyReviews>(undefined);
-  // const [reviewCards, setReviewCards] = useState<React.ReactNode[]>([]);
   const reviewCards = useComponentMapper(reviews, (review: Review) => {
     return (
       <EntityCard
@@ -74,12 +68,9 @@ export default function Page({ params }: any) {
   });
   // setRev
 
-  // const [showSpotsWindow, setShowSpotsWindow] = useState(false);
-  // const [showVehicleWindow, setShowVehicleWindow] = useState(false);
-  // const [reportWindow, setReportWindow] = useState(false);
-
   const [selectedSpot, setSelectedSpot] = useState(-1);
-  // const [selectedVehicle, setSelectedVehicle] = useState(-1);
+  const [selectedStartDate, setSelectedStartDate] = useState(undefined);
+  const [selectedEndDate, setSelectedEndDate] = useState(undefined);
 
   const [bookingStatus, setBookingStatus] = useState(false);
   // const [bookingStatusWindow, setBookingStatusWindow] = useState(false);
@@ -88,31 +79,6 @@ export default function Page({ params }: any) {
   const [availableVehiclesWindow] = useWindow(VehicleAvailabilityWindow);
   const [bookingStatusWindow] = useWindow(BookingStatusWindow);
   const [reportWindow] = useWindow(ReportWindow);
-  // console.log("windowTest");
-  // console.log(property);
-
-  // useEffect(() => {
-  // const load = async () => {
-  //   setSpots(await getSpotsByPropertyId(params.id));
-  //   const reviews = await getReviewsFromProperty(params.id);
-  //   if (reviews) {
-  //     setReviews(reviews);
-
-  //     const cards = reviews.reviews.map((review) => {
-  //       return (
-  //         <EntityCard
-  //           key={review.id}
-  //           title={`${review.rating}/5`}
-  //           description={`${review.comment}`}
-  //           image={review.user.avatar}
-  //         />
-  //       );
-  //     });
-  //     setReviewCards(cards);
-  //   }
-  // };
-  // load();
-  // }, []);
 
   const handleReserve = async (spotId: number, vehicleId: number) => {
     const datePeriod = new DatePeriod(
@@ -120,37 +86,27 @@ export default function Page({ params }: any) {
       new Date(2026, 4, 10),
     );
 
-    // setSelectedVehicle(vehicleId);
+    const form = FormUtils.toForm({
+      spotId: spotId,
+      vehicleId: vehicleId,
+      startDate: "2026-01-01",
+      endDate: "2026-05-10",
+    });
 
-    // const res = await BookingDAO.reserve(selectedSpot, vehicleId, datePeriod);
-    // const res = await bookSpot({
-    //   id: spotId,
-    //   vehicleId: vehicleId,
-    //   datePeriod: datePeriod,
-    // });
-    // const res = true;
+    const res = await ReservationController.register(
+      BrowserService.getToken(),
+      form,
+    );
+    console.log(res);
+    setBookingStatus(res);
+
+    availableVehiclesWindow.hide();
+    bookingStatusWindow.show();
+    refreshSpots();
 
     console.log(
       `you selected spot number ${spotId} to use with car ${vehicleId}`,
     );
-
-    // console.log(res);
-
-    // if (res) {
-    //   console.log("success!");
-    //   setBookingStatus(true);
-
-    //   // setSpots(await getSpotsByPropertyId(Number(params.id)));
-    //   // console.log(document.getElementById(`available_spot_${spotId}`));
-    // } else {
-    //   setBookingStatus(false);
-    // }
-    // availableVehiclesWindow.hide();
-    // bookingStatusWindow.show();
-    // setShowVehicleWindow(false);
-    // setBookingStatusWindow(true);
-
-    // return res;
   };
 
   function VehicleCard({ raw_data }: { raw_data: Vehicle }) {
@@ -179,7 +135,7 @@ export default function Page({ params }: any) {
   }
 
   function SpotAvailabilityCard({ spot }: { spot: Spot }) {
-    console.log(spot);
+    // console.log(spot);
     return (
       <section className="surface-elevated w-full rounded-3xl p-8 mb-4">
         <div className="flex flex-row w-full">
@@ -256,7 +212,7 @@ export default function Page({ params }: any) {
         >
           {/* TODO insert scroll here */}
           <section className="overflow-y-scroll scroll-smooth h-120 w-full">
-            {spots.map((spot: Spot) => {
+            {property?.spots?.map((spot: Spot) => {
               // TODO change to EntityFrame
               if (
                 spot?.status?.availability != "INDISPONIVEL" &&
@@ -539,7 +495,13 @@ export default function Page({ params }: any) {
       e.preventDefault();
       const currentTarget = e.currentTarget;
       const formData = new FormData(currentTarget);
-      const res = await sendReport("SPOT", 1, formData);
+      const res = await ReportController.register(
+        BrowserService.getToken(),
+        "SPOT",
+        1,
+        formData,
+      );
+      // const res = await sendReport("SPOT", 1, formData);
       setMessageState(res);
     };
     const messages = {
@@ -601,7 +563,7 @@ export default function Page({ params }: any) {
     );
   }
 
-  console.log(property);
+  // console.log(property);
   // if (property === undefined) return <section></section>;
   return (
     <main>
@@ -804,38 +766,6 @@ export default function Page({ params }: any) {
       {bookingStatusWindow.component && <bookingStatusWindow.component />}
 
       {reportWindow.component && <reportWindow.component />}
-
-      {/*{showVehicleWindow && (
-      <VehicleAvailabilityWindow
-        onExit={() => {
-          setShowVehicleWindow(false);
-        }}
-      />
-    )}
-
-    {bookingStatusWindow && (
-      <BookingStatusWindow
-        onExit={() => {
-          setBookingStatusWindow(false);
-        }}
-      />
-    )}
-
-    {bookingStatusWindow && (
-      <BookingStatusWindow
-        onExit={() => {
-          setBookingStatusWindow(false);
-        }}
-      />
-    )}
-
-    {reportWindow && (
-      <ReportWindow
-        onExit={() => {
-          setReportWindow(false);
-        }}
-      />
-    )}*/}
     </main>
   );
 }

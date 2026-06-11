@@ -7,7 +7,32 @@ import {
 import * as APIService from "@/modules/api/api.service";
 import map from "./mappers/reservation.service.interface.mapper";
 
-// export async function register(form: FormData) {}
+export async function register(
+  token: AccessTokenClassInterface,
+  formData: {
+    spotId: number;
+    vehicleId: number;
+    startDate: string;
+    endDate: string;
+  },
+): Promise<boolean> {
+  try {
+    const res = await APIService.request("reservations", token, {
+      body: JSON.stringify(formData),
+      method: "POST",
+    });
+
+    console.log(res);
+    //throw errors if not 200
+    // 409 'Já existe uma reserva neste período'
+    const data = await res.json();
+
+    // console.log(data);
+    return res.ok;
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 export async function get(
   token: AccessTokenClassInterface,
@@ -34,19 +59,15 @@ export async function get(
   return data.map(map);
 }
 
-// export async function getSpots(
-//   token: AccessTokenClassInterface,
-//   id: number,
-// ): Promise<SpotClassInterface[]> {
-//   const res = await APIService.request(`spots/properties/${id}/spots`, token);
+export async function changeApprovalStatus(
+  token: AccessTokenClassInterface,
+  id: number,
+  status: "approve" | "reject" | "cancel",
+): Promise<boolean> {
+  const url = `reservations/${id}/${status}`;
 
-//   const { data } = await res.json();
-
-//   return data.map(map);
-// }
-
-// export async function generateSpots(id: number, form: FormData) {}
-
-// export async function updateSpotStatus(id: number) {}
-
-// export async function deleteSpot(id: number) {}
+  const res = await APIService.request(url, token, {
+    method: "PATCH",
+  });
+  return res.ok;
+}

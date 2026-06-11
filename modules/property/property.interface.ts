@@ -6,7 +6,7 @@ export type PropertyClassInterface = Property;
 export type SpotClassInterface = Spot;
 export type SpotStructureInterface = DeepPartial<Spot>;
 
-export type SpotAvailabilityStatus = string | "DISPONÍVEL" | "PENDENTE";
+export type SpotAvailabilityStatus = string; //| "DISPONÍVEL" | "PENDENTE";
 export type AllowedVehiclesTypes = "CARRO" | "MOTO";
 export type SpotApprovalStatus = string | "APROVADA";
 

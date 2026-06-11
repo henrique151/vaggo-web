@@ -37,8 +37,8 @@ export function EntityCard({
     </h3>
   );
 
-  console.log("image");
-  console.log(image);
+  // console.log("image");
+  // console.log(image);
 
   return (
     <div

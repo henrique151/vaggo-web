@@ -1,9 +1,12 @@
 "use server";
 // import AccessTokenClassInterface from "@/classes/AccessToken";
 import DatePeriod from "@/classes/data/DatePeriod";
+import Property from "@/classes/property";
 import * as PropertyService from "@/modules/property/property.service";
+import { ControllerStatus } from "@classes";
 
 import { AccessTokenClassInterface, PropertyClassInterface } from "@interfaces";
+import { stat } from "node:fs/promises";
 
 type getPropertyFlags = {
   withSpots?: boolean;
@@ -76,3 +79,40 @@ export async function generateSpots(id: number, form: FormData) {}
 export async function updateSpotStatus(id: number) {}
 
 export async function deleteSpot(id: number) {}
+
+export async function edit(
+  token: AccessTokenClassInterface,
+  form: FormData,
+  idParam?: number,
+) {
+  const id = idParam ?? Number(form.get("id"));
+  const status = ControllerStatus.setup(form);
+
+  if (form.get("id")) form.delete("id");
+
+  try {
+    const res = await PropertyService.edit(token, id, form);
+    if (res) status.successfull();
+    else status.failed();
+
+    return status.toObject();
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function deleteById(token: AccessTokenClassInterface, id: number) {
+  const status = ControllerStatus.setup();
+
+  try {
+    const res = await PropertyService.deleteById(token, id);
+    if (res) status.successfull();
+    else status.failed();
+    return status.toObject();
+  } catch (e) {
+    console.log(e);
+
+    status.failed();
+    return status.toObject();
+  }
+}

@@ -3,6 +3,18 @@ import * as APIService from "@/modules/api/api.service";
 import { AccessTokenClassInterface, ReportClassInterface } from "@interfaces";
 import map from "./mappers/report.service.interface.mapper";
 
+export async function register(
+  token: AccessTokenClassInterface,
+  form: FormData,
+): Promise<boolean> {
+  const res = await APIService.request("reports", token, {
+    method: "POST",
+    body: form,
+  });
+
+  return res.ok;
+}
+
 export async function get(
   token: AccessTokenClassInterface,
 ): Promise<ReportClassInterface[]> {

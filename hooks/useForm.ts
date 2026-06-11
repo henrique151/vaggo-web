@@ -1,4 +1,5 @@
 import ControllerStatus from "@/classes/controller/ControllerStatus";
+// import {ControllerStatus} from "@classes";
 import { useActionState, useEffect, useState } from "react";
 
 export default function useForm(
@@ -18,6 +19,6 @@ export default function useForm(
     setController(ControllerStatus.fromObject(state));
     // console.log(controller);
   }, [state]);
-  console.log(controller);
+  // console.log(controller);
   return [controller, dispatchAction, pending];
 }

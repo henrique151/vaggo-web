@@ -1,11 +1,13 @@
 "use server";
 
-import ControllerFieldStatus from "@/classes/controller/ControllerFieldStatus";
-import ControllerStatus from "@/classes/controller/ControllerStatus";
+// import ControllerFieldStatus from "@/classes/controller/ControllerFieldStatus";
+// import ControllerStatus from "@/classes/controller/ControllerStatus";
 import InvalidCredentialsError from "@/classes/errors/api/InvalidCredentialsError";
 import * as auth from "@/services/auth.service";
 import * as z from "zod";
 import UserSchema from "../../controllers/schemas/user.schemas";
+
+import { ControllerStatus } from "@classes";
 // import {
 //   AccessToken,
 //   //   AccessToken as AccessTokenClassInterface,
@@ -14,7 +16,12 @@ import UserSchema from "../../controllers/schemas/user.schemas";
 // import { getUser } from "@/services/user.service";
 import * as UserService from "@/modules/user/user.service";
 
-import { AccessTokenClassInterface, UserClassInterface } from "@interfaces";
+import {
+  AccessTokenClassInterface,
+  ControllerStatusStructureInterface,
+  UserClassInterface,
+} from "@interfaces";
+import { FormUtils } from "@utils";
 // import * as APIService from "@/modules/api/api.service";
 // general?
 //  -> function receives raw input from form (FormData only?)
@@ -61,7 +68,7 @@ export async function authenticate(
   email: string,
   password: string,
 ): Promise<object> {
-  const status = new ControllerStatus({});
+  const status = ControllerStatus.setup();
   status.setFields({ email: email, password: password });
 
   // const Credentials = UserSchema.LOGIN_FORM
@@ -75,14 +82,15 @@ export async function authenticate(
     // IDEA wrap into function where class itself maps all Zod-related errors and execute it's own methods
     for (const issue of res.error.issues) {
       const current = issue.path[0] as string;
-      if (current in status.fields) {
-        status.fields[current].setError(issue.message);
-      }
+      status.setFieldError(current, issue.message);
+      // if (current in status.fields) {
+      //   status.fields[current].setError(issue.message);
+      // }
     }
     // if zod returns ValidationError, map all zod.error.issues to return::{errors:{}}
     // EXPERIMENT turn sucess state functions to return itself as plainObject if those lines below repeats in other files
     status.failed();
-    return status.toPlainObject();
+    return status.toObject();
   }
 
   try {
@@ -93,21 +101,21 @@ export async function authenticate(
 
     status.successfull(token);
 
-    return status.toPlainObject();
+    return status.toObject();
   } catch (e) {
     switch (e.constructor) {
       case InvalidCredentialsError:
         status.failed(
           "E-mail ou senha incorretos. Verifique e tente novamente.",
-          true,
+          { allFields: true },
         );
-        return status.toPlainObject();
+        return status.toObject();
       case Error:
         status.failed(
           "Algo aconteceu com o nosso servidor, tente novamente mais tarde. Pedimos desculpas pelo transtorno.",
-          true,
+          { allFields: true },
         );
-        return status.toPlainObject();
+        return status.toObject();
     }
   }
 }
@@ -122,20 +130,48 @@ export async function register(form: FormData) {
   } catch (e) {}
 }
 
-export async function edit(token: AccessTokenClassInterface, form: FormData) {
+export async function edit(
+  token: AccessTokenClassInterface,
+  form: FormData,
+): Promise<ControllerStatusStructureInterface>;
+export async function edit(
+  token: AccessTokenClassInterface,
+  id: number,
+  form: FormData,
+): Promise<ControllerStatusStructureInterface>;
+export async function edit(
+  token: AccessTokenClassInterface,
+  idOrForm: FormData | number,
+  formData?: FormData,
+): Promise<ControllerStatusStructureInterface> {
+  const form = idOrForm instanceof FormData ? idOrForm : formData;
+  const id = typeof idOrForm === "number" ? idOrForm : Number(form.get("id"));
   const status = ControllerStatus.setup(form);
 
+  if (idOrForm instanceof FormData) form.delete("id");
   // validate data
+  console.log("status from controller->edit");
+  console.log(status);
+  console.log("form from controller->edit");
+  console.log(form);
+  console.log(FormUtils.toObject(form));
 
   //send to service and await response
+  try {
+    const res = await UserService.edit(token, id, form);
+    console.log(res);
+    // const data = await res.json();
+    console.log("hello!");
+    console.log(res);
+    if (res) status.successfull();
 
-  // try {
-  //     console.log("hello!")
-  // } catch (e) {
-  //   console.log("heh!")
-  //   }
-  // }
-  // }
+    return status.toObject();
+  } catch (e) {
+    console.log("heh!");
+    console.log(e);
+  }
+
+  return status.toObject();
 }
 
 /**
@@ -159,4 +195,20 @@ export async function get(
   const res = await UserService.get(token, id);
 
   return res;
+}
+
+export async function deleteById(token: AccessTokenClassInterface, id: number) {
+  const status = ControllerStatus.setup();
+
+  try {
+    const res = await UserService.deleteById(token, id);
+    if (res) status.successfull();
+    else status.failed();
+    return status.toObject();
+  } catch (e) {
+    console.log(e);
+
+    status.failed();
+    return status.toObject();
+  }
 }

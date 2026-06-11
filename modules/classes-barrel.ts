@@ -1,5 +1,6 @@
-// export * as APIService from "./api/api";
-// export * as BrowserService from "./browser/browser.service";
+export * from "./data/datePeriod/dateperiod.class";
+export * from "./data/controllerStatus/controllerStatus.class";
+// export * from "./data/image/image.class";
 
 // export * from "./chat/chat.controller"
 export * from "./property/property.class";

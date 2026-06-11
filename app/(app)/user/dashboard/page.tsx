@@ -43,29 +43,13 @@ import useComponentMapper from "@/hooks/useComponentMapper";
 // import { BrowserService } from "@services";
 
 export default function Page() {
-  // const token = BrowserService.getToken();
-  // const [carsData] = useGetMyVehicles();
-  // const [userData] = useGetMyUser();
-
   const [user] = useGetUserDetails();
-  const [reservations] = useGetReservations();
+  const [reservations] = useGetReservations(true);
   // const [reviews] = useGetReviews();
-  //
-  // console.log(reservations);
 
   // const [bookingSolicitations] = useGetMySolicitations();
   const [chats] = useGetMyChats();
   const [vehicles] = useGetVehicleDetails();
-  // const [chatTest] = useGetChat(1);
-  // const [user] = useGetUserDetails(getToken());
-  // console.log("UserDetails");
-  console.log(vehicles);
-  const test = useComponentMapper(
-    ["asdasdasd", "osdkosdfkosdfko", "odaksodskaodkadkaosdk"],
-    (d) => {
-      return <p>{d}</p>;
-    },
-  );
 
   // console.log(test);
   // const [nextBookings] = useGetMyNextBookings();
@@ -247,7 +231,7 @@ export default function Page() {
             {/* ESQUERDA */}
             <div className="lg:col-span-2 space-y-8">
               <PanelContainer title="Próximas Reservas">
-                {nextBookingsCards ? (
+                {nextBookingsCards.length > 0 ? (
                   <CarouselContainer title="" cards={nextBookingsCards ?? []} />
                 ) : (
                   // <>

@@ -5,6 +5,7 @@ import BlurOverlay from "@/component/blur_overlay";
 import GenericWindow from "@/component/GenericWindow";
 import FormContainer from "@/component/container/FormContainer";
 import FormItem from "@/component/ui/form/FormItem";
+import ControllerStatus from "@/classes/controller/ControllerStatus";
 
 // Mirrors the FormItem props but without className (managed internally)
 export type EditFormField = {
@@ -22,6 +23,7 @@ type EditWindowProps = {
   fields: EditFormField[];
   onSubmit: (formData: FormData) => void;
   onClose: () => void;
+  controller?: ControllerStatus;
 };
 
 export default function EditWindow({
@@ -29,6 +31,7 @@ export default function EditWindow({
   fields,
   onSubmit,
   onClose,
+  controller,
 }: EditWindowProps) {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,6 +59,7 @@ export default function EditWindow({
                   items={field.items}
                   value={field.defaultValue}
                   className="mb-4"
+                  controller={controller}
                 />
               ))}
             </div>

@@ -1,6 +1,7 @@
 "use server";
 import { AccessTokenClassInterface, VehicleClassInterface } from "@interfaces";
 import * as APIService from "@/modules/api/api.service";
+import { FormUtils } from "@utils";
 // import { ReportService } from "@services";
 
 export async function get(
@@ -48,6 +49,38 @@ export async function get(
   return result;
 }
 
+export async function edit(
+  token: AccessTokenClassInterface,
+  id: number,
+  form: FormData,
+) {
+  try {
+    const formBody = FormUtils.toObject(form);
+
+    const res = await APIService.request(`vehicles/${id}`, token, {
+      method: "PUT",
+      body: JSON.stringify(formBody),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    console.log(data);
+
+    return res.ok;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function deleteById(token: AccessTokenClassInterface, id: number) {
+  try {
+    const res = await APIService.genericDeleteRequest(token, `vehicles`, id);
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
 // export const VehicleService = {
 //   get: getVehicle,
 // };

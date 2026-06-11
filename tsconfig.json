@@ -26,6 +26,7 @@
       "@classes": ["modules/classes-barrel.ts"],
       // "@components": ["modules/-barrel.ts"],
       "@hooks": ["modules/hooks-barrel.ts"],
+      "@utils": ["utils/index.ts"],
       // "@mappers": ["modules/classes-barrel.ts"],
       // "@utils": ["modules/-barrel.ts"],
       "@/*": ["./*"],

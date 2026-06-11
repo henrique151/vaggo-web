@@ -26,7 +26,7 @@ export class Property implements PropertyClassInterface {
   spots?: Spot[];
 
   constructor(i: PropertyStructureInterface) {
-    console.log(i);
+    // console.log(i);
     this.id = i.id;
     this.info = {
       name: i.info?.name,
@@ -39,7 +39,8 @@ export class Property implements PropertyClassInterface {
     this.location = {
       latitude: i.location?.latitude,
       longitude: i.location?.longitude,
-      address: i.location?.address && new Address(i.location.address),
+      address:
+        i.location?.address && new Address(i.location?.address as Address),
     };
     // this.address = new Address(this.address);
     // this.spots = this.spots && this.setSpots(this.spots);

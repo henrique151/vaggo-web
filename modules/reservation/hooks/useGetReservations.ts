@@ -7,6 +7,9 @@ type hookReturnProps = [reservations: Reservation[], loaded: boolean];
 
 export default function useGetReservations(): hookReturnProps;
 export default function useGetReservations(
+  fromProperties: boolean,
+): hookReturnProps;
+export default function useGetReservations(
   fromProperties?: boolean,
 ): hookReturnProps {
   const [reservations, setReservations] = useState<Reservation[] | undefined>(
@@ -16,7 +19,10 @@ export default function useGetReservations(
 
   useEffect(() => {
     const load = async () => {
-      const res = await ReservationController.get(BrowserService.getToken());
+      const res = await ReservationController.get(
+        BrowserService.getToken(),
+        fromProperties,
+      );
 
       const data = res.map((reservation) => {
         return new Reservation(reservation);

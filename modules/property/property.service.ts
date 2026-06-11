@@ -107,3 +107,29 @@ export async function updateSpotStatus(id: number) {}
 export async function deleteSpot(id: number) {}
 
 export async function search() {}
+
+export async function edit(
+  token: AccessTokenClassInterface,
+  id: number,
+  form: FormData,
+) {
+  try {
+    const res = await APIService.request(`properties/${id}`, token, {
+      method: "PUT",
+      body: form,
+    });
+
+    return await res.ok;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function deleteById(token: AccessTokenClassInterface, id: number) {
+  try {
+    const res = await APIService.genericDeleteRequest(token, `properties`, id);
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
+}

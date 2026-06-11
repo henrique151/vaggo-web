@@ -144,3 +144,31 @@ export async function get(
   };
   return user;
 }
+
+export async function edit(
+  token: AccessTokenClassInterface,
+  id: number,
+  form: FormData,
+) {
+  try {
+    const res = await APIService.request(`users/${id}`, token, {
+      method: "PUT",
+      body: form,
+      // headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return await res.ok;
+    // return await res.json();
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function deleteById(token: AccessTokenClassInterface, id: number) {
+  try {
+    const res = await APIService.genericDeleteRequest(token, `users`, id);
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
