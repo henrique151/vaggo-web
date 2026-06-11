@@ -1,159 +1,353 @@
 "use client";
-import FormCard, { GenericFormLayout } from "@/component/form_card";
-import Header from "@/component/header";
-import { register } from "@/services/user.service";
-import { authenticate } from "@/services/auth.service";
-// import RegisterCard from "@/component/register_card";
-// import { UserDAO } from "@/entity/user";
-// import { The_Nautigal } from "next/font/google";
+
+import { useState } from "react";
+
+import Image from "next/image";
 import Link from "next/link";
-// import Image from "next/image";
-import { useRouter, redirect } from "next/navigation";
-// import { redirect } from "next/navigation"
-import { useEffect, useState } from "react";
+
+import background from "@/public/vaggoLoginTest.png";
+import loginLogo from "@/public/assets/logo/logo_single/v1.png";
+
+import FormContainer from "@/component/container/FormContainer";
+import FormItem from "@/component/ui/form/FormItem";
+
+import GenericWindow from "@/component/GenericWindow";
+import BlurOverlay from "@/component/blur_overlay";
+
+import action from "./register.action";
+import useForm from "@/hooks/useForm";
+
+function VerificationCodeWindow({
+  onClose,
+}: {
+  onClose: () => void;
+}) {
+  return (
+    <>
+      <BlurOverlay
+        show={true}
+        onClick={() => {}}
+      />
+
+      <GenericWindow
+        title="Confirmar Cadastro"
+        exitButton={true}
+        onExit={onClose}
+      >
+        <div className="w-full max-w-md">
+
+          <p
+            className="
+              text-center
+              text-muted
+              mb-6
+            "
+          >
+            Digite o código de 6 dígitos enviado
+            para seu email.
+          </p>
+
+          <div
+            className="
+              flex
+              justify-center
+              gap-3
+              mb-6
+            "
+          >
+            {[...Array(6)].map((_, index) => (
+              <input
+                key={index}
+                type="text"
+                maxLength={1}
+                className="
+                  w-12
+                  h-14
+                  rounded-xl
+                  border
+                  border-soft
+                  bg-card
+                  text-center
+                  text-xl
+                  opacity-60
+                  cursor-not-allowed
+                "
+              />
+            ))}
+          </div>
+
+          {/* TODO:
+              Implementar envio e validação do código.
+              Atualmente a janela serve apenas como
+              placeholder visual para o fluxo.
+          */}
+
+          <button
+            disabled
+            className="
+              w-full
+              py-3
+              rounded-xl
+              btn-primary
+              opacity-50
+              cursor-not-allowed
+            "
+          >
+            Confirmar Código
+          </button>
+
+          <button
+            disabled
+            className="
+              w-full
+              mt-3
+              text-sm
+              text-muted
+              opacity-50
+              cursor-not-allowed
+            "
+          >
+            Reenviar Código
+          </button>
+
+        </div>
+      </GenericWindow>
+    </>
+  );
+}
 
 export default function Page() {
-  //user login page:
-  //  - credentials inserted will be validated and see if email and pass matches from api call
-  //  - if approved, insert credentials as cookies or somewhere safe, like a token or smth
-  //  - make user credential validation function on controller or model side, idk where tf this stays at i forgor
-  const router = useRouter();
+  const [state, dispatchAction, pending] =
+    useForm(action);
 
-  const [user, setUser] = useState(null);
+  const [
+    showVerificationWindow,
+    setShowVerificationWindow,
+  ] = useState(false);
 
-  const handleRegister = async (e: any) => {
-    e.preventDefault();
-
-    // validar  CPF
-    // validar e-mail
-    // validar telefone
-    // validar senha
-    const formData = new FormData(e.currentTarget);
-    const values = Object.fromEntries(formData) as {
-      name: string;
-      cpf: string;
-      gender: string;
-      phone: string;
-      birthDate: string;
-      email: string;
-      password: string;
-      avatarUrl: File;
-      passConfirm: string;
-    };
-
-    // console.log(values);
-
-    delete values.passConfirm;
-
-    const res = await register(values);
-    console.log("result from register");
-    console.log(res);
-
-    if (res.data.email) {
-      const resLogin = await authenticate({
-        email: values.email,
-        password: values.password,
-      });
-
-      if (resLogin) {
-        console.log("you are in!");
-        console.log(resLogin);
-        localStorage.setItem("token", JSON.stringify(resLogin));
-        router.push("/user/dashboard");
-      }
-    }
-  };
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/*<Header />*/}
+    <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
 
-      <div className="flex justify-center py-10 px-4">
-        <FormCard
-          endpoint={""}
-          method={"POST"}
-          content={"form-data"}
-          useToken={false}
-          onSubmit={handleRegister}
-        >
-          <GenericFormLayout
-            title={"Criar Conta"}
-            subtitle={"Preencha seus dados"}
-            backlink={"/something"}
-          >
-            <input
-              name="name"
-              placeholder="Nome completo"
-              className="input-clean"
+      {/* Background */}
+      <Image
+        src={background}
+        alt="Background"
+        fill
+        priority
+        className="object-cover"
+      />
+
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-xs" />
+
+      {/* Card */}
+      <div
+        className="
+          relative
+          z-10
+          w-full
+          max-w-lg
+          mx-auto
+          surface-elevated
+          rounded-4xl
+          p-8
+          md:p-10
+          overflow-auto
+          max-h-[90vh]
+        "
+      >
+
+        {/* Logo */}
+        <div className="w-full flex flex-col items-center">
+
+          <Image
+            src={loginLogo}
+            alt="Logo da Vaggo"
+            width={86}
+            height={86}
+            className="object-cover"
+          />
+
+        </div>
+
+        <div className="h-6" />
+
+        <h1 className="text-primary text-3xl text-center">
+          Criar Conta
+        </h1>
+
+        <div className="h-6" />
+
+        <FormContainer action={dispatchAction}>
+
+          <FormItem
+            type="text"
+            label="Nome Completo"
+            name="name"
+            placeholder="João da Silva"
+            controller={state}
+          />
+
+          <div className="h-3" />
+
+          <div className="grid grid-cols-2 gap-4">
+
+            <FormItem
+              type="text"
+              label="CPF"
+              name="cpf"
+              placeholder="000.000.000-00"
+              controller={state}
             />
 
-            <div className="grid grid-cols-2 gap-3">
-              <input name="cpf" placeholder="CPF" className="input-clean" />
+            <div className="flex flex-col gap-2">
 
-              <select defaultValue={"M"} name="gender" className="input-clean">
-                <option value="M">Masculino</option>
-                <option value="F">Feminino</option>
-              </select>
-            </div>
+              <label className="text-muted text-sm">
+                Gênero
+              </label>
 
-            <input type="date" name="birthDate" className="input-clean" />
-            <input
-              type="email"
-              name="email"
-              placeholder="E-mail"
-              className="input-clean"
-            />
-            <input
-              name="phone"
-              placeholder="Telefone"
-              className="input-clean"
-            />
-
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                type="password"
-                name="password"
-                placeholder="Senha"
-                className="input-clean"
-              />
-              <input
-                type="password"
-                name="passConfirm"
-                placeholder="Confirmar"
-                className="input-clean"
-              />
-            </div>
-
-            <input type="file" name="avatarUrl" className="input-clean" />
-
-            <button
-              type="submit"
-              className="
-                mt-4
-                py-3
-                rounded-lg
-                font-medium
-                text-white
-                bg-gray-900
-                hover:bg-black
-                transition
-              "
-            >
-              Registrar
-            </button>
-
-            {/* Link */}
-            <div className="text-center text-sm">
-              <Link
-                href={"kok"}
-                className="text-gray-600 hover:text-black hover:underline"
+              <select
+                name="gender"
+                defaultValue="M"
+                className="app-input"
               >
-                Voltar
-              </Link>
+                <option value="M">
+                  Masculino
+                </option>
+
+                <option value="F">
+                  Feminino
+                </option>
+              </select>
+
             </div>
-          </GenericFormLayout>
-        </FormCard>
-        {/*<RegisterCard type="user" onSubmit={handleRegister} />*/}
+
+          </div>
+
+          <div className="h-3" />
+
+          <div className="grid grid-cols-2 gap-4">
+
+            <FormItem
+              type="date"
+              label="Nascimento"
+              name="birthDate"
+              controller={state}
+            />
+
+            <FormItem
+              type="text"
+              label="Telefone"
+              name="phone"
+              placeholder="(11) 99999-9999"
+              controller={state}
+            />
+
+          </div>
+
+          <div className="h-3" />
+
+          <FormItem
+            type="email"
+            label="Email"
+            name="email"
+            placeholder="seu@email.com"
+            controller={state}
+          />
+
+          <div className="h-3" />
+
+          <div className="grid grid-cols-2 gap-4">
+
+            <FormItem
+              type="password"
+              label="Senha"
+              name="password"
+              placeholder="••••••••"
+              controller={state}
+            />
+
+            <FormItem
+              type="password"
+              label="Confirmar Senha"
+              name="passConfirm"
+              placeholder="••••••••"
+              controller={state}
+            />
+
+          </div>
+
+          <div className="h-3" />
+
+          <div className="flex flex-col gap-2">
+
+            <label className="text-muted text-sm">
+              Foto de Perfil
+            </label>
+
+            <input
+              type="file"
+              name="avatarUrl"
+              className="app-input"
+            />
+
+          </div>
+
+          <p className="text-rose-400">
+            {state?.error?.message}
+          </p>
+
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() =>
+              setShowVerificationWindow(true)
+            }
+            className="
+              mt-8
+              py-3
+              rounded-lg
+              font-medium
+              text-white
+              btn-primary
+              btn-hover
+              transition
+              disabled:opacity-60
+              w-full
+            "
+          >
+            {pending
+              ? "Criando conta..."
+              : "Criar Conta"}
+          </button>
+
+        </FormContainer>
+
+        <div className="mt-6 text-center">
+
+          <Link
+            href="/login"
+            className="
+              text-muted
+              text-link
+              transition-colors
+            "
+          >
+            Já possui uma conta? Entrar
+          </Link>
+
+        </div>
+
       </div>
+
+      {showVerificationWindow && (
+        <VerificationCodeWindow
+          onClose={() =>
+            setShowVerificationWindow(false)
+          }
+        />
+      )}
+
     </main>
   );
 }

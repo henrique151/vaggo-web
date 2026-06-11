@@ -1,3 +1,5 @@
+"use client";
+
 import FormContainer from "@/component/container/FormContainer";
 import InfoLayout from "@/component/layout/InfoLayout";
 import FormItem from "@/component/ui/form/FormItem";

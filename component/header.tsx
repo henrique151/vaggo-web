@@ -52,7 +52,7 @@ export default function Header({ showSearch = false }: HeaderProps) {
     router.push("/user/dashboard");
   }
 
-  const bannedPages = ["/login"];
+  const bannedPages = ["/login", "/register"];
   if (bannedPages.find((page) => pathName === page)) return null;
 
   return (

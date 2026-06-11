@@ -7,6 +7,7 @@ import loginLogo from "@/public/assets/logo/logo_single/v1.png";
 import Image from "next/image";
 import action from "./authentication.action";
 import useForm from "@/hooks/useForm";
+import Link from "next/dist/client/link";
 
 export default function Page() {
   const [state, dispacthAction, pending] = useForm(action);
@@ -74,6 +75,29 @@ export default function Page() {
               {pending ? "Entrando..." : "Entrar"}
             </button>
           </FormContainer>
+          <div className="mt-6 flex justify-between text-sm">
+            <Link
+              href="/register"
+              className="
+              text-muted
+              text-link
+              transition-colors
+    "
+            >
+              Criar conta
+            </Link>
+
+            <Link
+              href="/forgot-password"
+              className="
+              text-muted
+              text-link
+              transition-colors
+    "
+            >
+              Esqueci minha senha
+            </Link>
+          </div>
         </div>
       </div>
     </main>
