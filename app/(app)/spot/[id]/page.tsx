@@ -19,7 +19,7 @@ import DatePeriod from "@/classes/data/DatePeriod";
 import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetMyrVehicles";
 // import { useApi } from "@/hooks/api/useApi";
 import { bookSpot } from "@/services/booking.service";
-import { Spot } from "@/classes/spot";
+import { Spot } from "@classes";
 import { getSpotsByPropertyId } from "@/services/spot.service";
 import Property from "@/classes/property";
 import { Vehicle } from "@/classes/vehicle";
@@ -55,11 +55,11 @@ export default function Page({ params }: any) {
 
   const [property, loaded, refresh] = useGetPropertyDetails(params.id, true); //TODO REPLACE WITH TYPES
   const [reviews] = useGetReviews("property", params.id);
-  // const [vehicles] = useGetVehicleDetails()
+  const [vehicles] = useGetVehicleDetails();
 
   // const [test] = useComponentMapper([], () => {});
 
-  const [vehicles, setVehicles] = useGetMyVehicles();
+  // const [vehicles, setVehicles] = useGetMyVehicles();
   // const [reviews, setReviews] = useState<PropertyReviews>(undefined);
   // const [reviewCards, setReviewCards] = useState<React.ReactNode[]>([]);
   const reviewCards = useComponentMapper(reviews, (review: Review) => {
@@ -89,7 +89,7 @@ export default function Page({ params }: any) {
   const [bookingStatusWindow] = useWindow(BookingStatusWindow);
   const [reportWindow] = useWindow(ReportWindow);
   // console.log("windowTest");
-  console.log(property);
+  // console.log(property);
 
   // useEffect(() => {
   // const load = async () => {
@@ -123,30 +123,30 @@ export default function Page({ params }: any) {
     // setSelectedVehicle(vehicleId);
 
     // const res = await BookingDAO.reserve(selectedSpot, vehicleId, datePeriod);
-    const res = await bookSpot({
-      id: spotId,
-      vehicleId: vehicleId,
-      datePeriod: datePeriod,
-    });
+    // const res = await bookSpot({
+    //   id: spotId,
+    //   vehicleId: vehicleId,
+    //   datePeriod: datePeriod,
+    // });
     // const res = true;
 
     console.log(
       `you selected spot number ${spotId} to use with car ${vehicleId}`,
     );
 
-    console.log(res);
+    // console.log(res);
 
-    if (res) {
-      console.log("success!");
-      setBookingStatus(true);
+    // if (res) {
+    //   console.log("success!");
+    //   setBookingStatus(true);
 
-      setSpots(await getSpotsByPropertyId(Number(params.id)));
-      // console.log(document.getElementById(`available_spot_${spotId}`));
-    } else {
-      setBookingStatus(false);
-    }
-    availableVehiclesWindow.hide();
-    bookingStatusWindow.show();
+    //   // setSpots(await getSpotsByPropertyId(Number(params.id)));
+    //   // console.log(document.getElementById(`available_spot_${spotId}`));
+    // } else {
+    //   setBookingStatus(false);
+    // }
+    // availableVehiclesWindow.hide();
+    // bookingStatusWindow.show();
     // setShowVehicleWindow(false);
     // setBookingStatusWindow(true);
 
@@ -186,18 +186,18 @@ export default function Page({ params }: any) {
           <div className="w-1/2">
             <Image
               className="rounded-3xl"
-              src={spot.image.url}
+              src={spot.info.image.url}
               width={128}
               height={128}
               alt={""}
             />
           </div>
           <div className="flex flex-col items-end w-1/2">
-            <h2 className="font-semibold mb-6">{spot.identifier}</h2>
+            <h2 className="font-semibold mb-6">{spot.info.identifier}</h2>
 
             {/*<p>{spot.status}</p>*/}
             <StatusBadge
-              conditionValue={spot.status}
+              conditionValue={spot?.status?.availability}
               conditionTable={{ DISPONIVEL: "green" }}
               statusLabelTable={{ green: "Disponível", gray: "Desconhecido" }}
               defaultValue={"gray"}
@@ -205,7 +205,7 @@ export default function Page({ params }: any) {
 
             <div className="h-2" />
             <div className="flex flex-row my-2">
-              {spot.allowedVehicles.map((allowed) => {
+              {spot?.info?.allowedVehicles?.map((allowed) => {
                 return (
                   <TagContainer key={allowed} className="ml-2">
                     {allowed}
@@ -213,8 +213,8 @@ export default function Page({ params }: any) {
                 );
               })}
             </div>
-            <p>Tamanho: {spot.size}</p>
-            <p>Preço: R${spot.price}</p>
+            <p>Tamanho: {spot?.info?.size}</p>
+            <p>Preço: R${spot?.info?.price}</p>
           </div>
         </div>
 
@@ -248,7 +248,7 @@ export default function Page({ params }: any) {
   function SpotAvailabilityWindow() {
     return (
       <>
-        <BlurOverlay show={true} onClick={() => { }} />
+        <BlurOverlay show={true} onClick={() => {}} />
         <GenericWindow
           title={"Vagas Disponíveis"}
           exitButton={true}
@@ -258,7 +258,10 @@ export default function Page({ params }: any) {
           <section className="overflow-y-scroll scroll-smooth h-120 w-full">
             {spots.map((spot: Spot) => {
               // TODO change to EntityFrame
-              if (spot.status != "INDISPONIVEL" && spot.status != "OCUPADA") {
+              if (
+                spot?.status?.availability != "INDISPONIVEL" &&
+                spot?.status?.availability != "OCUPADA"
+              ) {
                 return (
                   <SpotAvailabilityCard
                     key={`available_spot_${spot.id}`}
@@ -274,13 +277,13 @@ export default function Page({ params }: any) {
   }
 
   function VehicleAvailabilityWindow() {
-    const spot = spots.find((s) => s.id === selectedSpot);
+    const spot = property?.spots?.find((s) => s.id === selectedSpot);
 
     if (!spot) return null;
 
     return (
       <>
-        <BlurOverlay show={true} onClick={() => { }} />
+        <BlurOverlay show={true} onClick={() => {}} />
 
         <GenericWindow
           title="Reserva"
@@ -295,7 +298,6 @@ export default function Page({ params }: any) {
         "
           >
             <div className="flex flex-col gap-4">
-
               {/* Dados da vaga */}
               <section
                 className="
@@ -316,7 +318,7 @@ export default function Page({ params }: any) {
               "
                 >
                   <Image
-                    src={spot.image.url}
+                    src={spot?.info?.image?.url}
                     width={180}
                     height={125}
                     alt=""
@@ -340,22 +342,16 @@ export default function Page({ params }: any) {
                 "
                   >
                     <h2 className="text-xl font-semibold break-words">
-                      {spot.identifier}
+                      {spot?.info.identifier}
                     </h2>
 
-                    <p className="text-sm">
-                      Tamanho: {spot.size}
-                    </p>
+                    <p className="text-sm">Tamanho: {spot?.info.size}</p>
 
-                    <p className="text-sm">
-                      Preço: R$ {spot.price}
-                    </p>
+                    <p className="text-sm">Preço: R$ {spot?.info.price}</p>
 
                     <div className="flex flex-wrap gap-1">
-                      {spot.allowedVehicles.map((allowed) => (
-                        <TagContainer key={allowed}>
-                          {allowed}
-                        </TagContainer>
+                      {spot?.info?.allowedVehicles?.map((allowed) => (
+                        <TagContainer key={allowed}>{allowed}</TagContainer>
                       ))}
                     </div>
                   </div>
@@ -372,7 +368,6 @@ export default function Page({ params }: any) {
               w-full
             "
               >
-
                 {/* Datas */}
                 <section
                   className="
@@ -387,7 +382,6 @@ export default function Page({ params }: any) {
                   </h3>
 
                   <div className="space-y-3">
-
                     <div>
                       <label className="block text-sm text-muted mb-2">
                         Entrada
@@ -429,7 +423,6 @@ export default function Page({ params }: any) {
                     "
                       />
                     </div>
-
                   </div>
                 </section>
 
@@ -463,10 +456,7 @@ export default function Page({ params }: any) {
                       <button
                         key={vehicle.id}
                         onClick={async () => {
-                          await handleReserve(
-                            spot.id,
-                            vehicle.id
-                          );
+                          await handleReserve(spot.id, vehicle.id);
                         }}
                         className="
                       w-full
@@ -507,7 +497,6 @@ export default function Page({ params }: any) {
                     Reservar Vaga
                   </button>
                 </section>
-
               </div>
             </div>
           </div>
@@ -519,7 +508,7 @@ export default function Page({ params }: any) {
   function BookingStatusWindow({ onExit }: { onExit: MouseEventHandler }) {
     return (
       <>
-        <BlurOverlay show={true} onClick={() => { }} />
+        <BlurOverlay show={true} onClick={() => {}} />
         <GenericWindow
           title={
             bookingStatus ? "Sucesso!" : "Não foi possível realizar a reserva"
@@ -573,8 +562,8 @@ export default function Page({ params }: any) {
             label={"Selecione a vaga que gostaria de denunciar:"}
             name={"targetId"}
             items={
-              spots?.map((spot) => {
-                return { value: String(spot.id), label: spot.identifier };
+              property.spots?.map((spot) => {
+                return { value: String(spot.id), label: spot.info?.identifier };
               }) ?? []
             }
           />
@@ -600,7 +589,7 @@ export default function Page({ params }: any) {
 
     return (
       <>
-        <BlurOverlay show={true} onClick={() => { }} />
+        <BlurOverlay show={true} onClick={() => {}} />
         <GenericWindow
           title={"Denúncia"}
           exitButton={true}
@@ -613,18 +602,17 @@ export default function Page({ params }: any) {
   }
 
   console.log(property);
-  if (property === undefined) return <section></section>;
+  // if (property === undefined) return <section></section>;
   return (
     <main>
       {/*<Header />*/}
 
       {/* TODO transform into ImageCarousel */}
       <section className="max-w-7xl mx-auto px-6 py-8">
-
         {/* Nome da propriedade */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-semibold text-primary">
-            {property?.name || "Propriedade"}
+            {property?.info?.name || "Propriedade"}
           </h1>
 
           <button
@@ -648,10 +636,10 @@ export default function Page({ params }: any) {
         >
           {/* Imagem principal */}
           <div className="col-span-2 relative">
-            {property?.images[0] ? (
+            {property?.info?.images[0] ? (
               <Image
                 fill
-                src={property.images[0].url}
+                src={property.info?.images[0].url}
                 alt="Imagem principal da propriedade"
                 className="
                 object-cover
@@ -669,10 +657,10 @@ export default function Page({ params }: any) {
           <div className="grid grid-rows-2 gap-2">
             {/* Imagem secundária */}
             <div className="relative">
-              {property?.images[1] ? (
+              {property?.info?.images[1] ? (
                 <Image
                   fill
-                  src={property.images[1].url}
+                  src={property.info?.images[1].url}
                   alt="Imagem da propriedade"
                   className="
                   object-cover
@@ -688,10 +676,10 @@ export default function Page({ params }: any) {
 
             {/* Imagem terciária */}
             <div className="relative">
-              {property?.images[2] ? (
+              {property?.info?.images[2] ? (
                 <Image
                   fill
-                  src={property.images[2].url}
+                  src={property.info?.images[2].url}
                   alt="Imagem da propriedade"
                   className="
                   object-cover
@@ -727,20 +715,22 @@ export default function Page({ params }: any) {
     "
           >
             <p className="text-sm text-muted mb-2">
-              {property?.type || "Tipo"}
+              {property?.info?.type || "Tipo"}
             </p>
 
             <p className="text-primary mb-6">
-              {property?.description || "Descrição"}
+              {property?.info?.description || "Descrição"}
             </p>
 
             <div className="flex flex-wrap gap-6 text-sm">
               <span className="text-muted">
-                🚗 Capacidade total: {property?.totalCapacity || "0"} vaga(as)
+                🚗 Capacidade total: {property?.info?.totalCapacity || "0"}{" "}
+                vaga(as)
               </span>
 
               <span className="text-muted">
-                ⭐ Avaliação: {reviews?.averageRating || 1}/5
+                {/*⭐ Avaliação: {reviews?.averageRating || 1}/5*/}⭐ Avaliação:{" "}
+                {0 || 1}/5
               </span>
             </div>
           </div>
@@ -755,15 +745,13 @@ export default function Page({ params }: any) {
       overflow-y-auto
     "
           >
-            <h2 className="text-xl font-semibold mb-4">
-              Vagas Disponíveis
-            </h2>
+            <h2 className="text-xl font-semibold mb-4">Vagas Disponíveis</h2>
 
-            {spots
-              .filter(
+            {property?.spots
+              ?.filter(
                 (spot) =>
-                  spot.status !== "INDISPONIVEL" &&
-                  spot.status !== "OCUPADA"
+                  spot?.status?.availability !== "INDISPONIVEL" &&
+                  spot?.status?.availability !== "OCUPADA",
               )
               .map((spot) => (
                 <SpotAvailabilityCard
@@ -771,7 +759,6 @@ export default function Page({ params }: any) {
                   spot={spot}
                 />
               ))}
-
           </div>
         </div>
 
@@ -791,15 +778,15 @@ export default function Page({ params }: any) {
             Ver mais vagas
           </p>
         </div>
-
-      </section >
+      </section>
 
       <section className="max-w-7xl mx-auto px-6 pb-8">
         <PanelContainer title="Avaliações">
           {reviews?.length > 0 ? (
             <>
               <p className="mb-4">
-                Avaliação Geral: {reviews?.averageRating || 1}/5
+                {/*Avaliação Geral: {reviews?.averageRating || 1}/5*/}
+                Avaliação Geral: {0 || 1}/5
               </p>
 
               <CarouselContainer title={""} cards={reviewCards} />
@@ -811,11 +798,9 @@ export default function Page({ params }: any) {
       </section>
 
       {availableSpotsWindow.component && <availableSpotsWindow.component />}
-      {
-        availableVehiclesWindow.component && (
-          <availableVehiclesWindow.component />
-        )
-      }
+      {availableVehiclesWindow.component && (
+        <availableVehiclesWindow.component />
+      )}
       {bookingStatusWindow.component && <bookingStatusWindow.component />}
 
       {reportWindow.component && <reportWindow.component />}
@@ -851,12 +836,6 @@ export default function Page({ params }: any) {
         }}
       />
     )}*/}
-    </main >
+    </main>
   );
 }
-
-// {
-// 	"base_url": "http://localhost:3000",
-// 	"bearer_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzc5MzIwNDM1LCJleHAiOjE3NzkzMjEwMzV9.MRucjVfv2JwAvcLA7BZJvQJQXnMeMKk9FwzPZaYUD_w",
-// 	"userId": 1
-// }
