@@ -59,21 +59,21 @@ export async function requestTest(
   const req = (reqBody ?? isToken) ? {} : tokenOrReq;
   const token = isToken ? tokenOrReq : undefined;
 
-  console.log("token");
-  console.log(token);
+  // console.log("token");
+  // console.log(token);
 
-  console.log("req");
-  console.log(req);
+  // console.log("req");
+  // console.log(req);
 
-  console.log("tokenOrReq");
-  console.log(tokenOrReq);
+  // console.log("tokenOrReq");
+  // console.log(tokenOrReq);
 
   if (token) {
     req.headers = Object.assign(
       { Authorization: `Bearer ${token.token}` },
       req.headers,
     );
-    console.log("token inserted", req.headers);
+    // console.log("token inserted", req.headers);
   }
 
   const res = await fetch(`${API_ADDRESS}/${url}`, req);

@@ -1,20 +1,22 @@
-import User from "./user";
+import VehicleClassInterface, {
+  VehicleStructureInterface,
+} from "@/interfaces/class/vehicle.interface";
+// import User from "./user";
+import UserClassInterface from "@/modules/user/user.interface";
+// import { UserInfoOptionsWithBufferEncoding } from "node:os";
 
-export class Vehicle {
+export class Vehicle implements VehicleClassInterface {
   public id: number;
   public brand: string;
   public model: string;
   public color: string;
   public licensePlate: string;
-  public manufactureYear: string;
+  public manufactureYear: Date;
   public type: VehicleTypes;
   public size: VehicleSizes;
-  public user: User;
+  public user: UserClassInterface;
 
-  constructor(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any,
-  ) {
+  constructor(data: VehicleStructureInterface) {
     this.id = data.id;
     this.brand = data.brand;
     this.model = data.model;

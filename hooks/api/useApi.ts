@@ -41,9 +41,9 @@ export function useApi({
       // return null;
       // }
 
-      console.log(
-        "Fetch is below this logging. If is appearing many times, it means api is being called alot",
-      );
+      // console.log(
+      //   "Fetch is below this logging. If is appearing many times, it means api is being called alot",
+      // );
       console.log(req);
       const res = await request({
         url: uri || "",
@@ -56,9 +56,9 @@ export function useApi({
       const data = await res.json();
 
       if (dataOnly && data) {
-        console.log("data from api");
-        console.log(`url: ${uri}`);
-        console.log(data);
+        // console.log("data from api");
+        // console.log(`url: ${uri}`);
+        // console.log(data);
         setData(data.data);
       } else {
         setData(data);

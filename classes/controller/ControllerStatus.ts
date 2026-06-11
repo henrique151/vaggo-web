@@ -116,13 +116,18 @@ export default class ControllerStatus {
     // };
   }
 
-  public static setup(fields: FormData | object) : ControllerStatus
-  public static setup({fields}: {fields?: FormData | object}) : ControllerStatus {
+  public static setup(fields: FormData | object): ControllerStatus;
+  public static setup({
+    fields,
+  }: {
+    fields?: FormData | object;
+  }): ControllerStatus {
     const controller = new ControllerStatus({});
     // set all fields
+    console.log("fields from ControllerStatus");
+    console.log(fields);
+    if (fields) controller.setFields(fields);
 
-    if (fields) controller.setFields(fields)
-    
     return controller;
   }
 

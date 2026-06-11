@@ -1,8 +1,8 @@
-import BookingsTab from "./tabs/bookings.tab";
-import ProfileTab from "./tabs/profile.tab";
-import PropertiesTab from "./tabs/properties.tab";
-import ReportsTab from "./tabs/reports.tab";
-import VehiclesTab from "./tabs/vehicles.tab";
+import BookingsTab from "./_tabs/bookings.tab";
+import ProfileTab from "./_tabs/profile.tab";
+import PropertiesTab from "./_tabs/properties.tab";
+import ReportsTab from "./_tabs/reports.tab";
+import VehiclesTab from "./_tabs/vehicles.tab";
 
 const pageTabs = [
   ProfileTab,

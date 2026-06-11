@@ -1,3 +1,4 @@
+"use client";
 import ControllerStatus from "@/classes/controller/ControllerStatus";
 import { HTMLInputTypeAttribute, useEffect } from "react";
 

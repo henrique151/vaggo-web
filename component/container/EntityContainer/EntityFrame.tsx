@@ -4,6 +4,7 @@ import { useState } from "react";
 import EditWindow, { EditFormField } from "@/component/windows/EditWindow";
 import BlurOverlay from "@/component/blur_overlay";
 import GenericWindow from "@/component/GenericWindow";
+import ControllerStatus from "@/classes/controller/ControllerStatus";
 
 interface EntityFrameProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ interface EntityFrameProps {
   deleteTitle?: string;
   deleteDescription?: string;
   onDelete?: () => void;
+  controller?: ControllerStatus;
 }
 
 export default function EntityFrame({
@@ -25,6 +27,7 @@ export default function EntityFrame({
   deleteTitle,
   deleteDescription,
   onDelete,
+  controller,
 }: EntityFrameProps) {
   const [showEdit, setShowEdit] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -95,14 +98,18 @@ export default function EntityFrame({
       {/* Delete Confirm Window */}
       {canDelete && showDeleteConfirm && (
         <>
-          <BlurOverlay show={true} onClick={() => setShowDeleteConfirm(false)} />
+          <BlurOverlay
+            show={true}
+            onClick={() => setShowDeleteConfirm(false)}
+          />
           <GenericWindow
             title={deleteTitle ?? "Confirmar exclusão"}
             exitButton={true}
             onExit={() => setShowDeleteConfirm(false)}
           >
             <p className="text-muted mb-6 text-center">
-              {deleteDescription ?? "Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita."}
+              {deleteDescription ??
+                "Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita."}
             </p>
             <div className="flex gap-3 w-full">
               <button

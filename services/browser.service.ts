@@ -10,13 +10,14 @@ export function setToken(data) {
   localStorage.setItem("token", JSON.stringify(token));
 }
 
-export function getToken():AccessToken {
+export function getToken(): AccessToken {
   try {
-    const token = JSON.parse(localStorage.getItem("token")) as AccessToken
-    return token
+    const token = JSON.parse(localStorage.getItem("token"));
+    // return AccessToken.fromInterface(token);
+    return token;
   } catch (e) {
     // console.warn("Something wrong happened while fetching token. It's better to authenticate again and ensure token is set")
-    redirect("/login")
+    // redirect("/login")
     // throw new Error("Token not found or does not exist.")
   }
 }
