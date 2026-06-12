@@ -7,3 +7,4 @@ export * as ReservationService from "./reservation/reservation.service";
 export * as ReviewService from "./review/review.service";
 export * as UserService from "./user/user.service";
 export * as VehicleService from "./vehicle/vehicle.service";
+export * as AuthService from "./auth/auth.service";

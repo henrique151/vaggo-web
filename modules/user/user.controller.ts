@@ -67,7 +67,7 @@ import { FormUtils } from "@utils";
 export async function authenticate(
   email: string,
   password: string,
-): Promise<object> {
+): Promise<ControllerStatusStructureInterface> {
   const status = ControllerStatus.setup();
   status.setFields({ email: email, password: password });
 
@@ -128,8 +128,11 @@ export async function register(form: FormData) {
   // auth.register(UserObject)
   try {
     const res = await UserService.register(form);
+    if (res) status.successfull();
   } catch (e) {
     console.log(e);
+  } finally {
+    return status.toObject();
   }
 }
 

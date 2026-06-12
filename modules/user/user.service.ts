@@ -180,8 +180,11 @@ export async function register(form: FormData) {
       method: "POST",
       body: form,
     });
+    const ok = res.ok;
     const data = await res.json();
     console.log(data);
+
+    return ok;
   } catch (e) {
     console.log(e);
   }

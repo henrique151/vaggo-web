@@ -68,7 +68,7 @@ export default function Header({ showSearch = false }: HeaderProps) {
 
           {/* Search */}
           {showSearch && (
-            <div className="flex-1 max-w-xl">
+            <div className="flex-1 flex flex-col max-w-xl items-center">
               <SearchBar />
             </div>
           )}

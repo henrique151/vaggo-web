@@ -8,11 +8,17 @@ import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
 import action from "../_actions/user/edit.action";
 import useForm from "@/hooks/useForm";
 import { startTransition, useEffect } from "react";
+import { User } from "@classes";
 // import { useRouter } from "next/navigation";
 // import { editUser } from "@/services/user.service";
 
 const Page = () => {
-  const { user, refreshUser, refresh } = usePageContext();
+  const {
+    user,
+    refreshUser,
+    refresh,
+  }: { user: User; refreshUser: () => void; refresh: () => void } =
+    usePageContext();
   const [state, editUserAction, pending] = useForm(action);
   // const router = useRouter();
 
@@ -103,12 +109,13 @@ const Page = () => {
           />
           <EntityItem
             label="Nascimento"
-            value={user?.person.birthDate || "XX/XX/XXXX"}
+            value={user?.person.date.birth.toString() || "XX/XX/XXXX"}
           />
           <EntityItem
             label="Último acesso"
             value={
-              showLastLoginDetails(user?.lastLogin || new Date(2026)) || "Data"
+              showLastLoginDetails(user?.lastTime.login || new Date(2026)) ||
+              "Data"
             }
           />
         </div>

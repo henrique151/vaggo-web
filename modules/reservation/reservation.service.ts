@@ -20,14 +20,17 @@ export async function register(
     const res = await APIService.request("reservations", token, {
       body: JSON.stringify(formData),
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     console.log(res);
     //throw errors if not 200
     // 409 'Já existe uma reserva neste período'
     const data = await res.json();
+    console.log(data);
 
-    // console.log(data);
     return res.ok;
   } catch (e) {
     console.log(e);

@@ -25,27 +25,25 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-fit">
       <div
         className="
-      w-full
-      h-14
+          w-full
+          h-14
 
-      surface-elevated
+          surface-elevated
 
-      rounded-full
+          rounded-full
 
-      flex items-center
-      px-2
+          flex items-center
+          px-2
 
-      overflow-hidden
-    "
+          overflow-hidden
+      "
       >
         {/* Onde */}
         <div className="flex-1 min-w-0 px-4">
-          <p className="text-[11px] font-semibold text-primary">
-            Onde
-          </p>
+          <p className="text-[11px] font-semibold text-primary">Onde</p>
 
           <input
             type="text"
@@ -68,10 +66,10 @@ export default function SearchBar() {
         </div>
 
         {/* Divider */}
-        <div className="w-px h-7 bg-surface border-soft shrink-0"></div>
+        {/*<div className="w-px h-7 bg-surface border-soft shrink-0"></div>*/}
 
         {/* Quando */}
-        <div className="flex-1 min-w-0 px-4">
+        {/*<div className="flex-1 min-w-0 px-4">
           <p className="text-[11px] font-semibold text-primary">
             Horário de Disp.
           </p>
@@ -93,13 +91,13 @@ export default function SearchBar() {
           truncate
         "
           />
-        </div>
+        </div>*/}
 
         {/* Divider */}
-        <div className="w-px h-7 bg-surface border-soft shrink-0"></div>
+        {/*<div className="w-px h-7 bg-surface border-soft shrink-0"></div>*/}
 
         {/* Tipo */}
-        <div className="flex-1 min-w-0 px-4">
+        {/*<div className="flex-1 min-w-0 px-4">
           <p className="text-[11px] font-semibold text-primary">
             Tipo
           </p>
@@ -121,7 +119,7 @@ export default function SearchBar() {
           truncate
         "
           />
-        </div>
+        </div>*/}
 
         {/* Buscar */}
         <button

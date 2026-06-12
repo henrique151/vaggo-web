@@ -3,6 +3,7 @@ export * from "./data/image/image.interface";
 export * from "./data/datePeriod/dateperiod.interface";
 export * from "./data/controllerStatus/controllerStatus.interface";
 
+export * from "./auth/auth.interface";
 export * from "./chat/chat.interface";
 export * from "./property/property.interface";
 export * from "./report/report.interface";

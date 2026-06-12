@@ -3,6 +3,7 @@ export * from "./data/controllerStatus/controllerStatus.class";
 // export * from "./data/image/image.class";
 
 // export * from "./chat/chat.controller"
+export * from "./auth/auth.class";
 export * from "./property/property.class";
 // export * from "./report/report.class";
 export * from "./reservation/reservation.class";

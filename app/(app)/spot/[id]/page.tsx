@@ -52,7 +52,7 @@ export default function Page({ params }: any) {
   const [property, loaded, refreshSpots] = useGetPropertyDetails(
     params.id,
     true,
-  ); //TODO REPLACE WITH TYPES
+  );
   const [reviews] = useGetReviews("property", params.id);
   const [vehicles] = useGetVehicleDetails();
 
