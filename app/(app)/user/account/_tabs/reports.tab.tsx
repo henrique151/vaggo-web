@@ -22,7 +22,7 @@ const Page = () => {
           return (
             <EntityFrame
               key={report.id}
-              editTitle={`Editar Denúncia #${report.id.toString().padStart(2, "0")}`}
+             /* editTitle={`Editar Denúncia #${report.id.toString().padStart(2, "0")}`}
               editFields={[
                 { label: "Motivo", name: "reason", type: "text", placeholder: "Descreva o motivo", defaultValue: report.reason, required: true },
                 {
@@ -33,17 +33,18 @@ const Page = () => {
                     { value: "CHAT", label: "Conversa" },
                   ],
                 },
-              ]}
+              ]} */
+              onReanalise={() => {}}
               onEdit={(formData) => {
                 // TODO: wire to update report action
                 console.log("edit report", report.id, Object.fromEntries(formData));
               }}
-              deleteTitle="Excluir denúncia"
+              /*deleteTitle="Excluir denúncia"
               deleteDescription={`Deseja excluir a denúncia #${report.id.toString().padStart(2, "0")}?`}
               onDelete={() => {
-                // TODO: wire to delete report action
+
                 console.log("delete report", report.id);
-              }}
+              }} */
             >
               <DefaultEntityFrame
                 title={`Denúncia #${report.id.toString().padStart(2, "0")}`}

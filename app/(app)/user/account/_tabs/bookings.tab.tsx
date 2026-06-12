@@ -36,6 +36,7 @@ const Page = () => {
                   // TODO: wire to update booking action
                   console.log("edit booking", booking.id, Object.fromEntries(formData));
                 }}
+                onCancelReservation={() => {}}
                 deleteTitle="Cancelar reserva"
                 deleteDescription={`Deseja cancelar a reserva de "${booking.spotName}" em ${booking.property}?`}
                 onDelete={() => {
