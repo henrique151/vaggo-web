@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   description: "Sistema de vagas",
 };
 
+export const dynamic = "force-dynamic";
+// const force-
+
 export default function RootLayout({
   children,
 }: {
