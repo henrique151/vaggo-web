@@ -1,3 +1,7 @@
+export default async function action(prevState: unknown, form: FormData) {
+  return { success: false }; // SÓ PRO BUILD FUNCIONAR
+}
+
 /* // import { authenticate } from "@/controllers/user.controller";
 import { setToken } from "@/services/browser.service";
 import { redirect } from "next/navigation";
