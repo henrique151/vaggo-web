@@ -1,9 +1,19 @@
-import {
-  AccessTokenClassInterface,
-  AccessTokenStructureInterface,
-} from "@/interfaces/class/data/AccessToken";
-import UserClassInterface from "@/modules/user/user.interface";
+import { UserClassInterface } from "@/modules/user/user.interface";
 // import User from "../user";
+
+
+// SÓ PRA FUNCIONAR BUILD
+export interface AccessTokenStructureInterface {
+  token: string;
+  expiration: Date | string;
+  user: UserClassInterface;
+}
+
+export interface AccessTokenClassInterface {
+  token: string;
+  expiration: Date;
+  user: UserClassInterface;
+}
 
 export default class AccessTokenTest implements AccessTokenClassInterface {
   token: string;

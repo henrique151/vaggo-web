@@ -1,9 +1,22 @@
-import VehicleClassInterface, {
-  VehicleStructureInterface,
-} from "@/interfaces/class/vehicle.interface";
-// import User from "./user";
-import UserClassInterface from "@/modules/user/user.interface";
-// import { UserInfoOptionsWithBufferEncoding } from "node:os";
+import { UserClassInterface } from "@/modules/user/user.interface";
+
+export type VehicleTypes = "CARRO" | "MOTO";
+export type VehicleSizes = "PEQUENO" | "MEDIO" | "GRANDE";
+
+export interface VehicleStructureInterface {
+  id: number;
+  brand: string;
+  model: string;
+  color: string;
+  licensePlate: string;
+  manufactureYear: Date;
+  type: VehicleTypes;
+  size: VehicleSizes;
+  user: UserClassInterface;
+}
+
+export default interface VehicleClassInterface
+  extends VehicleStructureInterface {}
 
 export class Vehicle implements VehicleClassInterface {
   public id: number;
@@ -28,6 +41,3 @@ export class Vehicle implements VehicleClassInterface {
     this.user = data.user;
   }
 }
-
-export type VehicleTypes = "CARRO" | "MOTO";
-export type VehicleSizes = "PEQUENO" | "MEDIO" | "GRANDE";

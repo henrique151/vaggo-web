@@ -26,7 +26,7 @@ export function useGetMyProperties(): stateReturnProps {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    get(getToken()).then((properties) => {
+    get(getToken() as any).then((properties) => {
       console.log("properties from controller");
       console.log(properties);
     });

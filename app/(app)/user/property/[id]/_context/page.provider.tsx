@@ -53,7 +53,7 @@ export default function PageContextProvider({
   const provider = { user, vehicles, reports, property };
   return (
     <>
-      <PageContext.Provider value={provider}>{children}</PageContext.Provider>
+      <PageContext.Provider value={provider as any}>{children}</PageContext.Provider>
     </>
   );
 }

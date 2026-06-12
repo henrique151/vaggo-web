@@ -23,7 +23,7 @@ export function useGetMyVehicles(): stateReturnProps {
   //   useToken: true,
   //   req: { method: "GET" },
   // });
-  const token = getToken();
+  const token = getToken() as any;
   // const [user, userLoading] = useGetMyUser();
 
   const [loading, setLoading] = useState(true);
