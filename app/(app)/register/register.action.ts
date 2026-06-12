@@ -26,8 +26,8 @@ export default async function action(prevState, form: FormData) {
 
   const res = await UserController.register(form);
 
-  console.log("from action");
-  console.log(res);
+  // console.log("from action");
+  // console.log(res);
 
   // if (res.success) {
   //   console.log("Seja bem vindo!");

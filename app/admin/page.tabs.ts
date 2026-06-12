@@ -1,9 +1,17 @@
-import GeneralTab from "./tabs/general.tab";
-import ReportsTab from "./tabs/reports.tab";
+import UsersTab from "./tabs/users.tab";
+import VehiclesTab from "./tabs/vehicles.tab";
+import PropertiesTab from "./tabs/properties.tab";
+import ReportsTab from "./tabs/reports_admin.tab";
+import BookingsTab from "./tabs/bookings.tab";
+import ReviewsTab from "./tabs/reviews.tab";
 
 const pageTabs = [
-  GeneralTab,
-  ReportsTab
+  UsersTab,
+  VehiclesTab,
+  PropertiesTab,
+  ReportsTab,
+  BookingsTab,
+  ReviewsTab,
 ];
 
 export default pageTabs;
