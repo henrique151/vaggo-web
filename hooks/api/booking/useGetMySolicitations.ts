@@ -4,7 +4,7 @@ import { useGetUserById } from "../user/useGetUserById";
 import { useEffect, useState } from "react";
 import { map } from "@/mappers/booking.mapper";
 // import { useUserToken } from "../user/useUserToken";
-import { getToken } from "@/services/user.service";
+// import { getToken } from "@/services/user.service";
 import { useGetMyUser } from "../user/useGetMyUser";
 
 type stateReturnProps = [
@@ -14,7 +14,7 @@ type stateReturnProps = [
 
 // export function useFetchPropertySolicitations(): stateReturnProps {
 export function useGetMySolicitations(): stateReturnProps {
-  const token = getToken();
+  // const token = getToken();
   const [data, dataLoading] = useApi({
     uri: `reservations/owner`,
     dataOnly: true,

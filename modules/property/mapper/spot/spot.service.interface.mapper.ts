@@ -47,8 +47,9 @@ export default function mapSpots(d: any): SpotClassInterface {
       location: {
         latitude: undefined,
         longitude: undefined,
+        address: undefined,
       },
-      address: undefined,
+      // address: undefined,
     },
   };
 }

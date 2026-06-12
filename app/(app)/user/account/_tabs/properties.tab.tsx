@@ -8,6 +8,8 @@ import { Property } from "@classes";
 import { startTransition, useEffect } from "react";
 import action from "../_actions/property/edit.action";
 import useForm from "@/hooks/useForm";
+import { PropertyController } from "@controllers";
+import { BrowserService } from "@services";
 
 const Page = () => {
   const { properties } = usePageContext();
@@ -123,8 +125,15 @@ const Page = () => {
               }}
               deleteTitle="Excluir propriedade"
               deleteDescription={`Deseja excluir a propriedade "${property.info?.name}"? Todas as vagas associadas também serão removidas.`}
-              onDelete={() => {
-                // TODO: wire to delete property action
+              onDelete={async () => {
+                const res = await PropertyController.deleteById(
+                  BrowserService.getToken(),
+                  property.id,
+                );
+                console.log(res);
+                if (res) {
+                  console.log("property has been deleted.");
+                }
                 console.log("delete property", property.id);
               }}
             >

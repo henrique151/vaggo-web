@@ -22,7 +22,7 @@ import DatePeriod from "@/classes/data/DatePeriod";
 import { Spot } from "@classes";
 // import { getSpotsByPropertyId } from "@/services/spot.service";
 // import Property from "@/classes/property";
-import { Vehicle } from "@/classes/vehicle";
+import { Vehicle } from "@classes";
 // import Link from "next/link";
 // import PanelLayout from "@/component/layout/PanelLayout";
 import PanelContainer from "@/component/container/PanelContainer";

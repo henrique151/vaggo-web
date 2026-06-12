@@ -5,6 +5,7 @@ import * as APIService from "@/modules/api/api.service";
 // import { UserClassInterface } from "@/modules/user/user.interface";
 // import { AccessTokenClassInterface as AccessToken } from "../browser/browser.interface";
 import { AccessTokenClassInterface, UserClassInterface } from "@interfaces";
+import { FormUtils } from "@utils";
 // import { keyof } from "zod";
 // import { cookies } from "next/headers";
 
@@ -168,6 +169,19 @@ export async function deleteById(token: AccessTokenClassInterface, id: number) {
   try {
     const res = await APIService.genericDeleteRequest(token, `users`, id);
     return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
+export async function register(form: FormData) {
+  // const obj = FormUtils.toObject(form);
+  try {
+    const res = await APIService.request("users", {
+      method: "POST",
+      body: form,
+    });
+    const data = await res.json();
+    console.log(data);
   } catch (e) {
     console.log(e);
   }

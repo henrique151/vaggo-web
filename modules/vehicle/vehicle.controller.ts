@@ -2,7 +2,7 @@
 
 import { AccessTokenClassInterface, VehicleClassInterface } from "@interfaces";
 import * as VehicleService from "@/modules/vehicle/vehicle.service";
-import { Vehicle } from "@/classes/vehicle";
+import { Vehicle } from "@classes";
 import { ControllerStatus } from "@classes";
 
 export async function get(
@@ -55,5 +55,31 @@ export async function deleteById(token: AccessTokenClassInterface, id: number) {
 
     status.failed();
     return status.toObject();
+  }
+}
+
+export async function register(
+  token: AccessTokenClassInterface,
+  form: FormData,
+) {
+  const status = ControllerStatus.setup(form);
+
+  // validate all data
+  //
+  // auth.register(UserObject)
+  try {
+    const res = await VehicleService.register(token, form);
+    console.log(res);
+    if (res.ok) {
+      const data = await res.json();
+      status.successfull(data.data);
+    } else {
+      const data = await res.json();
+      console.log(data);
+      status.failed();
+    }
+    return status.toObject();
+  } catch (e) {
+    console.log(e);
   }
 }

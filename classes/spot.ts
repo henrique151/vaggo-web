@@ -1,6 +1,6 @@
 import { Image } from "./data/Image";
 import Property from "./property";
-import { VehicleTypes } from "./vehicle";
+// import { VehicleTypes } from "./vehicle.ts_unused";
 
 export class Spot {
   public id: number;
@@ -9,7 +9,7 @@ export class Spot {
   public identifier: string;
   public isCovered: boolean;
   public approvalStatus: string;
-  public allowedVehicles: VehicleTypes[];
+  // public allowedVehicles: VehicleTypes[];
   public image: Image;
   // public operatingHours: OperatingHours
   public isActive: boolean;
@@ -25,7 +25,7 @@ export class Spot {
     this.identifier = data.identifier;
     this.isCovered = data.isCovered;
     this.approvalStatus = data.approvalStatus;
-    this.allowedVehicles = data.allowedVehicles;
+    // this.allowedVehicles = data.allowedVehicles;
     this.isActive = data.isActive;
     this.property = data.property;
     this.image = data.image;

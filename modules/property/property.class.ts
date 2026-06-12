@@ -135,7 +135,7 @@ class Address implements AddressInterface {
   }
 }
 
-type CityInterface = PropertyClassInterface["address"]["city"];
+type CityInterface = PropertyClassInterface["location"]["address"]["city"];
 class City implements CityInterface {
   id: number;
   name: string;
@@ -147,7 +147,8 @@ class City implements CityInterface {
   }
 }
 
-type StateInterface = PropertyClassInterface["address"]["city"]["state"];
+type StateInterface =
+  PropertyClassInterface["location"]["address"]["city"]["state"];
 class State implements StateInterface {
   id: number;
   name: string;

@@ -1,6 +1,6 @@
 import { map } from "@/mappers/spot.mapper";
 import request from "./api.service";
-import { Spot } from "@/classes/spot";
+import { Spot } from "@classes";
 
 export async function getSpotsByPropertyId(id: number): Promise<Spot[]> {
   const res = await request({

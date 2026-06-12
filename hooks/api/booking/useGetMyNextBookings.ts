@@ -11,7 +11,7 @@ import { useGetMyUser } from "../user/useGetMyUser";
 type stateReturnProps = [bookings: Booking[], loading: boolean];
 
 export function useGetMyNextBookings(): stateReturnProps {
-  const token = getToken();
+  // const token = getToken();
   const [data, dataLoading] = useApi({
     uri: `reservations`,
     dataOnly: true,

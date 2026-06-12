@@ -1,4 +1,4 @@
-import { Spot } from "@/classes/spot";
+import { Spot } from "@classes";
 import { Image } from "@/classes/data/Image";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

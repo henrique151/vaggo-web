@@ -81,6 +81,26 @@ export async function deleteById(token: AccessTokenClassInterface, id: number) {
     console.log(e);
   }
 }
+
+export async function register(
+  token: AccessTokenClassInterface,
+  form: FormData,
+) {
+  try {
+    const res = await APIService.request("vehicles", token, {
+      method: "POST",
+      body: JSON.stringify(FormUtils.toObject(form)),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    // const data = await res.json();
+    // console.log(data);
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
 // export const VehicleService = {
 //   get: getVehicle,
 // };

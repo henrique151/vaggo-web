@@ -7,6 +7,7 @@ import { ControllerStatus } from "@classes";
 
 import { AccessTokenClassInterface, PropertyClassInterface } from "@interfaces";
 import { stat } from "node:fs/promises";
+// import { AccessToken } from "../browser/browser.class";
 
 type getPropertyFlags = {
   withSpots?: boolean;
@@ -17,7 +18,17 @@ type getPropertyFlags = {
 export async function register(
   token: AccessTokenClassInterface,
   form: FormData,
-) {}
+) {
+  const status = ControllerStatus.setup(form);
+  try {
+    const res = await PropertyService.register(token, form);
+    status.successfull(res.data);
+    console.log(res);
+    return status.toObject();
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 /**
  *
@@ -43,7 +54,7 @@ export async function get(
   token: AccessTokenClassInterface,
   idOrFlags?: number | getPropertyFlags,
   flags?: getPropertyFlags,
-): Promise<PropertyClassInterface | PropertyClassInterface> {
+): Promise<PropertyClassInterface | PropertyClassInterface[]> {
   console.log("controller");
   console.log(idOrFlags);
   const id =
@@ -74,11 +85,49 @@ export async function getSpots(token: AccessTokenClassInterface, id: number) {
   return res;
 }
 
-export async function generateSpots(id: number, form: FormData) {}
+export async function generateSpots(
+  token: AccessTokenClassInterface,
+  id: number,
+  form: FormData,
+) {
+  try {
+    const res = await PropertyService.generateSpots(token, id, form);
+  } catch (e) {
+    console.log(e);
+  }
+}
 
-export async function updateSpotStatus(id: number) {}
+export async function updateSpotStatus(
+  token: AccessTokenClassInterface,
+  id: number,
+  status: "DISPONIVEL" | "INDISPONIVEL" | "OCUPADA",
+) {
+  try {
+    const res = await PropertyService.updateSpotStatus(token, id, status);
+  } catch (e) {
+    console.log(e);
+  }
+}
 
-export async function deleteSpot(id: number) {}
+export async function deleteSpot(
+  token: AccessTokenClassInterface,
+  propertyId: number,
+  id: number,
+) {
+  const status = ControllerStatus.setup();
+
+  try {
+    const res = await PropertyService.deleteSpot(token, propertyId, id);
+    if (res) status.successfull();
+    else status.failed();
+    return status.toObject();
+  } catch (e) {
+    console.log(e);
+
+    status.failed();
+    return status.toObject();
+  }
+}
 
 export async function edit(
   token: AccessTokenClassInterface,
@@ -114,5 +163,44 @@ export async function deleteById(token: AccessTokenClassInterface, id: number) {
 
     status.failed();
     return status.toObject();
+  }
+}
+
+export async function search(data: {
+  address?: string;
+  cep?: string;
+  coordinates?: {
+    lat: string;
+    lng: string;
+  };
+  date?: { start: string; end: string };
+  radius?: number;
+}) {
+  try {
+    const res = await PropertyService.search(data);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function editSpot(
+  token: AccessTokenClassInterface,
+  form: FormData,
+  propertyId: number,
+  idParam?: number,
+) {
+  const id = idParam ?? Number(form.get("id"));
+  const status = ControllerStatus.setup(form);
+
+  if (form.get("id")) form.delete("id");
+
+  try {
+    const res = await PropertyService.editSpot(token, propertyId, id, form);
+    if (res) status.successfull();
+    else status.failed();
+
+    return status.toObject();
+  } catch (e) {
+    console.log(e);
   }
 }

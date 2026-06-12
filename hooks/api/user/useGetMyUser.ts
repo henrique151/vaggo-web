@@ -3,6 +3,7 @@ import { useApi } from "../useApi";
 import User from "@/classes/user";
 import { Image } from "@/classes/data/Image";
 import { getToken } from "@/services/user.service";
+import { BrowserService } from "@services";
 
 type stateReturnProps = [
   user: User | undefined,
@@ -11,9 +12,9 @@ type stateReturnProps = [
 ];
 
 export function useGetMyUser(): stateReturnProps {
-  const token = getToken();
+  const token = BrowserService.getToken();
   const [data, success] = useApi({
-    uri: `users/${token?.id}`,
+    uri: `users/${token?.user.id}`,
     dataOnly: true,
     useToken: true,
     req: { method: "GET" },

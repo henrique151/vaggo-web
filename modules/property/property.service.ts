@@ -8,11 +8,25 @@ import {
   AccessTokenClassInterface,
   // PropertyStructureInterface,
 } from "@interfaces";
-import { APIService } from "@services";
+import { APIService, PropertyService } from "@services";
 import mapSpots from "./mapper/spot/spot.service.interface.mapper";
 import map from "./mapper/property.service.interface.mapper";
 
-export async function register(form: FormData) {}
+export async function register(
+  token: AccessTokenClassInterface,
+  form: FormData,
+) {
+  try {
+    const res = await APIService.request("properties", token, {
+      method: "POST",
+      body: form,
+    });
+    const data = await res.json();
+    console.log(data);
+    // console.log();
+    return data;
+  } catch (e) {}
+}
 
 export async function get(
   token: AccessTokenClassInterface,
@@ -100,13 +114,87 @@ export async function getSpots(
   return data.map(mapSpots);
 }
 
-export async function generateSpots(id: number, form: FormData) {}
+export async function generateSpots(
+  token: AccessTokenClassInterface,
+  id: number,
+  form: FormData,
+) {
+  try {
+    const res = await APIService.request(
+      `spots/properties/${id}/spots`,
+      token,
+      {
+        method: "POST",
+        body: form,
+      },
+    );
+    const data = await res.json();
+    console.log(data);
+  } catch (e) {
+    console.log(e);
+  }
+}
 
-export async function updateSpotStatus(id: number) {}
+export async function updateSpotStatus(
+  token: AccessTokenClassInterface,
+  id: number,
+  status: "DISPONIVEL" | "INDISPONIVEL" | "OCUPADA",
+) {
+  try {
+    const res = await APIService.request(`spots/${id}/status`, token, {
+      method: "PATCH",
+      body: JSON.stringify({ status: status }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-export async function deleteSpot(id: number) {}
+    console.log(res);
+    const data = await res.json();
+    console.log(data);
+  } catch (e) {
+    console.log(e);
+  }
+}
 
-export async function search() {}
+export async function search(params: {
+  address?: string;
+  cep?: string;
+  coordinates?: {
+    lat: string;
+    lng: string;
+  };
+  date?: { start: string; end: string };
+  radius?: number;
+}) {
+  const url = new URL(`http://localhost:3000/reservations/search/address`);
+
+  if (params.address) {
+    url.searchParams.append("address", params.address);
+    if (params.date) {
+      url.searchParams.append("startDate", params.date.start);
+      url.searchParams.append("endDate", params.date.end);
+    }
+  }
+  if (params.cep) url.searchParams.append("cep", params.cep);
+
+  // if (params.coordinates) throw new Error("Coordinates not implemented");
+
+  try {
+    // let uri = url.pathname.replace("/", "");
+    // console.log(url.toString());
+    const res = await APIService.request(
+      url.pathname.replace("/", "").concat(url.search),
+    );
+    console.log(res);
+    const data = await res.json();
+    console.log(data);
+    // console.log(url.pathname.replace("/", "").concat(url.search));
+    // console.log(url.toString());
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 export async function edit(
   token: AccessTokenClassInterface,
@@ -129,6 +217,46 @@ export async function deleteById(token: AccessTokenClassInterface, id: number) {
   try {
     const res = await APIService.genericDeleteRequest(token, `properties`, id);
     return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function deleteSpot(
+  token: AccessTokenClassInterface,
+  propertyId: number,
+  id: number,
+) {
+  try {
+    const res = await APIService.genericDeleteRequest(
+      token,
+      `spots/properties/${propertyId}/spots`,
+      id,
+    );
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function editSpot(
+  token: AccessTokenClassInterface,
+  propertyId: number,
+  id: number,
+  form: FormData,
+) {
+  try {
+    const res = await APIService.request(
+      `spots/properties/${propertyId}/spots/${id}`,
+      token,
+      {
+        method: "PUT",
+        body: form,
+      },
+    );
+
+    console.log(res);
+    return await res.ok;
   } catch (e) {
     console.log(e);
   }

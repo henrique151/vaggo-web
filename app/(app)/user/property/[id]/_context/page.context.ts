@@ -1,9 +1,9 @@
 "use client";
 import AccessToken from "@/classes/AccessToken";
-import Property from "@/classes/property";
+import { Property, User, Vehicle } from "@classes";
 import { Report } from "@/classes/Report";
-import User from "@/classes/user";
-import { Vehicle } from "@/classes/vehicle";
+// import User from "@/classes/user";
+// import { Vehicle } from "@/classes/vehicle";
 import { createContext, useContext } from "react";
 
 type PageContextProps = {

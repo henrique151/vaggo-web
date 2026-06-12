@@ -5,9 +5,10 @@ import EntityItem from "@/component/container/EntityContainer/EntityItem";
 import StatusBadge from "@/component/ui/StatusDisplay";
 import { useRouter } from "next/navigation";
 import map from "./spotFrame.mapper";
+import { Property } from "@classes";
 
 const Page = () => {
-  const { property } = usePageContext();
+  const { property }: { property: Property } = usePageContext();
   const router = useRouter();
 
   // attach editing window for editing a spot individually

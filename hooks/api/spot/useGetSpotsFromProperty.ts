@@ -1,4 +1,4 @@
-import { Spot } from "@/classes/spot";
+import { Spot } from "@classes";
 import { useApi } from "../useApi";
 import { useState, useEffect } from "react";
 import { map } from "@/mappers/spot.mapper";

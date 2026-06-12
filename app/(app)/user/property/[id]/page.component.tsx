@@ -1,8 +1,8 @@
 // import FormContainer from "@/component/container/FormContainer";
-import { Image } from "@/classes/data/Image";
+// import { Image } from "@/classes/data/Image";
 import InfoLayout from "@/component/layout/InfoLayout";
 // import FormItem from "@/component/ui/form/FormItem";
-import { useGetPropertyById } from "@/hooks/api/property/useGetPropertyById";
+// import { useGetPropertyById } from "@/hooks/api/property/useGetPropertyById";
 import { usePageContext } from "./_context/page.context";
 import DefaultTabPageContainer from "@/component/tabs/DefaultTabPageContainer";
 import DefaultTabSidebar from "@/component/tabs/DefaultTabSidebar";
@@ -16,8 +16,8 @@ export default function Page() {
   console.log(property);
   return (
     <InfoLayout
-      title={`${property?.name || "Propriedade [XXX]"}`}
-      description={`${property?.description || "Descrição"}`}
+      title={`${property?.info?.name || "Propriedade [XXX]"}`}
+      description={`${property?.info?.description || "Descrição"}`}
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <DefaultTabSidebar

@@ -127,7 +127,10 @@ export async function register(form: FormData) {
   //
   // auth.register(UserObject)
   try {
-  } catch (e) {}
+    const res = await UserService.register(form);
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 export async function edit(

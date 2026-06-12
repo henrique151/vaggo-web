@@ -3,6 +3,11 @@
 import FormContainer from "@/component/container/FormContainer";
 import InfoLayout from "@/component/layout/InfoLayout";
 import FormItem from "@/component/ui/form/FormItem";
+import { VehicleController } from "@controllers";
+import { ControllerStatusStructureInterface } from "@interfaces";
+import { BrowserService } from "@services";
+import { FormUtils } from "@utils";
+import { redirect } from "next/navigation";
 
 export default function Page() {
   return (
@@ -13,7 +18,16 @@ export default function Page() {
           "Insira as informações de seu veículo para usar com a plataforma"
         }
       >
-        <FormContainer>
+        <FormContainer
+          action={async (form: FormData) => {
+            console.log(FormUtils.toObject(form));
+            const res: ControllerStatusStructureInterface =
+              await VehicleController.register(BrowserService.getToken(), form);
+            if (res.success) {
+              redirect(`/user/account`);
+            }
+          }}
+        >
           <FormItem
             label={"Marca"}
             name={"brand"}
@@ -27,6 +41,14 @@ export default function Page() {
             type="text"
             label={"Modelo"}
             name={"model"}
+            className="mb-5"
+            required
+          />
+
+          <FormItem
+            type="text"
+            label={"Cor"}
+            name={"color"}
             className="mb-5"
             required
           />
@@ -63,7 +85,7 @@ export default function Page() {
           <FormItem
             type="select"
             label="Porte"
-            name="type"
+            name="size"
             className="mb-5"
             items={[
               { value: "PEQUENO", label: "Pequeno" },
@@ -72,6 +94,25 @@ export default function Page() {
             ]}
             required
           />
+
+          <button
+            type="submit"
+            disabled={false}
+            className="
+              mt-8
+              py-3
+              rounded-lg
+              font-medium
+              text-white
+              btn-primary
+              btn-hover
+              transition
+              disabled:opacity-60
+              w-full
+            "
+          >
+            Criar
+          </button>
         </FormContainer>
       </InfoLayout>
     </main>

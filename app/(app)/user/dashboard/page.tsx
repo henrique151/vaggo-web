@@ -266,12 +266,14 @@ export default function Page() {
               <PanelContainer title="Seu(s) veículo(os)">
                 {vehicles?.length > 0 ? (
                   vehicles?.map((car) => (
-                    <EntityFrame key={car.id}>
-                      <DefaultEntityFrame
-                        title={`${car.brand} ${car.model}`}
-                        description={`Placa: ${car.licensePlate}`}
-                      />
-                    </EntityFrame>
+                    <section key={car.id} className="mb-4">
+                      <EntityFrame>
+                        <DefaultEntityFrame
+                          title={`${car.brand} ${car.model}`}
+                          description={`Placa: ${car.licensePlate}`}
+                        />
+                      </EntityFrame>
+                    </section>
                   ))
                 ) : (
                   <p className="text-muted">

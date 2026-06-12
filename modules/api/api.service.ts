@@ -27,7 +27,8 @@ export async function request(
 
   // map req and token to variables
   // console.log("from request");
-  const isToken = tokenOrReq["token"] ? true : false;
+  // console.log(tokenOrReq);
+  const isToken = tokenOrReq && tokenOrReq["token"] ? true : false;
   // const isToken = tokenOrReq["token"] ? true : false;
   // type typeCheck<T, U> =
   //   (<G>() => G extends T ? 1 : 2) extends <G>() => G extends U ? 1 : 2
@@ -41,12 +42,13 @@ export async function request(
     if (isToken) {
       if (reqBody) req = Object.assign(req, reqBody);
     } else {
-      if (tokenOrReq) req = Object.assign(req, tokenOrReq);
+      req = Object.assign(req, tokenOrReq);
     }
     return req;
   }
 
   const req: RequestInit = resolveReq();
+  // console.log(req);
   const token = isToken
     ? new AccessToken(tokenOrReq as AccessTokenClassInterface)
     : undefined;
@@ -68,11 +70,9 @@ export async function request(
     // console.log("token inserted", req.headers);
   }
 
-  if (
-    !req.headers["Content-Type"] &&
-    req.method === "GET" &&
-    !(req.body instanceof FormData)
-  ) {
+  const headers = req?.headers ? req.headers["Content-Type"] : undefined;
+  console.log(headers);
+  if (!headers && req.method === "GET" && !(req.body instanceof FormData)) {
     // console.log(
     //   "looks like header doesn't have content-type, fallbacking to application/json",
     // );
@@ -193,6 +193,8 @@ export async function genericDeleteRequest(
   const res = await request(url, token, {
     method: "DELETE",
   });
+
+  console.log(res);
 
   if (res.ok) {
     if (returnResponse) return await res.json();
