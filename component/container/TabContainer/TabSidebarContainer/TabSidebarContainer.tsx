@@ -37,10 +37,10 @@ export default function TabSidebarContainer({
   useEffect(() => {
     if (tabs) {
       TabSidebarComponentSetter(
-        tabs.map((tab) => {
+        tabs.map((tab, index) => {
           return (
             <TabFragment
-              // key={1}
+              key={index}
               label={"asd"}
               activeTab={activeTab}
               activeTabSetter={activeTabSetter}

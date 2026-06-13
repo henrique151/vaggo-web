@@ -12,3 +12,8 @@ export async function setRefreshToken(cookie: string) {
     path: "/",
   });
 }
+
+export async function clearRefreshToken() {
+  const cookieStore = await cookies();
+  cookieStore.delete("refreshToken");
+}

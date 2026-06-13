@@ -89,8 +89,7 @@ export default function FormItem({
       <select
         className={baseStyle}
         name={name}
-        onChange={onChange}
-        value={value ?? ""}
+        {...(onChange ? { value: value ?? "", onChange } : { defaultValue: value ?? "" })}
       >
         {items?.map((item) => {
           return (
@@ -110,9 +109,14 @@ export default function FormItem({
       required={required}
       placeholder={placeholder}
       className={baseStyle}
-      value={mask ? displayValue : value}
+      {...(mask
+        ? { value: displayValue, onChange: handleInputChange }
+        : onChange
+          ? { value: value, onChange: onChange }
+          : value !== undefined
+            ? { defaultValue: value }
+            : {})}
       multiple={multiple}
-      onChange={mask ? handleInputChange : onChange}
       maxLength={maxLength}
     />
   );

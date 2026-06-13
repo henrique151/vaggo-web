@@ -101,3 +101,19 @@ export function calculateAge(birthDate: string): number {
 export function isAtLeast18(birthDate: string): boolean {
     return calculateAge(birthDate) >= 18;
 }
+
+/**
+ * Aplica máscara de CEP: 00000-000
+ */
+export function maskCEP(value: string): string {
+    const cleaned = value.replace(/\D/g, "");
+    if (cleaned.length <= 5) return cleaned;
+    return `${cleaned.slice(0, 5)}-${cleaned.slice(5, 8)}`;
+}
+
+/**
+ * Remove máscara do CEP
+ */
+export function unmaskCEP(value: string): string {
+    return value.replace(/\D/g, "");
+}
