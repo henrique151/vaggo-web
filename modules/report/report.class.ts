@@ -28,7 +28,7 @@ export class ReportData implements ReportClassInterface {
       status: i.info.status,
       reason: i.info.reason,
       adminNote: i.info.adminNote,
-      images: i.info.images,
+      images: i.info.images as ImageClassInterface[],
     };
     this.target = { id: i.target?.id, type: i.target?.type };
     this.date = {

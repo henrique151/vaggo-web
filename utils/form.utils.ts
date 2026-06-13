@@ -32,7 +32,7 @@ export function mapZodErrors(controller: ControllerStatus, data: any) {
 
 export function validateForm(
   controller: ControllerStatus,
-  schema: z.ZodObject,
+  schema: any,
   form: FormData,
 ) {
   const obj = toObject(form);

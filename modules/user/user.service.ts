@@ -72,7 +72,7 @@ export async function get(
   //     },
   //   },
   // };
-  return map(data);
+  // return map(data);
 }
 
 export async function edit(

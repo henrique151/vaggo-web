@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import useGetPropertyDetails from "@/modules/property/hooks/useGetPropertyDetails";
-import Image from "@/public/preview.jpg";
+// import Image from "@/public/preview.jpg";
 
 import {
   UserController,
@@ -34,7 +34,7 @@ export default function Page() {
   useEffect(() => {
     const token = BrowserService.getToken();
     const load = async () => {
-      const file = await convertToFile(Image);
+      // const file = await convertToFile(Image);
       // console.log(file);
       // const res = await UserController.countBlocked(token);
       const res = await UserController.get(token, true);
