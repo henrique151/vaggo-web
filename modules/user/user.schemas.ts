@@ -92,7 +92,7 @@ const Register = z.object({
 
   cpf: z
     .string()
-    .length(11, msg.string.fixed(FIELD.CPF, 11))
+    .length(15, msg.string.fixed(FIELD.CPF, 15))
     .refine(MaskUtils.isValidCPF, "CPF inválido. Verifique os dígitos."),
 
   gender: z.enum(["M", "F", "O"], {

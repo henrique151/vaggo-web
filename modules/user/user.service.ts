@@ -6,7 +6,7 @@ import { FormUtils } from "@utils";
 import map from "./mappers/user.service.interface.mapper";
 
 //checks if user's token is valid by checking it's expiry date. returns true to valid and false to invalid.
-export async function validateToken() {}
+export async function validateToken() { }
 
 export async function getAll(token: AccessTokenClassInterface) {
   try {

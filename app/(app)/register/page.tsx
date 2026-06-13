@@ -151,8 +151,16 @@ export default function Page() {
   const [state, dispatchAction, pending] = useForm(action);
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
-  const [selectedFileName, setSelectedFileName] = useState<string>("");
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<Record<string, string>>({
+    name: "",
+    cpf: "",
+    gender: "M",
+    birthDate: "",
+    phone: "",
+    email: "",
+    password: "",
+    passConfirm: "",
+  });
   const [isFormValid, setIsFormValid] = useState(false);
 
   const [showVerificationWindow, setShowVerificationWindow] = useState(false);
@@ -176,34 +184,31 @@ export default function Page() {
       data.cpf && MaskUtils.isValidCPF(MaskUtils.unmaskCPF(data.cpf));
     const phoneValid =
       data.phone && MaskUtils.isValidPhone(MaskUtils.unmaskPhone(data.phone));
-    const emailValid = data.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+    const emailValid =
+      data.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
     const passwordMatch =
-      data.password && data.passConfirm && data.password === data.passConfirm;
-    const ageValid =
-      data.birthDate && MaskUtils.isAtLeast18(data.birthDate);
+      data.password &&
+      data.passConfirm &&
+      data.password === data.passConfirm &&
+      data.password.length >= 8;
+    const ageValid = data.birthDate && MaskUtils.isAtLeast18(data.birthDate);
 
-    return (
+    const isValid =
       hasAllFields &&
       cpfValid &&
       phoneValid &&
       emailValid &&
       passwordMatch &&
-      ageValid
-    );
+      ageValid;
+
+    return isValid;
   };
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     const newFormData = { ...formData, [name]: value };
     setFormData(newFormData);
     setIsFormValid(validateForm(newFormData));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFileName(file.name);
-    }
   };
 
   return (
@@ -268,6 +273,7 @@ export default function Page() {
             name="name"
             placeholder="João da Silva"
             controller={state}
+            value={formData.name}
             onChange={handleFormChange}
             // required
           />
@@ -281,8 +287,9 @@ export default function Page() {
               name="cpf"
               placeholder="000.000.000-00"
               mask={MaskUtils.maskCPF}
-              maxLength={11}
+              maxLength={15}
               controller={state}
+              value={formData.cpf}
               onChange={handleFormChange}
               // required
             />
@@ -290,11 +297,11 @@ export default function Page() {
             <div className="flex flex-col gap-2">
               <label className="text-muted text-sm">Gênero</label>
 
-              <select 
-                name="gender" 
-                defaultValue="M" 
+              <select
+                name="gender"
+                value={formData.gender}
                 className="app-input"
-                onChange={(e) => handleFormChange(e as any)}
+                onChange={handleFormChange}
               >
                 <option value="M">Masculino</option>
 
@@ -313,6 +320,7 @@ export default function Page() {
               label="Nascimento"
               name="birthDate"
               controller={state}
+              value={formData.birthDate}
               onChange={handleFormChange}
               // required
             />
@@ -323,8 +331,9 @@ export default function Page() {
               name="phone"
               placeholder="(11) 99999-9999"
               mask={MaskUtils.maskPhone}
-              maxLength={11}
+              maxLength={15}
               controller={state}
+              value={formData.phone}
               onChange={handleFormChange}
               // required
             />
@@ -338,6 +347,7 @@ export default function Page() {
             name="email"
             placeholder="seu@email.com"
             controller={state}
+            value={formData.email}
             onChange={handleFormChange}
             // required
           />
@@ -351,6 +361,7 @@ export default function Page() {
               name="password"
               placeholder="••••••••"
               controller={state}
+              value={formData.password}
               onChange={handleFormChange}
               // required
             />
@@ -361,6 +372,7 @@ export default function Page() {
               name="passConfirm"
               placeholder="••••••••"
               controller={state}
+              value={formData.passConfirm}
               onChange={handleFormChange}
               // required
             />
@@ -371,20 +383,7 @@ export default function Page() {
           <div className="flex flex-col gap-2">
             <label className="text-muted text-sm">Foto de Perfil</label>
 
-            <div className="relative">
-              <input 
-                type="file" 
-                name="avatarUrl" 
-                className="app-input cursor-pointer" 
-                onChange={handleFileChange}
-                accept="image/*"
-              />
-              {selectedFileName && (
-                <p className="text-xs text-green-600 mt-1">
-                  ✓ Imagem selecionada: <span className="font-semibold">{selectedFileName}</span>
-                </p>
-              )}
-            </div>
+            <input type="file" name="avatarUrl" className="app-input" />
           </div>
 
           <p className="text-rose-400">{state?.error?.message}</p>

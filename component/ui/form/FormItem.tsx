@@ -21,7 +21,9 @@ type FormItemProps = {
   controller?: ControllerStatus;
   mask?: (value: string) => string;
   maxLength?: number;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  onChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => void;
 };
 
 export default function FormItem({
@@ -43,6 +45,10 @@ export default function FormItem({
 }: FormItemProps) {
   const [displayValue, setDisplayValue] = useState(value ?? "");
 
+  useEffect(() => {
+    setDisplayValue(value ?? "");
+  }, [value]);
+
   const formError = controller?.fields[name]?.error ?? error ?? false;
   const formErrorMessage =
     controller?.fields[name]?.error?.message ?? errorMessage ?? undefined;
@@ -54,11 +60,6 @@ export default function FormItem({
     ${formError ? "app-input-error" : "app-input"}
 
     `;
-
-  // useEffect(() => {
-  //   if (controller) console.log("error changed!", controller);
-  //   console.log("hsodksodk");
-  // }, [controller]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newValue = e.target.value;
@@ -72,21 +73,20 @@ export default function FormItem({
     }
 
     setDisplayValue(newValue);
-    // Update the hidden actual value (without mask) in FormData
-    e.target.value = newValue;
+    // Create a synthetic event with the masked value
+    const syntheticEvent = {
+      ...e,
+      target: { ...e.target, value: newValue, name },
+    } as React.ChangeEvent<HTMLInputElement>;
 
     if (onChange) {
-      onChange(e);
+      onChange(syntheticEvent);
     }
   };
 
   const formItemTable = {
     select: (
-      <select 
-        className={baseStyle} 
-        name={name}
-        onChange={onChange}
-      >
+      <select className={baseStyle} name={name} onChange={onChange} value={value ?? ""}>
         {items?.map((item) => {
           return (
             <option key={item.value} value={item.value}>
@@ -105,10 +105,9 @@ export default function FormItem({
       required={required}
       placeholder={placeholder}
       className={baseStyle}
-      defaultValue={formValue}
+      value={mask ? displayValue : value ?? ""}
       multiple={multiple}
       onChange={mask ? handleInputChange : onChange}
-      value={mask ? displayValue : undefined}
       maxLength={maxLength}
     />
   );
@@ -126,5 +125,3 @@ export default function FormItem({
     </div>
   );
 }
-
-// switch case to attributes

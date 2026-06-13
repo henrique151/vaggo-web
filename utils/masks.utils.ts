@@ -7,13 +7,13 @@
  * Removes non-digit characters and applies mask
  */
 export function maskCPF(value: string): string {
-  if (!value) return "";
-  const cleaned = value.replace(/\D/g, "");
-  const limited = cleaned.slice(0, 11);
-  return limited
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d{2})/, "$1-$2");
+    if (!value) return "";
+    const cleaned = value.replace(/\D/g, "");
+    const limited = cleaned.slice(0, 11);
+    return limited
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{2})/, "$1-$2");
 }
 
 /**
@@ -21,104 +21,104 @@ export function maskCPF(value: string): string {
  * Removes non-digit characters and applies mask
  */
 export function maskPhone(value: string): string {
-  if (!value) return "";
-  const cleaned = value.replace(/\D/g, "");
-  const limited = cleaned.slice(0, 11);
+    if (!value) return "";
+    const cleaned = value.replace(/\D/g, "");
+    const limited = cleaned.slice(0, 11);
 
-  if (limited.length <= 2) {
-    return limited;
-  }
-  if (limited.length <= 7) {
-    return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
-  }
-  return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
+    if (limited.length <= 2) {
+        return limited;
+    }
+    if (limited.length <= 7) {
+        return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
+    }
+    return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
 }
 
 /**
  * Format email - validates and converts to lowercase
  */
 export function maskEmail(value: string): string {
-  return value.toLowerCase().trim();
+    return value.toLowerCase().trim();
 }
 
 /**
  * Remove mask from CPF (returns only digits)
  */
 export function unmaskCPF(value: string): string {
-  return value.replace(/\D/g, "");
+    return value.replace(/\D/g, "");
 }
 
 /**
  * Remove mask from phone (returns only digits)
  */
 export function unmaskPhone(value: string): string {
-  return value.replace(/\D/g, "");
+    return value.replace(/\D/g, "");
 }
 
 /**
  * Validate CPF format (must be 11 digits, no repeated sequences)
  */
 export function isValidCPF(cpf: string): boolean {
-  const cleaned = cpf.replace(/\D/g, "");
+    const cleaned = cpf.replace(/\D/g, "");
 
-  if (cleaned.length !== 11) return false;
+    if (cleaned.length !== 11) return false;
 
-  // Check if all digits are the same (invalid CPF)
-  if (/^(\d)\1{10}$/.test(cleaned)) return false;
+    // Check if all digits are the same (invalid CPF)
+    if (/^(\d)\1{10}$/.test(cleaned)) return false;
 
-  // Calculate first digit
-  let sum = 0;
-  let remainder;
+    // Calculate first digit
+    let sum = 0;
+    let remainder;
 
-  for (let i = 1; i <= 9; i++) {
-    sum += parseInt(cleaned.substring(i - 1, i), 10) * (11 - i);
-  }
-  remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(cleaned.substring(9, 10), 10)) return false;
+    for (let i = 1; i <= 9; i++) {
+        sum += parseInt(cleaned.substring(i - 1, i), 10) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cleaned.substring(9, 10), 10)) return false;
 
-  // Calculate second digit
-  sum = 0;
-  for (let i = 1; i <= 10; i++) {
-    sum += parseInt(cleaned.substring(i - 1, i), 10) * (12 - i);
-  }
-  remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(cleaned.substring(10, 11), 10)) return false;
+    // Calculate second digit
+    sum = 0;
+    for (let i = 1; i <= 10; i++) {
+        sum += parseInt(cleaned.substring(i - 1, i), 10) * (12 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cleaned.substring(10, 11), 10)) return false;
 
-  return true;
+    return true;
 }
 
 /**
  * Validate phone format (must be 10 or 11 digits)
  */
 export function isValidPhone(phone: string): boolean {
-  const cleaned = phone.replace(/\D/g, "");
-  return cleaned.length >= 10 && cleaned.length <= 11;
+    const cleaned = phone.replace(/\D/g, "");
+    return cleaned.length >= 10 && cleaned.length <= 11;
 }
 
 /**
  * Calculate age from birth date
  */
 export function calculateAge(birthDate: string): number {
-  const birth = new Date(birthDate);
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
 
-  if (
-    monthDiff < 0 ||
-    (monthDiff === 0 && today.getDate() < birth.getDate())
-  ) {
-    age--;
-  }
+    if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+        age--;
+    }
 
-  return age;
+    return age;
 }
 
 /**
  * Validate age (must be 18 or older)
  */
 export function isAtLeast18(birthDate: string): boolean {
-  return calculateAge(birthDate) >= 18;
+    return calculateAge(birthDate) >= 18;
 }
