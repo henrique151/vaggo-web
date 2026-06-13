@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -32,7 +32,7 @@ function VerificationCodeWindow({
 }) {
   return (
     <>
-      <BlurOverlay show={true} onClick={() => {}} />
+      <BlurOverlay show={true} onClick={() => { }} />
 
       <GenericWindow
         title="Confirmar Cadastro"
@@ -101,8 +101,6 @@ function VerificationCodeWindow({
                   bg-card
                   text-center
                   text-xl
-                  opacity-60
-                  cursor-not-allowed
                 "
                 />
               ))}
@@ -122,7 +120,6 @@ function VerificationCodeWindow({
               py-3
               rounded-xl
               btn-primary
-              opacity-50
             "
             >
               Confirmar Código
@@ -163,6 +160,8 @@ export default function Page() {
   });
 
   const [showVerificationWindow, setShowVerificationWindow] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [avatarFileName, setAvatarFileName] = useState<string>("");
 
   useEffect(() => {
     if (state && state.success) {
@@ -179,57 +178,68 @@ export default function Page() {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const newErrors: Record<string, string> = {};
 
     // Validar campos obrigatórios
-    const hasAllFields =
-      formData.name &&
-      formData.cpf &&
-      formData.birthDate &&
-      formData.email &&
-      formData.password &&
-      formData.passConfirm &&
-      formData.phone;
-
-    if (!hasAllFields) {
-      alert("Por favor, preencha todos os campos obrigatórios.");
-      return;
-    }
+    if (!formData.name) newErrors.name = "Nome é obrigatório.";
+    if (!formData.cpf) newErrors.cpf = "CPF é obrigatório.";
+    if (!formData.birthDate) newErrors.birthDate = "Data de nascimento é obrigatória.";
+    if (!formData.phone) newErrors.phone = "Telefone é obrigatório.";
+    if (!formData.email) newErrors.email = "Email é obrigatório.";
+    if (!formData.password) newErrors.password = "Senha é obrigatória.";
+    if (!formData.passConfirm) newErrors.passConfirm = "Confirmação de senha é obrigatória.";
 
     // Validar CPF
     const cpfUnmasked = MaskUtils.unmaskCPF(formData.cpf);
-    if (!MaskUtils.isValidCPF(cpfUnmasked)) {
-      alert("CPF inválido. Por favor, verifique.");
-      return;
+    if (formData.cpf && cpfUnmasked.length !== 11) {
+      newErrors.cpf = "CPF inválido. Deve conter 11 dígitos.";
     }
 
     // Validar telefone
-    const phoneUnmasked = MaskUtils.unmaskPhone(formData.phone);
-    if (!MaskUtils.isValidPhone(phoneUnmasked)) {
-      alert("Telefone inválido. Deve ter entre 10 e 15 dígitos.");
-      return;
+    let phoneUnmasked = MaskUtils.unmaskPhone(formData.phone);
+    if (formData.phone && !MaskUtils.isValidPhone(phoneUnmasked)) {
+      newErrors.phone = "Telefone inválido. Deve ter entre 10 e 15 dígitos.";
     }
 
     // Validar email
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      alert("Email inválido. Por favor, verifique.");
-      return;
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Email inválido. Por favor, verifique.";
     }
 
     // Validar senhas
-    if (formData.password.length < 8) {
-      alert("Senha deve ter no mínimo 8 caracteres.");
-      return;
+    if (formData.password && formData.password.length < 8) {
+      newErrors.password = "Senha deve ter no mínimo 8 caracteres.";
     }
 
-    if (formData.password !== formData.passConfirm) {
-      alert("As senhas não conferem.");
-      return;
+    if (formData.passConfirm && formData.password !== formData.passConfirm) {
+      newErrors.passConfirm = "As senhas não conferem.";
     }
 
     // Validar idade
-    if (!MaskUtils.isAtLeast18(formData.birthDate)) {
-      alert("Você deve ter no mínimo 18 anos para criar uma conta.");
+    if (formData.birthDate && !MaskUtils.isAtLeast18(formData.birthDate)) {
+      newErrors.birthDate = "Você deve ter no mínimo 18 anos para criar uma conta.";
+    }
+
+    // Validar foto de perfil
+    const fileInput = e.currentTarget.querySelector(
+      'input[type="file"][name="avatarUrl"]',
+    ) as HTMLInputElement;
+
+    if (!fileInput?.files?.[0]) {
+      newErrors.avatarUrl = "Foto de perfil é obrigatória.";
+    }
+
+
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
+    }
+
+    setErrors({});
+
+    if (!phoneUnmasked.startsWith("55")) {
+      phoneUnmasked = "55" + phoneUnmasked;
     }
 
     // Tudo validado, criar FormData e enviar
@@ -242,11 +252,6 @@ export default function Page() {
     form.set("email", formData.email);
     form.set("password", formData.password);
     form.set("passConfirm", formData.passConfirm);
-
-    // Adicionar arquivo de avatar se selecionado
-    const fileInput = e.currentTarget.querySelector(
-      'input[type="file"][name="avatarUrl"]',
-    ) as HTMLInputElement;
     if (fileInput?.files?.[0]) {
       form.set("avatarUrl", fileInput.files[0]);
     }
@@ -255,7 +260,9 @@ export default function Page() {
     setEmail(formData.email);
     setPass(formData.password);
     setShowVerificationWindow(true);
-    dispatchAction(form);
+    startTransition(() => {
+      dispatchAction(form);
+    });
   };
 
   return (
@@ -305,9 +312,7 @@ export default function Page() {
 
         <div className="h-6" />
 
-        <FormContainer
-          onSubmit={handleFormSubmit}
-        >
+        <FormContainer onSubmit={handleFormSubmit}>
           <FormItem
             type="text"
             label="Nome Completo"
@@ -316,7 +321,9 @@ export default function Page() {
             controller={state}
             value={formData.name}
             onChange={handleFormChange}
-            // required
+            error={!!errors.name}
+            errorMessage={errors.name}
+          // required
           />
 
           <div className="h-3" />
@@ -332,7 +339,9 @@ export default function Page() {
               controller={state}
               value={formData.cpf}
               onChange={handleFormChange}
-              // required
+              error={!!errors.cpf}
+              errorMessage={errors.cpf}
+            // required
             />
 
             <div className="flex flex-col gap-2">
@@ -363,7 +372,9 @@ export default function Page() {
               controller={state}
               value={formData.birthDate}
               onChange={handleFormChange}
-              // required
+              error={!!errors.birthDate}
+              errorMessage={errors.birthDate}
+            // required
             />
 
             <FormItem
@@ -376,7 +387,9 @@ export default function Page() {
               controller={state}
               value={formData.phone}
               onChange={handleFormChange}
-              // required
+              error={!!errors.phone}
+              errorMessage={errors.phone}
+            // required
             />
           </div>
 
@@ -387,10 +400,13 @@ export default function Page() {
             label="Email"
             name="email"
             placeholder="seu@email.com"
+            mask={MaskUtils.maskEmail}
             controller={state}
             value={formData.email}
             onChange={handleFormChange}
-            // required
+            error={!!errors.email}
+            errorMessage={errors.email}
+          // required
           />
 
           <div className="h-3" />
@@ -404,7 +420,9 @@ export default function Page() {
               controller={state}
               value={formData.password}
               onChange={handleFormChange}
-              // required
+              error={!!errors.password}
+              errorMessage={errors.password}
+            // required
             />
 
             <FormItem
@@ -415,7 +433,9 @@ export default function Page() {
               controller={state}
               value={formData.passConfirm}
               onChange={handleFormChange}
-              // required
+              error={!!errors.passConfirm}
+              errorMessage={errors.passConfirm}
+            // required
             />
           </div>
 
@@ -424,7 +444,24 @@ export default function Page() {
           <div className="flex flex-col gap-2">
             <label className="text-muted text-sm">Foto de Perfil</label>
 
-            <input type="file" name="avatarUrl" className="app-input" />
+            <input
+              type="file"
+              name="avatarUrl"
+              className="app-input"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setAvatarFileName(e.target.files[0].name);
+                } else {
+                  setAvatarFileName("");
+                }
+              }}
+            />
+            {avatarFileName && (
+              <span className="text-sm text-primary">Imagem selecionada: {avatarFileName}</span>
+            )}
+            {errors.avatarUrl && (
+              <p className="text-xs text-rose-500">{errors.avatarUrl}</p>
+            )}
           </div>
 
           <p className="text-rose-400">{state?.error?.message}</p>

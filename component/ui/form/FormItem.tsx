@@ -110,7 +110,7 @@ export default function FormItem({
       required={required}
       placeholder={placeholder}
       className={baseStyle}
-      value={mask ? displayValue : (value ?? "")}
+      value={mask ? displayValue : value}
       multiple={multiple}
       onChange={mask ? handleInputChange : onChange}
       maxLength={maxLength}
