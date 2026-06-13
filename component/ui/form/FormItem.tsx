@@ -1,6 +1,6 @@
 "use client";
 import ControllerStatus from "@/classes/controller/ControllerStatus";
-import { HTMLInputTypeAttribute, useEffect } from "react";
+import { HTMLInputTypeAttribute, useEffect, useState } from "react";
 
 const formTypes: Partial<Record<HTMLInputTypeAttribute, React.ReactNode>> = {};
 
@@ -19,6 +19,9 @@ type FormItemProps = {
   error?: boolean;
   errorMessage?: string;
   controller?: ControllerStatus;
+  mask?: (value: string) => string;
+  maxLength?: number;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
 };
 
 export default function FormItem({
@@ -34,7 +37,12 @@ export default function FormItem({
   error,
   errorMessage,
   controller,
+  mask,
+  maxLength,
+  onChange,
 }: FormItemProps) {
+  const [displayValue, setDisplayValue] = useState(value ?? "");
+
   const formError = controller?.fields[name]?.error ?? error ?? false;
   const formErrorMessage =
     controller?.fields[name]?.error?.message ?? errorMessage ?? undefined;
@@ -52,9 +60,33 @@ export default function FormItem({
   //   console.log("hsodksodk");
   // }, [controller]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newValue = e.target.value;
+
+    if (mask) {
+      newValue = mask(newValue);
+    }
+
+    if (maxLength && newValue.replace(/\D/g, "").length > maxLength) {
+      return;
+    }
+
+    setDisplayValue(newValue);
+    // Update the hidden actual value (without mask) in FormData
+    e.target.value = newValue;
+
+    if (onChange) {
+      onChange(e);
+    }
+  };
+
   const formItemTable = {
     select: (
-      <select className={baseStyle} name={name}>
+      <select 
+        className={baseStyle} 
+        name={name}
+        onChange={onChange}
+      >
         {items?.map((item) => {
           return (
             <option key={item.value} value={item.value}>
@@ -75,6 +107,9 @@ export default function FormItem({
       className={baseStyle}
       defaultValue={formValue}
       multiple={multiple}
+      onChange={mask ? handleInputChange : onChange}
+      value={mask ? displayValue : undefined}
+      maxLength={maxLength}
     />
   );
 

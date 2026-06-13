@@ -134,11 +134,19 @@ export async function register(form: FormData) {
     });
     const ok = res.ok;
     const data = await res.json();
-    console.log(data);
+    console.log("Register response:", data);
+
+    if (!ok) {
+      console.error("Registration failed:", data);
+      throw new Error(data?.message || "Erro ao registrar. Tente novamente.");
+    }
 
     return ok;
   } catch (e) {
-    console.log(e);
+    console.error("Registration error:", e);
+    throw new Error(
+      e instanceof Error ? e.message : "Erro ao conectar ao servidor. Verifique sua conexão."
+    );
   }
 }
 

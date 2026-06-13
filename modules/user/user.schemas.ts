@@ -1,5 +1,6 @@
 import * as z from "zod";
 import msg from "@/controllers/schemas/validations_messages";
+import { MaskUtils } from "@utils";
 
 /*
 {
@@ -89,7 +90,10 @@ const Register = z.object({
     .min(3, msg.string.min(FIELD.NAME, 3))
     .max(100, msg.string.max(FIELD.NAME, 100)),
 
-  cpf: z.string().length(11, msg.string.fixed(FIELD.CPF, 11)),
+  cpf: z
+    .string()
+    .length(11, msg.string.fixed(FIELD.CPF, 11))
+    .refine(MaskUtils.isValidCPF, "CPF inválido. Verifique os dígitos."),
 
   gender: z.enum(["M", "F", "O"], {
     message: msg.enum.invalid(FIELD.GENDER),
@@ -98,9 +102,12 @@ const Register = z.object({
   phone: z
     .string()
     .min(10, msg.string.min(FIELD.PHONE, 10))
-    .max(15, msg.string.max(FIELD.PHONE, 15)),
+    .max(15, msg.string.max(FIELD.PHONE, 15))
+    .refine(MaskUtils.isValidPhone, "Telefone inválido. Mínimo 10 dígitos."),
 
-  // birthDate: z.date(),
+  birthDate: z
+    .string()
+    .refine(MaskUtils.isAtLeast18, "Você deve ter no mínimo 18 anos para se registrar."),
 
   email: z.email(msg.format.invalid(FIELD.EMAIL)),
 
