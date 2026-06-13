@@ -137,8 +137,14 @@ export async function register(form: FormData) {
   try {
     const res = await UserService.register(form);
     if (res) status.successfull();
+    else status.failed();
   } catch (e) {
-    console.log(e);
+    console.error("Registration error:", e);
+    const errorMessage =
+      e instanceof Error
+        ? e.message
+        : "Erro ao registrar. Tente novamente mais tarde.";
+    status.failed(errorMessage);
   } finally {
     return status.toObject();
   }

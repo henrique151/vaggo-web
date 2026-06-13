@@ -1,3 +1,5 @@
+"use server";
+
 // import { authenticate } from "@/controllers/user.controller";
 import { setToken } from "@/services/browser.service";
 import { UserController } from "@controllers";

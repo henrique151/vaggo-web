@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -16,7 +16,7 @@ import BlurOverlay from "@/component/blur_overlay";
 
 import action from "./register.action";
 import useForm from "@/hooks/useForm";
-import { FormUtils } from "@utils";
+import { FormUtils, MaskUtils } from "@utils";
 import { AuthController, UserController } from "@controllers";
 import { redirect } from "next/navigation";
 import { BrowserService } from "@services";
@@ -32,7 +32,7 @@ function VerificationCodeWindow({
 }) {
   return (
     <>
-      <BlurOverlay show={true} onClick={() => {}} />
+      <BlurOverlay show={true} onClick={() => { }} />
 
       <GenericWindow
         title="Confirmar Cadastro"
@@ -101,8 +101,6 @@ function VerificationCodeWindow({
                   bg-card
                   text-center
                   text-xl
-                  opacity-60
-                  cursor-not-allowed
                 "
                 />
               ))}
@@ -122,7 +120,6 @@ function VerificationCodeWindow({
               py-3
               rounded-xl
               btn-primary
-              opacity-50
             "
             >
               Confirmar Código
@@ -151,13 +148,122 @@ export default function Page() {
   const [state, dispatchAction, pending] = useForm(action);
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const [formData, setFormData] = useState<Record<string, string>>({
+    name: "",
+    cpf: "",
+    gender: "M",
+    birthDate: "",
+    phone: "",
+    email: "",
+    password: "",
+    passConfirm: "",
+  });
 
   const [showVerificationWindow, setShowVerificationWindow] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [avatarFileName, setAvatarFileName] = useState<string>("");
 
   useEffect(() => {
     if (state && state.success) {
     }
   }, [state]);
+
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    const newFormData = { ...formData, [name]: value };
+    setFormData(newFormData);
+  };
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const newErrors: Record<string, string> = {};
+
+    // Validar campos obrigatórios
+    if (!formData.name) newErrors.name = "Nome é obrigatório.";
+    if (!formData.cpf) newErrors.cpf = "CPF é obrigatório.";
+    if (!formData.birthDate) newErrors.birthDate = "Data de nascimento é obrigatória.";
+    if (!formData.phone) newErrors.phone = "Telefone é obrigatório.";
+    if (!formData.email) newErrors.email = "Email é obrigatório.";
+    if (!formData.password) newErrors.password = "Senha é obrigatória.";
+    if (!formData.passConfirm) newErrors.passConfirm = "Confirmação de senha é obrigatória.";
+
+    // Validar CPF
+    const cpfUnmasked = MaskUtils.unmaskCPF(formData.cpf);
+    if (formData.cpf && cpfUnmasked.length !== 11) {
+      newErrors.cpf = "CPF inválido. Deve conter 11 dígitos.";
+    }
+
+    // Validar telefone
+    let phoneUnmasked = MaskUtils.unmaskPhone(formData.phone);
+    if (formData.phone && !MaskUtils.isValidPhone(phoneUnmasked)) {
+      newErrors.phone = "Telefone inválido. Deve ter entre 10 e 15 dígitos.";
+    }
+
+    // Validar email
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Email inválido. Por favor, verifique.";
+    }
+
+    // Validar senhas
+    if (formData.password && formData.password.length < 8) {
+      newErrors.password = "Senha deve ter no mínimo 8 caracteres.";
+    }
+
+    if (formData.passConfirm && formData.password !== formData.passConfirm) {
+      newErrors.passConfirm = "As senhas não conferem.";
+    }
+
+    // Validar idade
+    if (formData.birthDate && !MaskUtils.isAtLeast18(formData.birthDate)) {
+      newErrors.birthDate = "Você deve ter no mínimo 18 anos para criar uma conta.";
+    }
+
+    // Validar foto de perfil
+    const fileInput = e.currentTarget.querySelector(
+      'input[type="file"][name="avatarUrl"]',
+    ) as HTMLInputElement;
+
+    if (!fileInput?.files?.[0]) {
+      newErrors.avatarUrl = "Foto de perfil é obrigatória.";
+    }
+
+
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+
+    if (!phoneUnmasked.startsWith("55")) {
+      phoneUnmasked = "55" + phoneUnmasked;
+    }
+
+    // Tudo validado, criar FormData e enviar
+    const form = new FormData();
+    form.set("name", formData.name);
+    form.set("cpf", cpfUnmasked);
+    form.set("gender", formData.gender);
+    form.set("birthDate", formData.birthDate);
+    form.set("phone", phoneUnmasked);
+    form.set("email", formData.email);
+    form.set("password", formData.password);
+    form.set("passConfirm", formData.passConfirm);
+    if (fileInput?.files?.[0]) {
+      form.set("avatarUrl", fileInput.files[0]);
+    }
+
+    // Enviar dados
+    setEmail(formData.email);
+    setPass(formData.password);
+    setShowVerificationWindow(true);
+    startTransition(() => {
+      dispatchAction(form);
+    });
+  };
 
   return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -206,23 +312,18 @@ export default function Page() {
 
         <div className="h-6" />
 
-        <FormContainer
-          action={(form: FormData) => {
-            setEmail(String(form.get("email")));
-            // if (state.success) {
-
-            setShowVerificationWindow(true);
-            // }
-            dispatchAction(form);
-          }}
-        >
+        <FormContainer onSubmit={handleFormSubmit}>
           <FormItem
             type="text"
             label="Nome Completo"
             name="name"
             placeholder="João da Silva"
             controller={state}
-            // required
+            value={formData.name}
+            onChange={handleFormChange}
+            error={!!errors.name}
+            errorMessage={errors.name}
+          // required
           />
 
           <div className="h-3" />
@@ -233,17 +334,30 @@ export default function Page() {
               label="CPF"
               name="cpf"
               placeholder="000.000.000-00"
+              mask={MaskUtils.maskCPF}
+              maxLength={15}
               controller={state}
-              // required
+              value={formData.cpf}
+              onChange={handleFormChange}
+              error={!!errors.cpf}
+              errorMessage={errors.cpf}
+            // required
             />
 
             <div className="flex flex-col gap-2">
               <label className="text-muted text-sm">Gênero</label>
 
-              <select name="gender" defaultValue="M" className="app-input">
+              <select
+                name="gender"
+                value={formData.gender}
+                className="app-input"
+                onChange={handleFormChange}
+              >
                 <option value="M">Masculino</option>
 
                 <option value="F">Feminino</option>
+
+                <option value="O">Outro</option>
               </select>
             </div>
           </div>
@@ -256,7 +370,11 @@ export default function Page() {
               label="Nascimento"
               name="birthDate"
               controller={state}
-              // required
+              value={formData.birthDate}
+              onChange={handleFormChange}
+              error={!!errors.birthDate}
+              errorMessage={errors.birthDate}
+            // required
             />
 
             <FormItem
@@ -264,8 +382,14 @@ export default function Page() {
               label="Telefone"
               name="phone"
               placeholder="(11) 99999-9999"
+              mask={MaskUtils.maskPhone}
+              maxLength={15}
               controller={state}
-              // required
+              value={formData.phone}
+              onChange={handleFormChange}
+              error={!!errors.phone}
+              errorMessage={errors.phone}
+            // required
             />
           </div>
 
@@ -276,8 +400,13 @@ export default function Page() {
             label="Email"
             name="email"
             placeholder="seu@email.com"
+            mask={MaskUtils.maskEmail}
             controller={state}
-            // required
+            value={formData.email}
+            onChange={handleFormChange}
+            error={!!errors.email}
+            errorMessage={errors.email}
+          // required
           />
 
           <div className="h-3" />
@@ -289,7 +418,11 @@ export default function Page() {
               name="password"
               placeholder="••••••••"
               controller={state}
-              // required
+              value={formData.password}
+              onChange={handleFormChange}
+              error={!!errors.password}
+              errorMessage={errors.password}
+            // required
             />
 
             <FormItem
@@ -298,7 +431,11 @@ export default function Page() {
               name="passConfirm"
               placeholder="••••••••"
               controller={state}
-              // required
+              value={formData.passConfirm}
+              onChange={handleFormChange}
+              error={!!errors.passConfirm}
+              errorMessage={errors.passConfirm}
+            // required
             />
           </div>
 
@@ -307,7 +444,24 @@ export default function Page() {
           <div className="flex flex-col gap-2">
             <label className="text-muted text-sm">Foto de Perfil</label>
 
-            <input type="file" name="avatarUrl" className="app-input" />
+            <input
+              type="file"
+              name="avatarUrl"
+              className="app-input"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setAvatarFileName(e.target.files[0].name);
+                } else {
+                  setAvatarFileName("");
+                }
+              }}
+            />
+            {avatarFileName && (
+              <span className="text-sm text-primary">Imagem selecionada: {avatarFileName}</span>
+            )}
+            {errors.avatarUrl && (
+              <p className="text-xs text-rose-500">{errors.avatarUrl}</p>
+            )}
           </div>
 
           <p className="text-rose-400">{state?.error?.message}</p>
@@ -315,7 +469,6 @@ export default function Page() {
           <button
             type="submit"
             disabled={pending}
-            // onClick={() => setShowVerificationWindow(true)}
             className="
               mt-8
               py-3
