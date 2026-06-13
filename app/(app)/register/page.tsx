@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -154,6 +154,11 @@ export default function Page() {
 
   const [showVerificationWindow, setShowVerificationWindow] = useState(false);
 
+  useEffect(() => {
+    if (state && state.success) {
+    }
+  }, [state]);
+
   return (
     <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background */}
@@ -204,7 +209,10 @@ export default function Page() {
         <FormContainer
           action={(form: FormData) => {
             setEmail(String(form.get("email")));
+            // if (state.success) {
+
             setShowVerificationWindow(true);
+            // }
             dispatchAction(form);
           }}
         >
@@ -214,7 +222,7 @@ export default function Page() {
             name="name"
             placeholder="João da Silva"
             controller={state}
-            required
+            // required
           />
 
           <div className="h-3" />
@@ -226,7 +234,7 @@ export default function Page() {
               name="cpf"
               placeholder="000.000.000-00"
               controller={state}
-              required
+              // required
             />
 
             <div className="flex flex-col gap-2">
@@ -248,7 +256,7 @@ export default function Page() {
               label="Nascimento"
               name="birthDate"
               controller={state}
-              required
+              // required
             />
 
             <FormItem
@@ -257,7 +265,7 @@ export default function Page() {
               name="phone"
               placeholder="(11) 99999-9999"
               controller={state}
-              required
+              // required
             />
           </div>
 
@@ -269,7 +277,7 @@ export default function Page() {
             name="email"
             placeholder="seu@email.com"
             controller={state}
-            required
+            // required
           />
 
           <div className="h-3" />
@@ -281,7 +289,7 @@ export default function Page() {
               name="password"
               placeholder="••••••••"
               controller={state}
-              required
+              // required
             />
 
             <FormItem
@@ -290,7 +298,7 @@ export default function Page() {
               name="passConfirm"
               placeholder="••••••••"
               controller={state}
-              required
+              // required
             />
           </div>
 

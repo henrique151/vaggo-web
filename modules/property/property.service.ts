@@ -261,3 +261,14 @@ export async function editSpot(
     console.log(e);
   }
 }
+
+export async function getAll(token: AccessTokenClassInterface) {
+  const data: any = await APIService.genericGetRequest(
+    token,
+    "admin/properties",
+    map,
+  );
+  // console.log("data");
+  // console.log(data);
+  return data;
+}

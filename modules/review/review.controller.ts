@@ -60,3 +60,8 @@ export async function deleteById(token: AccessTokenClassInterface, id: number) {
     return status.toObject();
   }
 }
+
+export async function getAll(token: AccessTokenClassInterface) {
+  const res = await ReviewService.getAll(token);
+  return res;
+}

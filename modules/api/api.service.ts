@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AccessToken } from "../browser/browser.class";
 
 import { AccessTokenClassInterface } from "@interfaces";
+import { FormUtils } from "@utils";
 
 const API_ADDRESS = process.env.API_ADDRESS ?? "http://localhost:3000";
 
@@ -109,7 +110,7 @@ export async function request(
   console.log(res);
   console.groupEnd();
 
-  // console.log();
+  console.log();
 
   // console.group();
   // console.log(`- Response from API: `);
@@ -162,10 +163,99 @@ export async function request(
 }
 
 export async function genericEditRequest(
+  token: AccessTokenClassInterface,
   endpoint: string,
   id: number,
   form: FormData,
-) {}
+  bodyFormat: "json" | "form",
+  returnResponse?: boolean,
+  overrideMethod?: string,
+) {
+  const url = `${endpoint}${id !== -1 ? `/${id}` : ""}`;
+  let body: string | FormData;
+  const headers: HeadersInit = {};
+
+  switch (bodyFormat) {
+    case "json":
+      body = JSON.stringify(FormUtils.toObject(form));
+      headers["Content-Type"] = "application/json";
+      break;
+    case "form":
+      body = form;
+      break;
+  }
+
+  try {
+    const res = await request(url, token, {
+      method: overrideMethod ?? "PUT",
+      body: body,
+      headers: headers,
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log(data);
+
+      if (returnResponse) return data;
+      return true;
+    } else {
+      const data = await res.json();
+      console.log(data);
+
+      if (returnResponse) return data;
+      return false;
+    }
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+}
+
+export async function genericPatchRequest(
+  token: AccessTokenClassInterface,
+  endpoint: string,
+  id?: number,
+  form?: FormData,
+  bodyFormat?: "json" | "form",
+  returnResponse?: boolean,
+) {
+  const url = `${endpoint}${id != -1 ? `/${id}` : ""}`;
+  const headers: HeadersInit = {};
+  let body = undefined;
+
+  const req: RequestInit = {
+    method: "PATCH",
+    headers: headers,
+  };
+
+  switch (bodyFormat) {
+    case "json":
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify(FormUtils.toObject(form));
+      req["body"] = body;
+      break;
+    case "form":
+      body = form;
+      req["body"] = body;
+      break;
+  }
+  try {
+    const res = await request(url, token, req);
+    if (res.ok) {
+      const data = await res.json();
+      console.log(data);
+      if (returnResponse) return data;
+      return true;
+    } else {
+      const data = await res.json();
+      console.log(data);
+      if (returnResponse) return data;
+      return false;
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 export async function genericDeleteRequest(
   token: AccessTokenClassInterface,
@@ -194,13 +284,136 @@ export async function genericDeleteRequest(
     method: "DELETE",
   });
 
-  console.log(res);
+  // console.log(res);
 
   if (res.ok) {
     if (returnResponse) return await res.json();
     return true;
   } else {
     if (returnResponse) return await res.json();
+    return false;
+  }
+}
+
+export async function genericGetRequest(endpoint: string): Promise<any>;
+export async function genericGetRequest(
+  token: AccessTokenClassInterface,
+  endpoint: string,
+): Promise<any>;
+export async function genericGetRequest(
+  token: AccessTokenClassInterface,
+  endpoint: string,
+  mapper?: (value: any, index?: number, array?: any[]) => unknown,
+): Promise<any>;
+export async function genericGetRequest(
+  token: AccessTokenClassInterface,
+  endpoint: string,
+  id: number,
+): Promise<any>;
+export async function genericGetRequest(
+  token: AccessTokenClassInterface,
+  endpoint: string,
+  id: number,
+  mapper: CallableFunction,
+): Promise<any>;
+export async function genericGetRequest(
+  tokenOrEndpoint: string | AccessTokenClassInterface,
+  endpointParam?: string,
+  idOrMapper?:
+    | number
+    | ((value: any, index?: number, array?: any[]) => unknown),
+  mapperParam?: (value: any, index?: number, array?: any[]) => unknown,
+): Promise<any> {
+  let endpoint =
+    typeof tokenOrEndpoint === "string" ? tokenOrEndpoint : endpointParam;
+  const token =
+    typeof tokenOrEndpoint !== "string" ? tokenOrEndpoint : undefined;
+  const id = typeof idOrMapper === "number" ? idOrMapper : undefined;
+  const mapper = typeof idOrMapper !== "number" ? idOrMapper : undefined;
+
+  const reqModel: RequestInit = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  if (id) endpoint = endpoint.concat(`/${id}`);
+
+  try {
+    const res = token
+      ? await request(endpoint, token, reqModel)
+      : await request(endpoint, reqModel);
+
+    if (res.ok) {
+      const resData = await res.json();
+      console.log(`[genericGetRequest] data from URL ${endpoint}:`);
+      console.log(resData);
+      if (mapper) {
+        if (resData.data) {
+          if (Array.isArray(resData.data)) {
+            return resData.data.map(mapper);
+          } else {
+            return mapper(resData.data);
+          }
+        }
+      }
+      // else return resData.data ? resData.data : resData;
+    } else {
+      const data = await res.json();
+      console.log(`[genericGetRequest] not succefull from URL ${endpoint}:`);
+      console.log(data);
+      // console.log(data);
+      return data;
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function genericRegisterRequest(
+  token: AccessTokenClassInterface,
+  endpoint: string,
+  form: FormData,
+  bodyFormat: "json" | "form",
+  returnResponse?: boolean,
+) {
+  // const url = `${endpoint}/${id}`;
+  let body: string | FormData;
+  const headers: HeadersInit = {};
+
+  switch (bodyFormat) {
+    case "json":
+      body = JSON.stringify(FormUtils.toObject(form));
+      headers["Content-Type"] = "application/json";
+      break;
+    case "form":
+      body = form;
+      break;
+  }
+
+  try {
+    const res = await request(endpoint, token, {
+      method: "POST",
+      body: body,
+      headers: headers,
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log(data);
+
+      if (returnResponse) return data;
+      return true;
+    } else {
+      const data = await res.json();
+      console.log(data);
+
+      if (returnResponse) return data;
+      return false;
+    }
+  } catch (e) {
+    console.log(e);
     return false;
   }
 }

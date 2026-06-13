@@ -74,3 +74,12 @@ export async function changeApprovalStatus(
   });
   return res.ok;
 }
+
+export async function getAll(token: AccessTokenClassInterface) {
+  const res = await APIService.genericGetRequest(
+    token,
+    "admin/reservations",
+    map,
+  );
+  return res;
+}

@@ -17,7 +17,9 @@ export async function register(
 
 export async function get(
   token: AccessTokenClassInterface,
+  all?: boolean,
 ): Promise<ReportClassInterface[]> {
+  if (all) return await ReportService.getAll(token);
   const res = await ReportService.get(token);
 
   return res;

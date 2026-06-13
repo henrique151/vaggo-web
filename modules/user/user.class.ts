@@ -16,7 +16,9 @@ export class User implements UserClassInterface {
   person: UserClassInterface["person"];
 
   constructor(i: UserStructureInterface) {
-    this.id = i.id;
+    if (!i) i = {};
+    // console.log(i);
+    this.id = i.id ?? 0;
     this.email = i.email;
     this.avatar = i.avatar as ImageClassInterface;
     this.lastTime = {

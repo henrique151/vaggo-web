@@ -4,9 +4,15 @@ import { AccessTokenClassInterface, VehicleClassInterface } from "@interfaces";
 import * as VehicleService from "@/modules/vehicle/vehicle.service";
 import { Vehicle } from "@classes";
 import { ControllerStatus } from "@classes";
+import { FormUtils } from "@utils";
+import schema from "./vehicle.schemas";
 
 export async function get(
   token: AccessTokenClassInterface,
+): Promise<VehicleClassInterface[]>;
+export async function get(
+  token: AccessTokenClassInterface,
+  asAdmin: boolean,
 ): Promise<VehicleClassInterface[]>;
 export async function get(
   token: AccessTokenClassInterface,
@@ -14,11 +20,32 @@ export async function get(
 ): Promise<VehicleClassInterface>;
 export async function get(
   token: AccessTokenClassInterface,
-  id?: number,
+  id: number,
+  asAdmin?: boolean,
+): Promise<VehicleClassInterface>;
+export async function get(
+  token: AccessTokenClassInterface,
+  idOrAll?: boolean | number,
+  asAdmin?: boolean,
 ): Promise<VehicleClassInterface | VehicleClassInterface[]> {
-  const res: VehicleClassInterface = await VehicleService.get(token, id);
+  const id = typeof idOrAll === "number" ? idOrAll : undefined;
+  const all = (asAdmin ?? typeof idOrAll === "boolean") ? idOrAll : false;
+  // console.log(id);
+  console.log("all");
+  console.log(all);
 
-  return res;
+  if (all) {
+    const data = await VehicleService.getAll(token);
+    console.log(data);
+    return data;
+  } else {
+    const data = await VehicleService.get(token, id);
+    console.log(data);
+
+    return data;
+  }
+
+  // return res;
 }
 
 export async function edit(
@@ -64,8 +91,12 @@ export async function register(
 ) {
   const status = ControllerStatus.setup(form);
 
+  const res = schema.REGISTER_FORM.safeParse(FormUtils.toObject(form));
   // validate all data
-  //
+  if (!res.success) {
+    status.failed();
+    return status.toObject();
+  }
   // auth.register(UserObject)
   try {
     const res = await VehicleService.register(token, form);

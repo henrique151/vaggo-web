@@ -5,7 +5,7 @@
 import InvalidCredentialsError from "@/classes/errors/api/InvalidCredentialsError";
 import * as auth from "@/services/auth.service";
 import * as z from "zod";
-import UserSchema from "../../controllers/schemas/user.schemas";
+import UserSchema from "./user.schemas";
 
 import { ControllerStatus } from "@classes";
 // import {
@@ -22,6 +22,7 @@ import {
   UserClassInterface,
 } from "@interfaces";
 import { FormUtils } from "@utils";
+import { APIService } from "@services";
 // import * as APIService from "@/modules/api/api.service";
 // general?
 //  -> function receives raw input from form (FormData only?)
@@ -80,13 +81,14 @@ export async function authenticate(
 
   if (!res.success) {
     // IDEA wrap into function where class itself maps all Zod-related errors and execute it's own methods
-    for (const issue of res.error.issues) {
-      const current = issue.path[0] as string;
-      status.setFieldError(current, issue.message);
-      // if (current in status.fields) {
-      //   status.fields[current].setError(issue.message);
-      // }
-    }
+    FormUtils.mapZodErrors(status, res);
+    // for (const issue of res.error.issues) {
+    //   const current = issue.path[0] as string;
+    //   status.setFieldError(current, issue.message);
+    //   // if (current in status.fields) {
+    //   //   status.fields[current].setError(issue.message);
+    //   // }
+    // }
     // if zod returns ValidationError, map all zod.error.issues to return::{errors:{}}
     // EXPERIMENT turn sucess state functions to return itself as plainObject if those lines below repeats in other files
     status.failed();
@@ -123,6 +125,12 @@ export async function authenticate(
 export async function register(form: FormData) {
   const status = ControllerStatus.setup(form);
 
+  const res = UserSchema.REGISTER_FORM.safeParse(FormUtils.toObject(form));
+  if (!res.success) {
+    FormUtils.mapZodErrors(status, res);
+    status.failed();
+    return status.toObject();
+  }
   // validate all data
   //
   // auth.register(UserObject)
@@ -147,12 +155,29 @@ export async function edit(
 ): Promise<ControllerStatusStructureInterface>;
 export async function edit(
   token: AccessTokenClassInterface,
+  id: number,
+  form: FormData,
+  asAdmin: boolean,
+): Promise<ControllerStatusStructureInterface>;
+export async function edit(
+  token: AccessTokenClassInterface,
+  form: FormData,
+  asAdmin: boolean,
+): Promise<ControllerStatusStructureInterface>;
+export async function edit(
+  token: AccessTokenClassInterface,
   idOrForm: FormData | number,
-  formData?: FormData,
+  formDataOrOption?: FormData | boolean,
+  asAdmin?: boolean,
 ): Promise<ControllerStatusStructureInterface> {
-  const form = idOrForm instanceof FormData ? idOrForm : formData;
+  const form =
+    idOrForm instanceof FormData ? idOrForm : (formDataOrOption as FormData);
   const id = typeof idOrForm === "number" ? idOrForm : Number(form.get("id"));
   const status = ControllerStatus.setup(form);
+  const adminOption =
+    (asAdmin ?? typeof formDataOrOption === "boolean")
+      ? (formDataOrOption as boolean)
+      : false;
 
   if (idOrForm instanceof FormData) form.delete("id");
   // validate data
@@ -162,9 +187,17 @@ export async function edit(
   console.log(form);
   console.log(FormUtils.toObject(form));
 
+  FormUtils.validateForm(status, UserSchema.EDIT_FORM, form);
+  console.log(status);
+  if (!status.success) {
+    return status.toObject();
+  }
   //send to service and await response
   try {
-    const res = await UserService.edit(token, id, form);
+    // console.log("asAdmin");
+    // console.log(adminOption);
+    const res = await UserService.edit(token, id, form, adminOption);
+    // const res = adminOption ? await UserService.edit(token, form, adminOption) : await UserService.edit(token, id, form, adminOption);
     console.log(res);
     // const data = await res.json();
     console.log("hello!");
@@ -183,6 +216,7 @@ export async function edit(
 /**
  * Gets user's information by giving it's ID, or it's own information by providing it's token.
  * @param token User's Token.
+ * @param all? Returns all users
  * @param id User's ID
  * @returns User Object
  */
@@ -191,23 +225,37 @@ export async function get(
 ): Promise<UserClassInterface>;
 export async function get(
   token: AccessTokenClassInterface,
+  all: boolean,
+): Promise<UserClassInterface[]>;
+export async function get(
+  token: AccessTokenClassInterface,
   id: number,
 ): Promise<UserClassInterface>;
 export async function get(
   token: AccessTokenClassInterface,
-  id?: number,
-): Promise<UserClassInterface> {
+  OneOrAll?: boolean | number,
+): Promise<UserClassInterface | UserClassInterface[]> {
+  const id = typeof OneOrAll === "number" ? OneOrAll : undefined;
+  const all = typeof OneOrAll === "boolean" ? OneOrAll : undefined;
+
   // const tokenObj = new AccessToken(token);
-  const res = await UserService.get(token, id);
+  // console.log(all);
+  const res = all
+    ? await UserService.getAll(token)
+    : await UserService.get(token, id);
 
   return res;
 }
 
-export async function deleteById(token: AccessTokenClassInterface, id: number) {
+export async function deleteById(
+  token: AccessTokenClassInterface,
+  id: number,
+  asAdmin?: boolean,
+) {
   const status = ControllerStatus.setup();
 
   try {
-    const res = await UserService.deleteById(token, id);
+    const res = await UserService.deleteById(token, id, asAdmin);
     if (res) status.successfull();
     else status.failed();
     return status.toObject();
@@ -217,4 +265,10 @@ export async function deleteById(token: AccessTokenClassInterface, id: number) {
     status.failed();
     return status.toObject();
   }
+}
+
+export async function countBlocked(
+  token: AccessTokenClassInterface,
+): Promise<number> {
+  return await UserService.countBlocked(token);
 }

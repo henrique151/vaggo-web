@@ -6,22 +6,11 @@ import { redirect } from "next/navigation";
 // import { redirect } from "next/navigation";
 
 export default async function action(prevState, form: FormData) {
-  // const cred = {
-  //   email: form.get("email") as string,
-  //   pass: form.get("password") as string,
-  // };
+  // if (String(form.get("password")) !== String(form.get("passwordConfirm")))
+  // return {};
   // const cred = Object.fromEntries(form) as { email: string; password: string };
   if (form.get("passConfirm")) form.delete("passConfirm");
-  // console.log(prevState);
-  // console.log("Object converted");
-  // console.log(values);
-  // const timeConsumingPromise = new Promise((resolve) => {
-  //   setTimeout(() => {
-  //     resolve("Time-consuming task completed!");
-  //   }, 2000); // 2 seconds delay
-  // });
 
-  // await timeConsumingPromise;
   console.log(FormUtils.toObject(form));
 
   const res = await UserController.register(form);

@@ -19,7 +19,7 @@ export default function Page() {
 
     // delete values.passConfirm;
 
-    fetch("http://localhost:3000/properties", {
+    fetch(`http://localhost:3000/properties`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

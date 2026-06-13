@@ -52,7 +52,7 @@ const Page = () => {
             type: "text",
             placeholder: "Seu nome completo",
             defaultValue: user?.person.name,
-            required: true,
+            // required: true,
           },
           {
             label: "Email",
@@ -60,7 +60,7 @@ const Page = () => {
             type: "email",
             placeholder: "email@email.com",
             defaultValue: user?.email,
-            required: true,
+            // required: true,
           },
           {
             label: "Telefone",

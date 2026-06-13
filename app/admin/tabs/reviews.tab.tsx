@@ -2,6 +2,9 @@ import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
 import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
+import { usePageContext } from "../_context/page.context";
+import { Review } from "@classes";
+import { APIService, BrowserService } from "@services";
 
 // TODO: substituir pelo tipo real de Review e pelo hook de dados
 type AdminReview = {
@@ -15,8 +18,9 @@ type AdminReview = {
 };
 
 const Page = () => {
-  // TODO: const { reviews } = useAdminContext();
-  const reviews: AdminReview[] = []; // placeholder
+  const { reviews, refreshReviews } = usePageContext();
+  console.log(reviews);
+  // const reviews: AdminReview[] = []; // placeholder
 
   return (
     <TabPage label="Avaliações">
@@ -26,43 +30,64 @@ const Page = () => {
 
       <div className="space-y-4">
         {reviews.length > 0 ? (
-          reviews.map((review) => (
+          reviews?.map((review: Review) => (
             <EntityFrame
               key={review.id}
-              editTitle={`Editar Avaliação #${review.id.toString().padStart(2, "0")}`}
-              editFields={[
-                {
-                  label: "Nota", name: "rating", type: "select",
-                  defaultValue: String(review.rating),
-                  items: [
-                    { value: "1", label: "1 — Péssimo" },
-                    { value: "2", label: "2 — Ruim" },
-                    { value: "3", label: "3 — Regular" },
-                    { value: "4", label: "4 — Bom" },
-                    { value: "5", label: "5 — Excelente" },
-                  ],
-                  required: true,
-                },
-                { label: "Comentário", name: "comment", type: "text", placeholder: "Comentário da avaliação", defaultValue: review.comment },
-              ]}
-              onEdit={(formData) => {
-                // TODO: wire to update review action
-                console.log("edit review", review.id, Object.fromEntries(formData));
-              }}
+              // editTitle={`Editar Avaliação #${review.id.toString().padStart(2, "0")}`}
+              // editFields={[
+              //   {
+              //     label: "Nota",
+              //     name: "rating",
+              //     type: "select",
+              //     defaultValue: String(review.info.rating),
+              //     items: [
+              //       { value: "1", label: "1 — Péssimo" },
+              //       { value: "2", label: "2 — Ruim" },
+              //       { value: "3", label: "3 — Regular" },
+              //       { value: "4", label: "4 — Bom" },
+              //       { value: "5", label: "5 — Excelente" },
+              //     ],
+              //     required: true,
+              //   },
+              //   {
+              //     label: "Comentário",
+              //     name: "comment",
+              //     type: "text",
+              //     placeholder: "Comentário da avaliação",
+              //     defaultValue: review.info.comment,
+              //   },
+              // ]}
+              // onEdit={(formData) => {
+              //   // TODO: wire to update review action
+              //   console.log(
+              //     "edit review",
+              //     review.id,
+              //     Object.fromEntries(formData),
+              //   );
+              // }}
               deleteTitle="Excluir avaliação"
-              deleteDescription={`Deseja excluir a avaliação de ${review.authorName} sobre ${review.targetName}?`}
-              onDelete={() => {
+              deleteDescription={`Deseja excluir a avaliação de ${review?.info?.author?.email} sobre ${review.spot.info.identifier}?`}
+              onDelete={async () => {
+                const res = await APIService.genericDeleteRequest(
+                  BrowserService.getToken(),
+                  "admin/reviews",
+                  review.id,
+                );
+
+                if (res) {
+                  refreshReviews();
+                }
                 // TODO: wire to delete review action
                 console.log("delete review", review.id);
               }}
             >
               <DefaultEntityFrame
-                title={`${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)} — ${review.authorName}`}
-                description={review.comment || "Sem comentário"}
+                title={`${"★".repeat(review.info.rating)}${"☆".repeat(5 - review.info.rating)} — ${review?.info?.author?.email}`}
+                description={review.info.comment || "Sem comentário"}
                 tagList={[
-                  `Alvo: ${review.targetName}`,
-                  `Tipo: ${{ SPOT: "Vaga", USER: "Usuário" }[review.targetType]}`,
-                  `Data: ${review.createdAt.toLocaleDateString("pt-BR")}`,
+                  `Alvo: ${review.spot?.info?.identifier ?? ""}`,
+                  `Tipo: ${{ SPOT: "Vaga", USER: "Usuário" }[review.spot ? "SPOT" : "USER"]}`,
+                  `Data: ${review.date.review.toLocaleDateString("pt-BR")}`,
                 ]}
               />
             </EntityFrame>

@@ -143,6 +143,6 @@ const Page = () => {
   );
 };
 
-const UsersTab = new Tab({ default: "Usuários", page: "Usuários" }, Page);
+const SpotsTab = new Tab({ default: "Vagas", page: "Vagas" }, Page);
 
-export default UsersTab;
+export default SpotsTab;

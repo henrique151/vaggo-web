@@ -3,6 +3,7 @@
 import FormContainer from "@/component/container/FormContainer";
 import InfoLayout from "@/component/layout/InfoLayout";
 import FormItem from "@/component/ui/form/FormItem";
+import useForm from "@/hooks/useForm";
 import { VehicleController } from "@controllers";
 import { ControllerStatusStructureInterface } from "@interfaces";
 import { BrowserService } from "@services";
@@ -10,6 +11,20 @@ import { FormUtils } from "@utils";
 import { redirect } from "next/navigation";
 
 export default function Page() {
+  const [state, dispatchAction, pending] = useForm(action);
+
+  async function action(form: FormData) {
+    console.log(FormUtils.toObject(form));
+    const res: ControllerStatusStructureInterface =
+      await VehicleController.register(BrowserService.getToken(), form);
+    if (res.success) {
+      redirect(`/user/account`);
+    } else {
+      return res;
+    }
+    return res;
+  }
+
   return (
     <main>
       <InfoLayout
@@ -18,23 +33,14 @@ export default function Page() {
           "Insira as informações de seu veículo para usar com a plataforma"
         }
       >
-        <FormContainer
-          action={async (form: FormData) => {
-            console.log(FormUtils.toObject(form));
-            const res: ControllerStatusStructureInterface =
-              await VehicleController.register(BrowserService.getToken(), form);
-            if (res.success) {
-              redirect(`/user/account`);
-            }
-          }}
-        >
+        <FormContainer action={dispatchAction}>
           <FormItem
             label={"Marca"}
             name={"brand"}
             type="text"
             className="mb-5"
             placeholder="CarroX"
-            required
+            // required
           />
 
           <FormItem
@@ -42,7 +48,7 @@ export default function Page() {
             label={"Modelo"}
             name={"model"}
             className="mb-5"
-            required
+            // required
           />
 
           <FormItem
@@ -50,7 +56,7 @@ export default function Page() {
             label={"Cor"}
             name={"color"}
             className="mb-5"
-            required
+            // required
           />
 
           <FormItem
@@ -58,7 +64,7 @@ export default function Page() {
             name={"licensePlate"}
             type="text"
             className="mb-5"
-            required
+            // required
           />
 
           <FormItem
@@ -67,7 +73,7 @@ export default function Page() {
             name="manufactureYear"
             className="mb-5"
             placeholder="2000"
-            required
+            // required
           />
 
           <FormItem
@@ -79,7 +85,7 @@ export default function Page() {
               { value: "CARRO", label: "Carro" },
               { value: "MOTO", label: "Moto" },
             ]}
-            required
+            // required
           />
 
           <FormItem
@@ -92,7 +98,8 @@ export default function Page() {
               { value: "MEDIO", label: "Médio" },
               { value: "GRANDE", label: "Grande" },
             ]}
-            required
+            // required]
+            controller={state}
           />
 
           <button

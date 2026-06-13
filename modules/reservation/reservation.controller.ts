@@ -4,6 +4,11 @@ import {
 } from "@interfaces";
 import * as ReservationService from "@/modules/reservation/reservation.service";
 
+export async function getAll(token: AccessTokenClassInterface) {
+  const res = await ReservationService.getAll(token);
+  return res;
+}
+
 export async function register(
   token: AccessTokenClassInterface,
   form: FormData,

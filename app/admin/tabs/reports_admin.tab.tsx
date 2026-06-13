@@ -2,6 +2,9 @@ import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
 import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
+import { usePageContext } from "../_context/page.context";
+import { ReportData } from "@classes";
+import { APIService, BrowserService } from "@services";
 
 // TODO: substituir pelo tipo real de Report e pelo hook de dados
 type AdminReport = {
@@ -21,8 +24,9 @@ const statusLabel = {
 } as const;
 
 const Page = () => {
-  // TODO: const { reports } = useAdminContext();
-  const reports: AdminReport[] = []; // placeholder
+  const { reports, refreshReports } = usePageContext();
+  console.log(reports);
+  // const reports: AdminReport[] = []; // placeholder
 
   return (
     <TabPage label="Denúncias">
@@ -31,52 +35,84 @@ const Page = () => {
       </div>
 
       <div className="space-y-4">
-        {reports.length > 0 ? (
-          reports.map((report) => (
+        {reports?.length > 0 ? (
+          reports.map((report: ReportData) => (
             <EntityFrame
               key={report.id}
-              editTitle={`Denúncia #${report.id.toString().padStart(2, "0")}`}
+              editTitle={`Alterar Status de Denúncia #${report.id.toString().padStart(2, "0")}`}
               editFields={[
-                { label: "Motivo", name: "reason", type: "text", placeholder: "Descreva o motivo", defaultValue: report.reason, required: true },
                 {
-                  label: "Decisão", name: "status", type: "select",
-                  defaultValue: report.status,
+                  label: "Status",
+                  name: "status",
+                  type: "select",
                   items: [
-                    { value: "PENDENTE", label: "Pendente" },
-                    { value: "APROVADA", label: "Aprovar" },
-                    { value: "RECUSADA", label: "Recusar" },
+                    { label: "Pendente", value: "PENDENTE" },
+                    { label: "Em Análise", value: "EM ANALISE" },
+                    { label: "Resolvida", value: "RESOLVIDA" },
+                    { label: "Recusada", value: "RECUSADA" },
+                    { label: "Reanálise", value: "REANALISE" },
                   ],
+                  placeholder: "Pendente",
+                  defaultValue: report.info.status,
+                  required: true,
                 },
                 {
-                  label: "Tipo do alvo", name: "targetType", type: "select",
-                  defaultValue: report.targetType,
+                  label: "Nota",
+                  name: "adminNote",
+                  type: "text",
+                  defaultValue: report.info.adminNote,
+                },
+                {
+                  label: "Suspender Vaga?",
+                  name: "suspendSpot",
+                  type: "select",
+                  defaultValue: "false",
                   items: [
-                    { value: "SPOT", label: "Vaga" },
-                    { value: "CHAT", label: "Conversa" },
+                    { value: "true", label: "Sim" },
+                    { value: "false", label: "Não" },
                   ],
                 },
               ]}
-              onReanalise={() => {}}
-              onEdit={(formData) => {
+              // onReanalise={() => {}}
+              onEdit={async (formData) => {
                 // TODO: wire to update report action (approve/reject)
-                console.log("edit report", report.id, Object.fromEntries(formData));
+                const res = await APIService.genericEditRequest(
+                  BrowserService.getToken(),
+                  `admin/reports/${report.id}/status`,
+                  -1,
+                  formData,
+                  "json",
+                  false,
+                  "PATCH",
+                );
+
+                if (res) {
+                  refreshReports();
+                }
+                console.log(
+                  "edit report",
+                  report.id,
+                  Object.fromEntries(formData),
+                );
               }}
-              deleteTitle="Excluir denúncia"
-              deleteDescription={`Deseja excluir a denúncia #${report.id.toString().padStart(2, "0")}?`}
-              onDelete={() => {
-                // TODO: wire to delete report action
-                console.log("delete report", report.id);
-              }}
+              // deleteTitle="Excluir denúncia"
+              // deleteDescription={`Deseja excluir a denúncia #${report.id.toString().padStart(2, "0")}?`}
+              // onDelete={() => {
+              //   // TODO: wire to delete report action
+              //   console.log("delete report", report.id);
+              // }}
             >
               <DefaultEntityFrame
                 title={`Denúncia #${report.id.toString().padStart(2, "0")}`}
-                description={`Motivo: ${report.reason}`}
+                description={`Motivo: ${report.info.reason}`}
                 tagList={[
-                  `Status: ${statusLabel[report.status]}`,
-                  `Tipo: ${{ SPOT: "Vaga", CHAT: "Conversa" }[report.targetType]}`,
-                  `Denunciante: ${report.reporterName}`,
-                  `Alvo: ${report.targetName}`,
-                  `Data: ${report.createdAt.toLocaleDateString("pt-BR")}`,
+                  `Status: ${statusLabel[report.info.status]}`,
+                  `Tipo: ${{ SPOT: "Vaga", CHAT: "Conversa" }[report.target.type]}`,
+                  // `Denunciante: ${report?.reporter?.person?.name}`,
+                  // `Alvo: ${report.reported.person.name}`,
+                  `Data: ${report.date.created.toLocaleDateString("pt-BR")}`,
+                  `Nota: ${report.info.adminNote ?? "[Não Criada]"}`,
+                  // `Nota: ${report}`,
                 ]}
               />
             </EntityFrame>

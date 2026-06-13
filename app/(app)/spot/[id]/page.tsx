@@ -345,17 +345,19 @@ export default function Page({ params }: any) {
 
                       <input
                         type="date"
-                        disabled
-                        className="
+                        name="startDate"
+                        onChange={(e) => {
+                          console.log(e.currentTarget.value);
+                          setSelectedStartDate(e.currentTarget.value);
+                        }}
+                        className={`
                       w-full
                       rounded-xl
                       border border-soft
                       bg-card
                       px-3
                       py-2
-                      opacity-60
-                      cursor-not-allowed
-                    "
+                    `}
                       />
                     </div>
 
@@ -366,7 +368,9 @@ export default function Page({ params }: any) {
 
                       <input
                         type="date"
-                        disabled
+                        onChange={(e) => {
+                          setSelectedStartDate(e.currentTarget.value);
+                        }}
                         className="
                       w-full
                       rounded-xl
@@ -374,8 +378,6 @@ export default function Page({ params }: any) {
                       bg-card
                       px-3
                       py-2
-                      opacity-60
-                      cursor-not-allowed
                     "
                       />
                     </div>

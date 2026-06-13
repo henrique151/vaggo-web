@@ -57,3 +57,8 @@ export async function deleteById(token: AccessTokenClassInterface, id: number) {
     console.log(e);
   }
 }
+
+export async function getAll(token: AccessTokenClassInterface) {
+  const res = await APIService.genericGetRequest(token, "admin/reviews", map);
+  return res;
+}

@@ -12,48 +12,46 @@ import {
   ReviewController,
   ReportController,
 } from "@controllers";
-import { BrowserService, ReviewService } from "@services";
+import { APIService, BrowserService, ReviewService } from "@services";
 import { User } from "@classes";
 import { FormUtils } from "@utils";
+import { StaticImageData } from "next/image";
+
+async function convertToFile(image: StaticImageData) {
+  const url: string = image.src;
+  const file = await fetch(url);
+  const blob = await file.blob();
+  return new File([blob], "preview.jpg", { type: "image/jpg" });
+
+  return file;
+}
 
 export default function Page() {
   const [propertyHook, loaded, refresh] = useGetPropertyDetails(1, true);
+  // const test = convertToFile(Image);
+  // console.log(test);
 
   useEffect(() => {
     const token = BrowserService.getToken();
     const load = async () => {
-      const user = await UserController.get(token);
-      const vehicle = await VehicleController.get(token);
-      const property = await PropertyController.get(token);
-      const spots = await PropertyController.getSpots(token, 1);
-      const reservations = await ReservationController.get(token);
-      const reviews = await ReviewController.get(token);
-      const reports = await ReportController.get(token);
-
-      const obj = new User(user);
-      console.log(obj);
-      console.log(vehicle);
-      console.log(property);
-      console.log(spots);
-      console.log("reservations");
-      console.log(reservations);
-      console.log("reviews");
-      console.log(reviews);
-      console.log("reports");
-      console.log(reports);
+      const file = await convertToFile(Image);
+      // console.log(file);
+      // const res = await UserController.countBlocked(token);
+      const res = await UserController.get(token, true);
+      console.log(res);
     };
     load();
   }, []);
 
-  useEffect(() => {
-    console.log(propertyHook);
-    // refresh();
-  }, [propertyHook]);
+  // useEffect(() => {
+  //   console.log(propertyHook);
+  //   // refresh();
+  // }, [propertyHook]);
 
   return (
     <>
       <div className="flex flex-col">
-        <button
+        {/*<button
           onClick={async () => {
             const data = FormUtils.toForm({
               rating: "4",
@@ -273,8 +271,167 @@ export default function Page() {
           }}
         >
           Deletar vaga (OK?)
-        </button>
+        </button>*/}
+        <div className="flex flex-col items-center">
+          <h1>ADMIN</h1>
+          <div className="h-5" />
+          {/*<button>entity: get all ()</button>
+          <button>entity: get by id ()</button>
+          <div className="h-5" />*/}
+          {/*<button>user: get all (OK)</button>
+          <div className="h-5" />
+
+          <button>vehicles: get all (OK)</button>
+          <button>vehicles: get by id (OK)</button>
+          <div className="h-5" />
+
+          <button>properties: get all (OK)</button>
+          <button>properties: get by id (OK)</button>
+          <div className="h-5" />
+
+          <button>spots: get all (OK)</button>
+          <div className="h-5" />
+
+          <button>reservations: get all (OK)</button>
+          <button>reservations: get by id (OK)</button>
+          <div className="h-5" />
+
+          <button>reviews: get all (OK)</button>
+          <div className="h-5" />
+
+          <button>reports: get all (OK)</button>
+          <button>reports: get by id (OK)</button>*/}
+        </div>
       </div>
     </>
   );
 }
+
+// const user = await UserController.get(token);
+// const vehicle = await VehicleController.get(token);
+// const property = await PropertyController.get(token);
+// const spots = await PropertyController.getSpots(token, 1);
+// const reservations = await ReservationController.get(token);
+// const reviews = await ReviewController.get(token);
+// const reports = await ReportController.get(token);
+// const obj = new User(user);
+// console.log(obj);
+// console.log(vehicle);
+// console.log(property);
+// console.log(spots);
+// console.log("reservations");
+// console.log(reservations);
+// console.log("reviews");
+// console.log(reviews);
+// console.log("reports");
+// console.log(reports);
+
+// const user = await APIService.genericEditRequest(
+//   token,
+//   "admin/users",
+//   1,
+//   FormUtils.toForm({
+//     name: "common user",
+//     gender: "M",
+//     phone: "11983756968",
+//     birthDate: "1999-06-12",
+//     email: "user@example.com",
+//     password: "Password123!",
+//     permissionLevel: "1",
+//   }),
+//   "json",
+//   true,
+//   // 1,
+// );
+// console.log("user");
+// console.log(user);
+
+// const vehicles = await APIService.genericEditRequest(
+//   token,
+//   "admin/vehicles",
+//   1,
+//   FormUtils.toForm({
+//     brand: "Toyota",
+//     model: "Corollers",
+//     color: "Brancaço",
+//     licensePlate: "ABCD1234",
+//     manufactureYear: "2000",
+//     type: "CARRO",
+//     size: "PEQUENO",
+//   }),
+//   "json",
+//   true,
+//   // 1,
+// );
+// console.log("vehicles");
+// console.log(vehicles);
+
+// const properties = await APIService.genericEditRequest(
+//   token,
+//   "admin/properties",
+//   1,
+//   FormUtils.toForm({
+//     name: "Laranjeiras Doces",
+//     type: "Residencialista",
+//     description: "Residência muito legal com laranjas",
+//     totalCapacity: String(1000),
+//     isActive: String(true),
+//     street: "Rua das Amoras",
+//     number: "64",
+//     complement: "Pomar 14",
+//     neighborhood: "Bairro das Pitangas",
+//     zipCode: "37553099",
+//     cityId: String(1),
+//     // imagesToRemove: "[]", //must not be included if no image
+//   }),
+//   "json",
+//   true,
+//   // 1,
+// );
+// console.log("properties");
+// console.log(properties);
+
+// console.log("prop");
+// console.log(prop);
+// const vehicle = await APIService.genericGetRequest(
+//   token,
+//   "admin/vehicles",
+//   // 1,
+// );
+// console.log("vehicle");
+// console.log(vehicle);
+// const reservations = await APIService.genericGetRequest(
+//   token,
+//   "admin/reservations",
+//   // 1,
+// );
+// console.log("reservations");
+// console.log(reservations);
+// const reports = await APIService.genericGetRequest(
+//   token,
+//   "admin/reports",
+//   // 1,
+// );
+// console.log("reports");
+// console.log(reports);
+// const users = await APIService.genericGetRequest(
+//   token,
+//   "admin/users",
+//   // 1,
+// );
+// console.log("users");
+// console.log(users);
+// const spots = await APIService.genericGetRequest(
+//   token,
+//   "admin/spots",
+//   // 1,
+// );
+// console.log("spots");
+// console.log(spots);
+// const reviews = await APIService.genericGetRequest(
+//   token,
+//   "admin/reviews",
+//   // 1,
+// );
+// console.log("reviews");
+// console.log(reviews);

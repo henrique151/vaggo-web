@@ -24,3 +24,16 @@ export async function get(
 
   return data.map(map);
 }
+
+export async function getAll(
+  token: AccessTokenClassInterface,
+): Promise<ReportClassInterface[]> {
+  const data: any = await APIService.genericGetRequest(
+    token,
+    "admin/reports",
+    map,
+  );
+  console.log("data");
+  console.log(data);
+  return data;
+}

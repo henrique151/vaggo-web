@@ -13,6 +13,7 @@ type getPropertyFlags = {
   withSpots?: boolean;
   withReviews?: boolean;
   withReports?: boolean;
+  all?: boolean;
 };
 
 export async function register(
@@ -64,6 +65,10 @@ export async function get(
 
   const flagsParam = flags ?? (idOrFlags as getPropertyFlags);
   console.log(id);
+  if (flagsParam.all) {
+    const res = await PropertyService.getAll(token);
+    return res;
+  }
 
   const res = await PropertyService.get(token, id);
   // console.log(res);
