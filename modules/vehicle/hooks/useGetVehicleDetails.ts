@@ -23,7 +23,7 @@ export default function useGetVehicleDetails(
   useEffect(() => {
     const load = async () => {
       const v = await VehicleController.get(BrowserService.getToken(), id);
-      const res = id ? map(v) : (v as unknown as Vehicle[]).map(map);
+      const res = id ? (v ? map(v) : undefined) : (v ? (Array.isArray(v) ? v.map(map) : [map(v)]) : []);
 
       setVehicle(res);
       setLoaded(true);

@@ -18,7 +18,7 @@ const Page = () => {
 
         <div className="flex items-center gap-3">
           <StatusBadge
-            conditionValue={property?.status.active}
+            conditionValue={property?.status?.active}
             conditionTable={{ true: "green", false: "red" }}
             statusLabelTable={{ green: "Ativo", red: "Inativo" }}
             defaultValue="red"

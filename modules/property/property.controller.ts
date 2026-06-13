@@ -63,9 +63,9 @@ export async function get(
       ? (idOrFlags as number)
       : undefined;
 
-  const flagsParam = flags ?? (idOrFlags as getPropertyFlags);
+  const flagsParam = flags ?? (typeof idOrFlags === 'object' ? idOrFlags as getPropertyFlags : undefined);
   console.log(id);
-  if (flagsParam.all) {
+  if (flagsParam?.all) {
     const res = await PropertyService.getAll(token);
     return res;
   }

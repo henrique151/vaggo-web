@@ -2,6 +2,10 @@ import { ControllerStatus } from "@classes";
 import { FormUtils } from "@utils";
 
 export function toObject(form: FormData): object {
+  if (!(form instanceof FormData)) {
+    console.warn("toObject recebeu um objeto que não é FormData.");
+    return form as object;
+  }
   return Object.fromEntries(form.entries());
 }
 

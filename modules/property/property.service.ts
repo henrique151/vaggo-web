@@ -91,8 +91,8 @@ export async function get(
   //   };
   // }
 
-  const result: PropertyClassInterface[] | PropertyClassInterface =
-    Array.isArray(data) ? data.map(map) : map(data);
+  const result: any =
+    data ? (Array.isArray(data) ? data.map(map) : map(data)) : [];
 
   // const propertyData: PropertyInterface | PropertyInterface[] = Array.isArray(
   //   data.data,

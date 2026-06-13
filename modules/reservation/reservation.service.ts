@@ -59,7 +59,7 @@ export async function get(
   // const result: ReservationClassInterface[] | ReservationClassInterface =
   // Array.isArray(data) ? data.map(map) : map(data);
 
-  return data.map(map);
+  return data ? (Array.isArray(data) ? data.map(map) : [map(data)]) : [];
 }
 
 export async function changeApprovalStatus(
