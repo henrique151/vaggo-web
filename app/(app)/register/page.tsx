@@ -161,7 +161,6 @@ export default function Page() {
     password: "",
     passConfirm: "",
   });
-  const [isFormValid, setIsFormValid] = useState(false);
 
   const [showVerificationWindow, setShowVerificationWindow] = useState(false);
 
@@ -170,45 +169,93 @@ export default function Page() {
     }
   }, [state]);
 
-  const validateForm = (data: Record<string, string>) => {
-    const hasAllFields =
-      data.name &&
-      data.cpf &&
-      data.birthDate &&
-      data.email &&
-      data.password &&
-      data.passConfirm &&
-      data.phone;
-
-    const cpfValid =
-      data.cpf && MaskUtils.isValidCPF(MaskUtils.unmaskCPF(data.cpf));
-    const phoneValid =
-      data.phone && MaskUtils.isValidPhone(MaskUtils.unmaskPhone(data.phone));
-    const emailValid =
-      data.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
-    const passwordMatch =
-      data.password &&
-      data.passConfirm &&
-      data.password === data.passConfirm &&
-      data.password.length >= 8;
-    const ageValid = data.birthDate && MaskUtils.isAtLeast18(data.birthDate);
-
-    const isValid =
-      hasAllFields &&
-      cpfValid &&
-      phoneValid &&
-      emailValid &&
-      passwordMatch &&
-      ageValid;
-
-    return isValid;
-  };
-
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     const newFormData = { ...formData, [name]: value };
     setFormData(newFormData);
-    setIsFormValid(validateForm(newFormData));
+  };
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Validar campos obrigatórios
+    const hasAllFields =
+      formData.name &&
+      formData.cpf &&
+      formData.birthDate &&
+      formData.email &&
+      formData.password &&
+      formData.passConfirm &&
+      formData.phone;
+
+    if (!hasAllFields) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    // Validar CPF
+    const cpfUnmasked = MaskUtils.unmaskCPF(formData.cpf);
+    if (!MaskUtils.isValidCPF(cpfUnmasked)) {
+      alert("CPF inválido. Por favor, verifique.");
+      return;
+    }
+
+    // Validar telefone
+    const phoneUnmasked = MaskUtils.unmaskPhone(formData.phone);
+    if (!MaskUtils.isValidPhone(phoneUnmasked)) {
+      alert("Telefone inválido. Deve ter entre 10 e 15 dígitos.");
+      return;
+    }
+
+    // Validar email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      alert("Email inválido. Por favor, verifique.");
+      return;
+    }
+
+    // Validar senhas
+    if (formData.password.length < 8) {
+      alert("Senha deve ter no mínimo 8 caracteres.");
+      return;
+    }
+
+    if (formData.password !== formData.passConfirm) {
+      alert("As senhas não conferem.");
+      return;
+    }
+
+    // Validar idade
+    if (!MaskUtils.isAtLeast18(formData.birthDate)) {
+      alert("Você deve ter no mínimo 18 anos para criar uma conta.");
+      return;
+    }
+
+    // Tudo validado, criar FormData e enviar
+    const form = new FormData();
+    form.set("name", formData.name);
+    form.set("cpf", cpfUnmasked);
+    form.set("gender", formData.gender);
+    form.set("birthDate", formData.birthDate);
+    form.set("phone", phoneUnmasked);
+    form.set("email", formData.email);
+    form.set("password", formData.password);
+    form.set("passConfirm", formData.passConfirm);
+
+    // Adicionar arquivo de avatar se selecionado
+    const fileInput = e.currentTarget.querySelector(
+      'input[type="file"][name="avatarUrl"]',
+    ) as HTMLInputElement;
+    if (fileInput?.files?.[0]) {
+      form.set("avatarUrl", fileInput.files[0]);
+    }
+
+    // Enviar dados
+    setEmail(formData.email);
+    setPass(formData.password);
+    setShowVerificationWindow(true);
+    dispatchAction(form);
   };
 
   return (
@@ -259,13 +306,7 @@ export default function Page() {
         <div className="h-6" />
 
         <FormContainer
-          action={(form: FormData) => {
-            setEmail(String(form.get("email")));
-            setPass(String(form.get("password")));
-
-            setShowVerificationWindow(true);
-            dispatchAction(form);
-          }}
+          onSubmit={handleFormSubmit}
         >
           <FormItem
             type="text"
@@ -390,8 +431,7 @@ export default function Page() {
 
           <button
             type="submit"
-            disabled={pending || !isFormValid}
-            // onClick={() => setShowVerificationWindow(true)}
+            disabled={pending}
             className="
               mt-8
               py-3

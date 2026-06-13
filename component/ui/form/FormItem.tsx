@@ -86,7 +86,12 @@ export default function FormItem({
 
   const formItemTable = {
     select: (
-      <select className={baseStyle} name={name} onChange={onChange} value={value ?? ""}>
+      <select
+        className={baseStyle}
+        name={name}
+        onChange={onChange}
+        value={value ?? ""}
+      >
         {items?.map((item) => {
           return (
             <option key={item.value} value={item.value}>
@@ -105,7 +110,7 @@ export default function FormItem({
       required={required}
       placeholder={placeholder}
       className={baseStyle}
-      value={mask ? displayValue : value ?? ""}
+      value={mask ? displayValue : (value ?? "")}
       multiple={multiple}
       onChange={mask ? handleInputChange : onChange}
       maxLength={maxLength}
