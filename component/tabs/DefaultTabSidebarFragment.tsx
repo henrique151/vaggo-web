@@ -10,19 +10,18 @@ export default function DefaultTabSidebarFragment({
   activeTabSetter: CallableFunction;
   tab: Tab;
 }) {
-  // useEffect(() => {
-  //   console.log("activeTab");
-  //   console.log(activeTab);
-  // });
+  const isLogout = tab.getLabel("sidebar") === "Sair";
 
   return (
     <button
       onClick={() => activeTabSetter(tab)}
       className={`
     w-full text-left px-4 py-3 rounded-2xl transition
-    ${activeTab === tab
-          ? "tab-item-active"
-          : "tab-item-hover"
+    ${isLogout
+          ? "bg-rose-500 text-white dark:bg-rose-600"
+          : activeTab === tab
+            ? "tab-item-active"
+            : "tab-item-hover"
         }
   `}
     >

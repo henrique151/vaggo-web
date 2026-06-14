@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
@@ -5,6 +6,7 @@ import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
 import { usePageContext } from "../_context/page.context";
 import { ReportData } from "@classes";
 import { APIService, BrowserService } from "@services";
+import FilterBar, { FilterField, FilterValues } from "@/component/filter/FilterBar";
 
 // TODO: substituir pelo tipo real de Report e pelo hook de dados
 type AdminReport = {
@@ -23,10 +25,46 @@ const statusLabel = {
   RECUSADA: "Recusada",
 } as const;
 
+const FILTER_FIELDS: FilterField[] = [
+  { key: "reason", label: "Motivo", type: "text", placeholder: "Palavra-chave" },
+  {
+    key: "status", label: "Status", type: "select",
+    options: [
+      { value: "PENDENTE",   label: "Pendente" },
+      { value: "EM ANALISE", label: "Em Análise" },
+      { value: "RESOLVIDA",  label: "Resolvida" },
+      { value: "RECUSADA",   label: "Recusada" },
+      { value: "REANALISE",  label: "Reanálise" },
+    ],
+  },
+  {
+    key: "targetType", label: "Tipo", type: "select",
+    options: [{ value: "SPOT", label: "Vaga" }, { value: "CHAT", label: "Conversa" }],
+  },
+];
+
 const Page = () => {
   const { reports, refreshReports } = usePageContext();
+  const [displayReports, setDisplayReports] = useState<ReportData[] | undefined>(undefined);
   console.log(reports);
   // const reports: AdminReport[] = []; // placeholder
+
+  const filtered = displayReports ?? reports;
+
+  const handleSearch = (values: FilterValues) => {
+    const { reason, status, targetType } = values;
+    const hasFilter = reason || status || targetType;
+    if (!hasFilter) { setDisplayReports(undefined); return; }
+
+    setDisplayReports(
+      (reports ?? []).filter((r: ReportData) => {
+        if (reason     && !r.info.reason?.toLowerCase().includes(reason.toLowerCase())) return false;
+        if (status     && r.info.status !== status)                                     return false;
+        if (targetType && r.target.type !== targetType)                                 return false;
+        return true;
+      }),
+    );
+  };
 
   return (
     <TabPage label="Denúncias">
@@ -34,9 +72,16 @@ const Page = () => {
         <h2 className="text-2xl font-semibold">Denúncias</h2>
       </div>
 
+      <FilterBar
+        title="Filtrar Denúncias"
+        fields={FILTER_FIELDS}
+        onSearch={handleSearch}
+        onClear={() => setDisplayReports(undefined)}
+      />
+
       <div className="space-y-4">
-        {reports?.length > 0 ? (
-          reports.map((report: ReportData) => (
+        {filtered?.length > 0 ? (
+          filtered.map((report: ReportData) => (
             <EntityFrame
               key={report.id}
               editTitle={`Alterar Status de Denúncia #${report.id.toString().padStart(2, "0")}`}

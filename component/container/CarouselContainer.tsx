@@ -33,7 +33,7 @@ export default function CarouselContainer({
   return (
     <section className="w-full border-base surface-elevated rounded-lg p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4bg-white">
+      <div className="flex items-center justify-between mb-4 bg-base">
         <h2 className="font-semibold text-lg text-primary">{title}</h2>
 
         <div className="flex gap-2">

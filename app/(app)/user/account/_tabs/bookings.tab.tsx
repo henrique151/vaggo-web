@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
@@ -6,6 +7,7 @@ import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
 import useGetReservations from "@/modules/reservation/hooks/useGetReservations";
 import { ReservationController } from "@controllers";
 import { BrowserService } from "@services";
+import FilterBar, { FilterField, FilterValues } from "@/component/filter/FilterBar";
 
 function formatDate(value: Date | string | undefined): string {
   if (!value) return "—";
@@ -16,23 +18,54 @@ function formatDate(value: Date | string | undefined): string {
 
 function statusLabel(status: string): string {
   const map: Record<string, string> = {
-    PENDENTE: "Pendente",
-    APROVADA: "Aprovada",
-    RECUSADA: "Recusada",
-    CANCELADA: "Cancelada",
+    PENDENTE: "Pendente", APROVADA: "Aprovada", RECUSADA: "Recusada", CANCELADA: "Cancelada",
   };
   return map[status] ?? status;
 }
 
+const FILTER_FIELDS: FilterField[] = [
+  { key: "spotName", label: "Vaga", type: "text", placeholder: "Nome ou ID da vaga" },
+  { key: "startDate", label: "Data de início", type: "date" },
+  {
+    key: "status", label: "Status", type: "select",
+    options: [
+      { value: "PENDENTE",  label: "Pendente" },
+      { value: "APROVADA",  label: "Aprovada" },
+      { value: "RECUSADA",  label: "Recusada" },
+      { value: "CANCELADA", label: "Cancelada" },
+    ],
+  },
+];
+
 const Page = () => {
   const [reservations] = useGetReservations();
+  const [displayReservations, setDisplayReservations] = useState<typeof reservations | undefined>(undefined);
+
+  const filtered = displayReservations ?? reservations;
+
+  function handleSearch(values: FilterValues) {
+    if (!reservations) return;
+    const { spotName, startDate, status } = values;
+    const hasFilter = spotName || startDate || status;
+    if (!hasFilter) { setDisplayReservations(undefined); return; }
+
+    setDisplayReservations(
+      reservations.filter((r) => {
+        const spot = r.info?.spot;
+        const sName = spot?.info?.identifier ?? `Vaga #${spot?.id ?? ""}`;
+        if (spotName  && !sName.toLowerCase().includes(spotName.toLowerCase())) return false;
+        if (status    && r.status !== status)                                     return false;
+        if (startDate) {
+          const start = r.info?.date?.period?.start;
+          if (!start || new Date(start).toISOString().substring(0, 10) !== startDate) return false;
+        }
+        return true;
+      }),
+    );
+  }
 
   const handleCancel = async (id: number) => {
-    await ReservationController.changeApprovalStatus(
-      BrowserService.getToken(),
-      id,
-      "cancel",
-    );
+    await ReservationController.changeApprovalStatus(BrowserService.getToken(), id, "cancel");
     window.location.reload();
   };
 
@@ -42,47 +75,38 @@ const Page = () => {
         <h2 className="text-2xl font-semibold">Minhas Reservas</h2>
       </div>
 
-      <div className="space-y-4">
-        {!reservations ? (
-          <p className="text-muted">Carregando reservas...</p>
-        ) : reservations.length > 0 ? (
-          reservations.map((reservation) => {
-            const spot = reservation.info?.spot;
-            const vehicle = reservation.info?.vehicle;
-            const period = reservation.info?.date?.period;
+      <FilterBar
+        title="Filtrar Reservas"
+        fields={FILTER_FIELDS}
+        onSearch={handleSearch}
+        onClear={() => setDisplayReservations(undefined)}
+      />
 
-            const spotName =
-              spot?.info?.identifier ?? `Vaga #${spot?.id ?? "?"}`;
-            const propertyName =
-              (spot as any)?.property?.info?.name ?? "";
-            const vehicleLabel = vehicle
-              ? `${vehicle.brand ?? ""} ${vehicle.model ?? ""}`.trim()
-              : "";
-            const startDate = formatDate(period?.start);
-            const endDate = formatDate(period?.end);
-            const status = statusLabel(reservation.status);
-            const canCancel =
-              reservation.status === "PENDENTE" ||
-              reservation.status === "APROVADA";
+      <div className="space-y-4">
+        {!filtered ? (
+          <p className="text-muted">Carregando reservas...</p>
+        ) : filtered.length > 0 ? (
+          filtered.map((reservation) => {
+            const spot        = reservation.info?.spot;
+            const vehicle     = reservation.info?.vehicle;
+            const period      = reservation.info?.date?.period;
+            const spotName    = spot?.info?.identifier ?? `Vaga #${spot?.id ?? "?"}`;
+            const propertyName= (spot as any)?.property?.info?.name ?? "";
+            const vehicleLabel= vehicle ? `${vehicle.brand ?? ""} ${vehicle.model ?? ""}`.trim() : "";
+            const canCancel   = reservation.status === "PENDENTE" || reservation.status === "APROVADA";
 
             return (
               <EntityFrame
                 key={reservation.id}
-                onCancelReservation={
-                  canCancel
-                    ? () => handleCancel(reservation.id)
-                    : undefined
-                }
+                onCancelReservation={canCancel ? () => handleCancel(reservation.id) : undefined}
               >
                 <DefaultEntityFrame
                   title={spotName}
-                  description={[propertyName, vehicleLabel ? `Veículo: ${vehicleLabel}` : ""]
-                    .filter(Boolean)
-                    .join(" · ")}
+                  description={[propertyName, vehicleLabel ? `Veículo: ${vehicleLabel}` : ""].filter(Boolean).join(" · ")}
                   tagList={[
-                    `Entrada: ${startDate}`,
-                    `Saída: ${endDate}`,
-                    `Status: ${status}`,
+                    `Entrada: ${formatDate(period?.start)}`,
+                    `Saída: ${formatDate(period?.end)}`,
+                    `Status: ${statusLabel(reservation.status)}`,
                   ]}
                 />
               </EntityFrame>
@@ -96,9 +120,5 @@ const Page = () => {
   );
 };
 
-const BookingsTab = new Tab(
-  { default: "Reservas", page: "Minhas Reservas" },
-  Page,
-);
-
+const BookingsTab = new Tab({ default: "Reservas", page: "Minhas Reservas" }, Page);
 export default BookingsTab;

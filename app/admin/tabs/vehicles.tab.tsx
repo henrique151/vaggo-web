@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
@@ -5,6 +6,7 @@ import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
 import { usePageContext } from "../_context/page.context";
 import { Vehicle } from "@classes";
 import { APIService, BrowserService } from "@services";
+import FilterBar, { FilterField, FilterValues } from "@/component/filter/FilterBar";
 
 // TODO: substituir pelo tipo real de Vehicle e pelo hook de dados
 // type AdminVehicle = {
@@ -26,9 +28,50 @@ const sizeLabel = {
   GRANDE: "Grande",
 } as const;
 
+const FILTER_FIELDS: FilterField[] = [
+  { key: "brand",        label: "Marca",             type: "text",  placeholder: "Ex: Toyota" },
+  { key: "licensePlate", label: "Placa",              type: "text",  placeholder: "ABC-1234" },
+  { key: "ownerName",    label: "Dono",               type: "text",  placeholder: "Nome do proprietário" },
+  {
+    key: "type", label: "Tipo", type: "select",
+    options: [
+      { value: "CARRO", label: "Carro" },
+      { value: "MOTO",  label: "Moto" },
+    ],
+  },
+  {
+    key: "size", label: "Porte", type: "select",
+    options: [
+      { value: "PEQUENO", label: "Pequeno" },
+      { value: "MEDIO",   label: "Médio" },
+      { value: "GRANDE",  label: "Grande" },
+    ],
+  },
+];
+
 const Page = () => {
   const { vehicles, refreshVehicles } = usePageContext();
+  const [displayVehicles, setDisplayVehicles] = useState<Vehicle[] | undefined>(undefined);
   console.log(vehicles);
+
+  const filtered = displayVehicles ?? vehicles;
+
+  const handleSearch = (values: FilterValues) => {
+    const { brand, licensePlate, ownerName, type, size } = values;
+    const hasFilter = brand || licensePlate || ownerName || type || size;
+    if (!hasFilter) { setDisplayVehicles(undefined); return; }
+
+    setDisplayVehicles(
+      (vehicles ?? []).filter((v: Vehicle) => {
+        if (brand        && !v.brand?.toLowerCase().includes(brand.toLowerCase()))                       return false;
+        if (licensePlate && !v.licensePlate?.toLowerCase().includes(licensePlate.toLowerCase()))         return false;
+        if (ownerName    && !v.user?.person?.name?.toLowerCase().includes(ownerName.toLowerCase()))      return false;
+        if (type         && v.type !== type)                                                             return false;
+        if (size         && v.size !== size)                                                             return false;
+        return true;
+      }),
+    );
+  };
 
   return (
     <TabPage label="Veículos">
@@ -36,9 +79,16 @@ const Page = () => {
         <h2 className="text-2xl font-semibold">Veículos</h2>
       </div>
 
+      <FilterBar
+        title="Filtrar Veículos"
+        fields={FILTER_FIELDS}
+        onSearch={handleSearch}
+        onClear={() => setDisplayVehicles(undefined)}
+      />
+
       <div className="space-y-4">
-        {vehicles?.length > 0 ? (
-          vehicles.map((vehicle?: Vehicle) => (
+        {filtered?.length > 0 ? (
+          filtered.map((vehicle?: Vehicle) => (
             <EntityFrame
               key={vehicle?.id}
               editTitle={`Editar ${typeLabel[vehicle?.type]} ${vehicle?.brand}`}
