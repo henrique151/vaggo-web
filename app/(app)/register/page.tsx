@@ -18,7 +18,7 @@ import action from "./register.action";
 import useForm from "@/hooks/useForm";
 import { FormUtils, MaskUtils } from "@utils";
 import { AuthController, UserController } from "@controllers";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { BrowserService } from "@services";
 
 function VerificationCodeWindow({
@@ -30,9 +30,12 @@ function VerificationCodeWindow({
   password: string;
   onClose: () => void;
 }) {
+  const [codeError, setCodeError] = useState("");
+  const router = useRouter();
+
   return (
     <>
-      <BlurOverlay show={true} onClick={() => { }} />
+      <BlurOverlay show={true} onClick={() => {}} />
 
       <GenericWindow
         title="Confirmar Cadastro"
@@ -52,29 +55,29 @@ function VerificationCodeWindow({
 
           <FormContainer
             action={async (form: FormData) => {
-              const formObj = FormUtils.toObject(form);
+              setCodeError("");
               let code = "";
 
-              for (const [key, value] of Object.entries(formObj)) {
-                console.log(value);
-                code = code.concat(value);
+              for (let i = 0; i < 6; i++) {
+                code += (form.get(`code_${i}`) as string) || "";
               }
-              console.log(FormUtils.toObject(form));
-              console.log(code);
-              const res = await AuthController.confirmRegistration(email, code);
-              if (res) {
-                const res = await UserController.authenticate(email, password);
-                console.log(res);
-                // if (res.success) {
-                //   BrowserService.setToken({
-                //     token: res.data.acessToken,
-                //     expiration: res.data.expiresIn,
-                //     user: {
-                //       id: res.data.user.id,
-                //     },
-                //   });
-                // }
-                redirect("/login");
+              
+              console.log("Código enviado:", code);
+
+              try {
+                const res = await AuthController.confirmRegistration(email, code);
+                console.log("Resposta da API:", res);
+                if (res && res.success !== false) {
+                  const authRes = await UserController.authenticate(email, password);
+                  console.log("Autenticação finalizada:", authRes);
+                  router.push("/login");
+                } else {
+                  console.log("Falha de validação da API");
+                  setCodeError("Código incorreto. Confira o código recebido e tente novamente.");
+                }
+              } catch (error) {
+                console.log("Erro capturado:", error);
+                setCodeError("Não foi possível validar o código no momento. Tente novamente.");
               }
             }}
           >
@@ -83,7 +86,7 @@ function VerificationCodeWindow({
               flex
               justify-center
               gap-3
-              mb-6
+              mb-2
             "
             >
               {[...Array(6)].map((_, index) => (
@@ -106,15 +109,14 @@ function VerificationCodeWindow({
               ))}
             </div>
 
-            {/* TODO:
-              Implementar envio e validação do código.
-              Atualmente a janela serve apenas como
-              placeholder visual para o fluxo.
-          */}
+            <div className="h-4 flex items-center justify-center mb-4">
+              {codeError && (
+                <p className="text-xs text-rose-500">{codeError}</p>
+              )}
+            </div>
 
             <button
               type="submit"
-              // disabled
               className="
               w-full
               py-3
@@ -126,7 +128,7 @@ function VerificationCodeWindow({
             </button>
 
             <button
-              // disabled
+              type="button"
               className="
               w-full
               mt-3

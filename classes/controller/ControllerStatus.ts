@@ -132,6 +132,7 @@ export default class ControllerStatus {
   }
 
   public static fromObject(obj: object) {
+    if (!obj) return new ControllerStatus({});
     const controller = new ControllerStatus({});
     for (const [key, value] of Object.entries(obj)) {
       switch (key) {
