@@ -28,6 +28,9 @@ interface Property {
     address: Address;
   };
   spots?: Spot[];
+  user?: {
+    id: number;
+  };
 }
 
 interface Spot {

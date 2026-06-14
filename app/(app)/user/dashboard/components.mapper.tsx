@@ -59,37 +59,41 @@ export function mapSolicitationFrames(d: Reservation) {
 }
 
 export function mapNextBookingCards(d: Reservation) {
+  const propertyId = (d.info.spot as any)?.property?.id;
+  const redirectTo = propertyId ? `/spot/${propertyId}` : "";
   return (
     <EntityCard
       key={`next_booking_${d.id}`}
       title={d.info.spot.info.identifier}
       description={`Data: ${d.info.date.period.start.toLocaleDateString()}, Status: ${d.status}`}
-      redirectTo={""}
+      redirectTo={redirectTo}
     />
   );
 }
 
 export function mapLatestBookingCards(d: Reservation, window: any) {
-  // export function mapLatestBookingCards(d: any) {
+  const propertyId = (d.info.spot as any)?.property?.id;
+  const redirectTo = propertyId ? `/spot/${propertyId}` : "";
   return (
     <LatestBookingCard
       id={d.id}
       identifier={d.info.spot.info.identifier}
       datePeriod={d.info.date.period}
       status={d.status}
+      redirectTo={redirectTo}
       window={window}
     />
   );
 }
 
-function LatestBookingCard({ id, identifier, datePeriod, status, window }) {
+function LatestBookingCard({ id, identifier, datePeriod, status, window, redirectTo }) {
   return (
     <>
       <EntityCard
         key={`next_booking_${id}`}
         title={identifier}
         description={`Data: ${datePeriod.start.toLocaleDateString()}, Status: ${status}`}
-        redirectTo={""}
+        redirectTo={redirectTo ?? ""}
       >
         {status === "APROVADA" && (
           <button

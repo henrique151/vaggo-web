@@ -24,6 +24,7 @@ export class Property implements PropertyClassInterface {
   location: { latitude: string; longitude: string; address: Address };
   // address: Address;
   spots?: Spot[];
+  user?: { id: number };
 
   constructor(i: PropertyStructureInterface) {
     // console.log(i);
@@ -45,6 +46,7 @@ export class Property implements PropertyClassInterface {
     // this.address = new Address(this.address);
     // this.spots = this.spots && this.setSpots(this.spots);
     if (i.spots) this.setSpots(i.spots as SpotClassInterface[]);
+    if (i.user) this.user = { id: i.user.id };
   }
 
   public setSpots(spots: SpotClassInterface[]): void {

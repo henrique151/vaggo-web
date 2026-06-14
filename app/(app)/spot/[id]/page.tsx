@@ -40,7 +40,11 @@ import useGetReviews from "@/modules/review/hooks/useGetReviews";
 import useComponentMapper from "@/hooks/useComponentMapper";
 import { Review } from "@classes";
 import useGetVehicleDetails from "@/modules/vehicle/hooks/useGetVehicleDetails";
-import { ReportController, ReservationController } from "@controllers";
+import {
+  ReviewController,
+  ReportController,
+  ReservationController,
+} from "@controllers";
 import { BrowserService } from "@services";
 import { FormUtils } from "@utils";
 
@@ -77,6 +81,7 @@ export default function Page({ params }: any) {
   const [availableVehiclesWindow] = useWindow(VehicleAvailabilityWindow);
   const [bookingStatusWindow] = useWindow(BookingStatusWindow);
   const [reportWindow] = useWindow(ReportWindow);
+  const [reviewWindow] = useWindow(ReviewWindow);
 
   const handleReserve = async (spotId: number, vehicleId: number) => {
     // Use spot's operatingHours dates instead of hardcoded values
@@ -228,6 +233,7 @@ export default function Page({ params }: any) {
 
   function VehicleAvailabilityWindow() {
     const spot = property?.spots?.find((s) => s.id === selectedSpot);
+    const [selectedVehicleId, setSelectedVehicleId] = useState<number>(-1);
 
     if (!spot) return null;
 
@@ -397,20 +403,17 @@ export default function Page({ params }: any) {
                     {vehicles?.map((vehicle) => (
                       <button
                         key={vehicle.id}
-                        onClick={async () => {
-                          await handleReserve(spot.id, vehicle.id);
-                        }}
-                        className="
-                      w-full
-                      p-3
-                      mb-2
-                      rounded-xl
-                      border
-                      border-soft
-                      text-left
-                      transition
-                      hover:border-blue-400
-                    "
+                        onClick={() => setSelectedVehicleId(vehicle.id)}
+                        className={`
+                          w-full
+                          p-3
+                          mb-2
+                          rounded-xl
+                          border
+                          text-left
+                          transition
+                          ${selectedVehicleId === vehicle.id ? "border-primary bg-primary/5" : "border-soft hover:border-blue-400"}
+                        `}
                       >
                         <h4 className="text-sm font-medium break-words">
                           {vehicle.brand} {vehicle.model}
@@ -424,7 +427,12 @@ export default function Page({ params }: any) {
                   </div>
 
                   <button
-                    disabled
+                    disabled={selectedVehicleId === -1}
+                    onClick={async () => {
+                      if (selectedVehicleId !== -1) {
+                        await handleReserve(spot.id, selectedVehicleId);
+                      }
+                    }}
                     className="
                   w-full
                   mt-3
@@ -432,8 +440,9 @@ export default function Page({ params }: any) {
                   rounded-xl
                   font-medium
                   btn-primary
-                  opacity-50
-                  cursor-not-allowed
+                  transition
+                  disabled:opacity-50
+                  disabled:cursor-not-allowed
                 "
                   >
                     Reservar Vaga
@@ -484,7 +493,7 @@ export default function Page({ params }: any) {
       const res = await ReportController.register(
         BrowserService.getToken(),
         "SPOT",
-        1,
+        property?.user?.id ?? 0,
         formData,
       );
       // const res = await sendReport("SPOT", 1, formData);
@@ -518,9 +527,15 @@ export default function Page({ params }: any) {
 
           <div className="h-4" />
           <FormItem
-            type="text"
+            type="select"
             label="Qual motivo para a denúncia?"
-            name={"reason"}
+            name="reason"
+            items={[
+              { value: "", label: "Selecione um motivo" },
+              { value: "Conteúdo Inadequado", label: "Conteúdo Inadequado" },
+              { value: "Fraude/Golpe", label: "Fraude/Golpe" },
+              { value: "Outro", label: "Outro" },
+            ]}
           />
 
           <div className="h-4" />
@@ -543,6 +558,62 @@ export default function Page({ params }: any) {
           exitButton={true}
           onExit={reportWindow.hide}
         >
+          {messages[String(messageState)]}
+        </GenericWindow>
+      </>
+    );
+  }
+
+  function ReviewWindow({ onExit }: { onExit: MouseEventHandler }) {
+    const [messageState, setMessageState] = useState<boolean | undefined>(undefined);
+
+    const handleReview = async (e) => {
+      e.preventDefault();
+      const currentTarget = e.currentTarget;
+      const formData = new FormData(currentTarget);
+      formData.set("reservationId", "1"); // Placeholder conforme pedido (avaliar a qualquer momento)
+      const res = await ReviewController.register(BrowserService.getToken(), formData);
+      setMessageState((res as any)?.isSuccessfull ?? false);
+    };
+
+    const messages = {
+      true: <p>Avaliação enviada com sucesso!</p>,
+      false: <p>Houve um erro ao enviar a avaliação.</p>,
+      undefined: (
+        <form onSubmit={handleReview}>
+          <FormItem
+            type="select"
+            label="Nota"
+            name="rating"
+            items={[
+              { value: "5", label: "5 estrelas" },
+              { value: "4", label: "4 estrelas" },
+              { value: "3", label: "3 estrelas" },
+              { value: "2", label: "2 estrelas" },
+              { value: "1", label: "1 estrela" },
+            ]}
+          />
+          <div className="h-4" />
+          <FormItem
+            type="text"
+            label="Comentário (opcional)"
+            name="comment"
+          />
+          <div className="h-4" />
+          <button
+            type="submit"
+            className="w-full py-3 rounded-lg font-medium text-white btn-primary transition"
+          >
+            Enviar Avaliação
+          </button>
+        </form>
+      ),
+    };
+
+    return (
+      <>
+        <BlurOverlay show={true} onClick={() => {}} />
+        <GenericWindow title="Avaliar" exitButton={true} onExit={reviewWindow.hide}>
           {messages[String(messageState)]}
         </GenericWindow>
       </>
@@ -677,8 +748,7 @@ export default function Page({ params }: any) {
               </span>
 
               <span className="text-muted">
-                {/*⭐ Avaliação: {reviews?.averageRating || 1}/5*/}⭐ Avaliação:{" "}
-                {0 || 1}/5
+                {reviews?.length > 0 ? `⭐ Avaliação: ${(reviews.reduce((acc, curr) => acc + Number(curr.info.rating), 0) / reviews.length).toFixed(1)}/5` : "⭐ Ainda sem avaliações"}
               </span>
             </div>
           </div>
@@ -730,17 +800,22 @@ export default function Page({ params }: any) {
 
       <section className="max-w-7xl mx-auto px-6 pb-8">
         <PanelContainer title="Avaliações">
-          {reviews?.length > 0 ? (
-            <>
-              <p className="mb-4">
-                {/*Avaliação Geral: {reviews?.averageRating || 1}/5*/}
-                Avaliação Geral: {0 || 1}/5
-              </p>
-
-              <CarouselContainer title={""} cards={reviewCards} />
-            </>
-          ) : (
-            <p>No momento, nenhuma avaliação foi registrada.</p>
+          <div className="flex justify-between items-center mb-4">
+            {reviews?.length > 0 ? (
+              <p>Avaliação Geral: {(reviews.reduce((acc, curr) => acc + Number(curr.info.rating), 0) / reviews.length).toFixed(1)}/5</p>
+            ) : (
+              <p>No momento, nenhuma avaliação foi registrada.</p>
+            )}
+            <button
+              onClick={reviewWindow.show}
+              className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition"
+            >
+              Avaliar
+            </button>
+          </div>
+          
+          {reviews?.length > 0 && (
+            <CarouselContainer title={""} cards={reviewCards} />
           )}
         </PanelContainer>
       </section>
@@ -752,6 +827,7 @@ export default function Page({ params }: any) {
       {bookingStatusWindow.component && <bookingStatusWindow.component />}
 
       {reportWindow.component && <reportWindow.component />}
+      {reviewWindow.component && <reviewWindow.component />}
     </main>
   );
 }

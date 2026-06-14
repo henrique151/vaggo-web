@@ -24,3 +24,7 @@ export async function get(
 
   return res;
 }
+
+export async function requestReanalysis(token: AccessTokenClassInterface, id: number) {
+  return await ReportService.requestReanalysis(token, id);
+}

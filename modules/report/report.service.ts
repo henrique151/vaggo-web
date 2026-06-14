@@ -37,3 +37,15 @@ export async function getAll(
   console.log(data);
   return data;
 }
+
+export async function requestReanalysis(token: AccessTokenClassInterface, id: number) {
+  try {
+    const res = await APIService.request(`reports/${id}/reanalysis`, token, {
+      method: "PATCH",
+    });
+    return res.ok;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+}

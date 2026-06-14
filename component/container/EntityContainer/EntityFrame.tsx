@@ -23,6 +23,8 @@ interface EntityFrameProps {
   onReanalise?: () => void;
   // Cancelar Reserva
   onCancelReservation?: () => void;
+  // Suspender Vaga
+  onSuspendSpot?: () => void;
   controller?: ControllerStatus;
 }
 
@@ -36,6 +38,7 @@ export default function EntityFrame({
   onDelete,
   onReanalise,
   onCancelReservation,
+  onSuspendSpot,
   controller,
 }: EntityFrameProps) {
   const [showEdit, setShowEdit] = useState(false);
@@ -48,6 +51,7 @@ export default function EntityFrame({
   const canDelete = !!onDelete;
   const canReanalise = !!onReanalise;
   const canCancelReservation = !!onCancelReservation;
+  const canSuspendSpot = !!onSuspendSpot;
   const [reanaliseWindow] = useWindow(ReanaliseWindow);
   const [cancelReservationWindow] = useWindow(CancelReservationWindow);
 
@@ -196,7 +200,7 @@ export default function EntityFrame({
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">{children}</div>
 
-          {(canEdit || canDelete || canReanalise || canCancelReservation) && (
+          {(canEdit || canDelete || canReanalise || canCancelReservation || canSuspendSpot) && (
             <div className="flex items-center gap-2 shrink-0">
               {canEdit && (
                 <button
@@ -252,6 +256,25 @@ export default function EntityFrame({
                   "
                 >
                   Cancelar Reserva
+                </button>
+              )}
+
+              {canSuspendSpot && (
+                <button
+                  onClick={() => onSuspendSpot?.()}
+                  className="
+                    px-4 py-2
+                    rounded-xl
+                    text-sm
+                    font-medium
+                    bg-rose-600
+                    hover:bg-rose-700
+                    text-white
+                    transition
+                    shrink-0
+                  "
+                >
+                  Suspender Vaga
                 </button>
               )}
 

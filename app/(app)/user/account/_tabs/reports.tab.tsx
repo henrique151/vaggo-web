@@ -3,6 +3,8 @@ import TabPage from "@/component/container/TabContainer/TabPage";
 import { usePageContext } from "../page.context";
 import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
 import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
+import { ReportController } from "@controllers";
+import { BrowserService } from "@services";
 
 const Page = () => {
   const { reports } = usePageContext();
@@ -33,8 +35,11 @@ const Page = () => {
                     { value: "CHAT", label: "Conversa" },
                   ],
                 },
-              ]} */
-              onReanalise={() => {}}
+              onReanalise={async () => {
+                const res = await ReportController.requestReanalysis(BrowserService.getToken(), report.id);
+                if (res) alert("Reanálise solicitada com sucesso!");
+                else alert("Erro ao solicitar reanálise.");
+              }}
               onEdit={(formData) => {
                 // TODO: wire to update report action
                 console.log("edit report", report.id, Object.fromEntries(formData));

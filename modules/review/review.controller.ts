@@ -6,6 +6,18 @@ import {
 import * as ReviewService from "./review.service";
 import { ControllerStatus } from "@classes";
 
+export async function register(token: AccessTokenClassInterface, form: FormData) {
+  const status = ControllerStatus.setup(form);
+  try {
+    const res = await ReviewService.register(token, form);
+    if (res) status.successfull();
+    else status.failed();
+  } catch (e) {
+    status.failed();
+  }
+  return status.toObject();
+}
+
 export async function get(
   token: AccessTokenClassInterface,
 ): Promise<ReviewClassInterface[]>;
