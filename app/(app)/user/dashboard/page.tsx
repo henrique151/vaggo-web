@@ -44,10 +44,9 @@ import useComponentMapper from "@/hooks/useComponentMapper";
 
 export default function Page() {
   const [user] = useGetUserDetails();
-  const [reservations] = useGetReservations(true);
-  // const [reviews] = useGetReviews();
+  const [ownerReservations] = useGetReservations(true);  // Reservas recebidas como proprietário
+  const [myReservations] = useGetReservations();          // Reservas feitas como locatário
 
-  // const [bookingSolicitations] = useGetMySolicitations();
   const [chats] = useGetMyChats();
   const [vehicles] = useGetVehicleDetails();
 
@@ -65,8 +64,9 @@ export default function Page() {
   const [window, setWindow] = useState(false);
   const [reservationId, setReservationId] = useState(0);
 
+  // Próximas e históricas reservas do PROPRIETÁRIO (reservas recebidas)
   const nextBookingsCards = useComponentMapper(
-    reservations?.filter(
+    ownerReservations?.filter(
       (booking) =>
         booking.status === "APROVADA" || booking.status === "PENDENTE",
     ),
@@ -74,13 +74,19 @@ export default function Page() {
   );
 
   const latestBookingsCards = useComponentMapper(
-    reservations?.filter((booking) => booking.status === "APROVADA"),
+    ownerReservations?.filter((booking) => booking.status === "APROVADA"),
     (d) => {
       return mapLatestBookingCards(d, {
         windowSetter: setWindow,
         reservationSetter: setReservationId,
       });
     },
+  );
+
+  // Reservas do LOCATÁRIO (feitas pelo usuário)
+  const myReservationCards = useComponentMapper(
+    myReservations,
+    (d) => mapNextBookingCards(d),
   );
   // useEffect(() => {
   //   const test = async () => {};
@@ -230,18 +236,28 @@ export default function Page() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* ESQUERDA */}
             <div className="lg:col-span-2 space-y-8">
-              <PanelContainer title="Próximas Reservas">
+              {/* Reservas do locatário */}
+              <PanelContainer title="Minhas Reservas">
+                {myReservationCards.length > 0 ? (
+                  <CarouselContainer title="" cards={myReservationCards ?? []} />
+                ) : (
+                  <p className="text-muted">
+                    Nenhuma reserva realizada.
+                  </p>
+                )}
+              </PanelContainer>
+
+              <PanelContainer title="Próximas Reservas (Proprietário)">
                 {nextBookingsCards.length > 0 ? (
                   <CarouselContainer title="" cards={nextBookingsCards ?? []} />
                 ) : (
-                  // <>
                   <p className="text-muted">
                     Não há reservas agendadas no momento.
                   </p>
                 )}
               </PanelContainer>
 
-              <PanelContainer title="Reservas anteriores">
+              <PanelContainer title="Reservas anteriores (Proprietário)">
                 {latestBookingsCards.length > 0 ? (
                   <CarouselContainer title="" cards={latestBookingsCards} />
                 ) : (
@@ -249,12 +265,11 @@ export default function Page() {
                     Por enquanto não há reservas no histórico.
                   </p>
                 )}
-                <p className="text-muted"></p>
               </PanelContainer>
 
               <PanelContainer title="Solicitações de Reservas">
-                {reservations?.length !== 0 ? (
-                  reservations?.map(mapSolicitationFrames)
+                {ownerReservations?.length !== 0 ? (
+                  ownerReservations?.map(mapSolicitationFrames)
                 ) : (
                   <p className="text-muted">Nenhuma Solicitação no momento.</p>
                 )}

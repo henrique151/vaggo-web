@@ -5,7 +5,7 @@ import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
 import { SearchResult } from "@/classes/SearchResult";
 import { useEffect, useState } from "react";
 import CarouselContainer from "@/component/container/CarouselContainer";
-import DatePeriod from "@/classes/data/DatePeriod";
+
 import PanelContainer from "@/component/container/PanelContainer";
 import Header from "@/component/header";
 
@@ -13,13 +13,12 @@ export default function Home() {
   const [currentLocationSpotsResult, currentLocationSpotsLoading] =
     useSearchProperties({
       address: "São Paulo",
-      datePeriod: new DatePeriod(new Date(2026, 4, 10), new Date(2026, 4, 10)),
     });
   const [lastBookingLocationSpotsResult, lastBookingLocationSpotsLoading] =
     useSearchProperties({
       address: "São Paulo",
-      datePeriod: new DatePeriod(new Date(2026, 4, 10), new Date(2026, 4, 10)),
     });
+
 
   const [currentLocationCards, setCurrentLocationCards] = useState<
     React.ReactNode[]

@@ -15,7 +15,7 @@ import BlurOverlay from "@/component/blur_overlay";
 import GenericWindow from "@/component/GenericWindow";
 // import { Vehicle, VehicleDAO } from "@/entity/vehicle";
 // import { BookingDAO } from "@/entity/booking";
-import DatePeriod from "@/classes/data/DatePeriod";
+
 // import { useGetMyVehicles } from "@/hooks/api/vehicles/useGetMyrVehicles";
 // import { useApi } from "@/hooks/api/useApi";
 // import { bookSpot } from "@/services/booking.service";
@@ -43,7 +43,7 @@ import useGetVehicleDetails from "@/modules/vehicle/hooks/useGetVehicleDetails";
 import { ReportController, ReservationController } from "@controllers";
 import { BrowserService } from "@services";
 import { FormUtils } from "@utils";
-import { da } from "zod/v4/locales";
+
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Page({ params }: any) {
@@ -69,8 +69,6 @@ export default function Page({ params }: any) {
   // setRev
 
   const [selectedSpot, setSelectedSpot] = useState(-1);
-  const [selectedStartDate, setSelectedStartDate] = useState(undefined);
-  const [selectedEndDate, setSelectedEndDate] = useState(undefined);
 
   const [bookingStatus, setBookingStatus] = useState(false);
   // const [bookingStatusWindow, setBookingStatusWindow] = useState(false);
@@ -81,16 +79,16 @@ export default function Page({ params }: any) {
   const [reportWindow] = useWindow(ReportWindow);
 
   const handleReserve = async (spotId: number, vehicleId: number) => {
-    const datePeriod = new DatePeriod(
-      new Date(2026, 4, 10),
-      new Date(2026, 4, 10),
-    );
+    // Use spot's operatingHours dates instead of hardcoded values
+    const spot = property?.spots?.find((s) => s.id === spotId);
+    const startDate = spot?.operatingHours?.datePeriod?.start ?? "";
+    const endDate = spot?.operatingHours?.datePeriod?.end ?? "";
 
     const form = FormUtils.toForm({
       spotId: spotId,
       vehicleId: vehicleId,
-      startDate: "2026-01-01",
-      endDate: "2026-05-10",
+      startDate,
+      endDate,
     });
 
     const res = await ReservationController.register(
@@ -103,10 +101,6 @@ export default function Page({ params }: any) {
     availableVehiclesWindow.hide();
     bookingStatusWindow.show();
     refreshSpots();
-
-    console.log(
-      `you selected spot number ${spotId} to use with car ${vehicleId}`,
-    );
   };
 
   function VehicleCard({ raw_data }: { raw_data: Vehicle }) {
@@ -324,7 +318,7 @@ export default function Page({ params }: any) {
               w-full
             "
               >
-                {/* Datas */}
+                {/* Disponibilidade (somente leitura) */}
                 <section
                   className="
                 surface-elevated
@@ -334,53 +328,43 @@ export default function Page({ params }: any) {
               "
                 >
                   <h3 className="font-semibold text-base mb-3">
-                    Período da reserva
+                    Disponibilidade da vaga
                   </h3>
 
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm text-muted mb-2">
-                        Entrada
-                      </label>
-
-                      <input
-                        type="date"
-                        name="startDate"
-                        onChange={(e) => {
-                          console.log(e.currentTarget.value);
-                          setSelectedStartDate(e.currentTarget.value);
-                        }}
-                        className={`
-                      w-full
-                      rounded-xl
-                      border border-soft
-                      bg-card
-                      px-3
-                      py-2
-                    `}
-                      />
+                      <p className="block text-sm text-muted mb-1">Período disponível</p>
+                      <div className="flex gap-2 items-center">
+                        <span className="text-sm font-medium">
+                          {spot?.operatingHours?.datePeriod?.start
+                            ? new Date(spot.operatingHours.datePeriod.start).toLocaleDateString("pt-BR")
+                            : "—"}
+                        </span>
+                        <span className="text-muted text-xs">até</span>
+                        <span className="text-sm font-medium">
+                          {spot?.operatingHours?.datePeriod?.end
+                            ? new Date(spot.operatingHours.datePeriod.end).toLocaleDateString("pt-BR")
+                            : "—"}
+                        </span>
+                      </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm text-muted mb-2">
-                        Saída
-                      </label>
-
-                      <input
-                        type="date"
-                        onChange={(e) => {
-                          setSelectedStartDate(e.currentTarget.value);
-                        }}
-                        className="
-                      w-full
-                      rounded-xl
-                      border border-soft
-                      bg-card
-                      px-3
-                      py-2
-                    "
-                      />
+                      <p className="block text-sm text-muted mb-1">Horário</p>
+                      <div className="flex gap-2 items-center">
+                        <span className="text-sm font-medium">
+                          {spot?.operatingHours?.timePeriod?.start ?? "—"}
+                        </span>
+                        <span className="text-muted text-xs">às</span>
+                        <span className="text-sm font-medium">
+                          {spot?.operatingHours?.timePeriod?.end ?? "—"}
+                        </span>
+                      </div>
                     </div>
+
+                    <p className="text-xs text-muted italic mt-2">
+                      O período é fixo conforme cadastrado pelo proprietário.
+                    </p>
                   </div>
                 </section>
 

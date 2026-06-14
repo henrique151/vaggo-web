@@ -28,9 +28,11 @@ export default function useGetReservations(
         return new Reservation(reservation);
       });
       setReservations(data);
+      setLoaded(true);
     };
     load();
   }, []);
+
 
   return [reservations, loaded];
 }

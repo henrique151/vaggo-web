@@ -1,18 +1,97 @@
-fix(vagas): correcao de bugs no cadastro de vagas e auth
+fix/feat: Correcao da Pesquisa de Propriedades + Sistema de Reservas
 
-Bugs Arrumados:
-1. Erro de redirecionamento no popup de verificacao (Register).
-2. Erro 400 'Unrecognized keys' no cadastro de vagas (Admin).
-3. Redirecionamento silenciosamente falhando ao salvar uma vaga.
-4. Erro de compilacao/montagem do ControllerStatus.
+## Causa Raiz dos Problemas
 
-Qual era o erro:
-1. O uso de redirect() no React Client Component estava causando travamentos no modal de confirmacao de cadastro.
-2. A API retornava 'Unrecognized keys: startDate, endDate, startTime, endTime' e 'Unrecognized key: complement' pois a validacao do Zod no backend e .strict() e esperava um objeto availability serializado. O campo complement sequer existe no DTO.
-3. Apos criar a vaga, o sistema nao ia para /user/property/ID pois PropertyService.generateSpots retornava undefined (tinha apenas console.log).
+### Problema 1: Propriedades nao aparecendo na tela inicial e pesquisa
+- CAUSA: Os hooks useSearchProperties chamavam a API com datas fixas no passado
+  (new Date(2026, 4, 10) = 10/Maio/2026), filtrando apenas vagas disponiveis
+  NAQUELE periodo especifico.
+- IDENTIFICACAO: Analise do codigo em hooks/api/property/useSearchProperties.ts
+  e app/page.tsx mostrou que datePeriod era passado com valores hardcoded.
+- CORRECAO: Removidas as datas hardcoded. A busca agora retorna todas as
+  propriedades com vagas aprovadas sem filtrar por periodo de data.
+- IMPACTO: Propriedades com vagas APROVADAS agora aparecem corretamente
+  na tela inicial e na pagina de pesquisa.
 
-Como foi arrumado:
-1. Trocado redirect() por useRouter().push('/login') para redirecionamento suave em CSR e implementadas chamadas logout.
-2. Alterado o FormData no new-spot/page.tsx para nao enviar complement e agrupar dados temporais num objeto JSON availability.
-3. Adicionado o return data no generateSpots do arquivo property.service.ts e inserida uma box de erro dinamica.
-4. Tratado erro de instanciamento no ControllerStatus.ts protegendo contra estados nulos.
+### Problema 2: Tab de Reservas na conta exibia sempre vazio
+- CAUSA: bookings.tab.tsx usava apenas um array estatico vazio como placeholder.
+  Nenhuma chamada de API era feita.
+- IDENTIFICACAO: Comentario no codigo "TODO: replace with real Booking type".
+- CORRECAO: Implementado uso do hook useGetReservations() para buscar reservas
+  reais do usuario autenticado via GET /reservations.
+- IMPACTO: Tab "Reservas" na conta agora exibe reservas reais com status,
+  datas, nome da vaga, propriedade e veiculo. Permite cancelar reservas
+  PENDENTES e APROVADAS via PATCH /reservations/{id}/cancel.
+
+### Problema 3: Datas de reserva hardcoded no fluxo de criacao
+- CAUSA: handleReserve em spot/[id]/page.tsx usava datas fixas ("2026-01-01"
+  e "2026-05-10") independente da disponibilidade real da vaga.
+- IDENTIFICACAO: Analise direta do codigo de handleReserve.
+- CORRECAO: O sistema agora le spot.operatingHours.datePeriod.start/end
+  e usa essas datas ao criar a reserva via POST /reservations.
+- IMPACTO: A reserva e criada com o periodo correto da vaga. Inputs de data
+  editaveis foram substituidos por exibicao somente leitura do periodo e
+  horario da vaga (startDate, endDate, timePeriod).
+
+### Problema 4: Dashboard nao exibia reservas do locatario
+- CAUSA: Dashboard so chamava useGetReservations(true) - apenas reservas
+  recebidas como proprietario.
+- CORRECAO: Adicionado segundo hook useGetReservations() (sem argumento)
+  para buscar tambem as reservas feitas pelo proprio usuario como locatario.
+- IMPACTO: Dashboard agora exibe secoes separadas: "Minhas Reservas"
+  (como locatario) e secoes do proprietario (proximas reservas recebidas,
+  historico, solicitacoes para aprovar/rejeitar).
+
+### Correcao menor: loaded nunca retornava true em useGetReservations
+- CAUSA: setLoaded(true) nunca era chamado apos carregar os dados.
+- CORRECAO: Adicionado setLoaded(true) apos setReservations(data).
+
+## Arquivos Modificados
+
+### hooks/api/property/useSearchProperties.ts
+- Refatorado para usar URLSearchParams corretamente
+- datePeriod agora e verdadeiramente opcional (nao enviado na URL se ausente)
+- Remove duplicata de parametro cep
+
+### app/page.tsx
+- Removidas datas hardcoded das chamadas de useSearchProperties
+- Removido import inutilizado de DatePeriod
+
+### app/(app)/search/page.tsx
+- Removida data hardcoded da chamada de useSearchProperties
+- Limpeza de imports inutilizados
+
+### app/(app)/user/account/_tabs/bookings.tab.tsx
+- Implementacao completa substituindo o placeholder
+- Usa useGetReservations() para dados reais
+- Exibe: vaga, propriedade, veiculo, datas, status
+- Botao de cancelar via PATCH /reservations/{id}/cancel
+
+### app/(app)/spot/[id]/page.tsx
+- handleReserve agora usa spot.operatingHours.datePeriod.start/end
+- VehicleAvailabilityWindow: inputs de data removidos, exibe periodo e
+  horario da vaga como somente leitura
+- Removidos imports inutilizados (DatePeriod, da from zod)
+- Removidos estados inutilizados (selectedStartDate, selectedEndDate)
+
+### app/(app)/user/dashboard/page.tsx
+- Adicionado useGetReservations() para reservas do locatario
+- Nova secao "Minhas Reservas" exibindo as reservas do usuario logado
+- Secoes do proprietario renomeadas para clareza
+
+### modules/reservation/hooks/useGetReservations.ts
+- Corrigido bug: setLoaded(true) agora e chamado apos carregar dados
+
+## Endpoints Utilizados
+- GET /reservations - reservas do usuario autenticado (locatario)
+- GET /reservations/owner - reservas recebidas pelo proprietario
+- POST /reservations - criar nova reserva
+- PATCH /reservations/{id}/cancel - cancelar reserva
+- PATCH /reservations/{id}/approve - aprovar reserva (proprietario)
+- PATCH /reservations/{id}/reject - rejeitar reserva (proprietario)
+- GET /reservations/search/address - pesquisa de propriedades
+
+## Verificacao
+- Build Next.js passou sem erros: npm run build
+- TypeScript sem erros de tipo
+- 21 rotas compiladas com sucesso
