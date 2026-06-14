@@ -67,7 +67,7 @@ function VerificationCodeWindow({
               try {
                 const res = await AuthController.confirmRegistration(email, code);
                 console.log("Resposta da API:", res);
-                if (res && res.success !== false) {
+                if (res) {
                   const authRes = await UserController.authenticate(email, password);
                   console.log("Autenticação finalizada:", authRes);
                   router.push("/login");

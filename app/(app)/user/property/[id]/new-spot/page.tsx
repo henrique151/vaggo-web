@@ -198,7 +198,7 @@ export default function Page() {
   };
 
   // Mapear os erros que vieram da API e não foram tratados nos campos acima (ex: complemento que não existe, data inválida no backend, etc)
-  const apiErrors = state?.errors || state?.error?.data?.errors;
+  const apiErrors = (state as any)?.errors || (state as any)?.error?.data?.errors;
   const mainApiMessage = state?.message || state?.error?.message;
 
   return (

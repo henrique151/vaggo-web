@@ -11,3 +11,4 @@ export * as ReviewController from "./review/review.controller";
 export * as UserController from "./user/user.controller";
 export * as VehicleController from "./vehicle/vehicle.controller";
 export * as AuthController from "./auth/auth.controller";
+export * as SpotAdminController from "./spot/spot.admin.controller";

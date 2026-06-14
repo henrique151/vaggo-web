@@ -1,13 +1,29 @@
 "use client";
 
 import Header from "@/component/header";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import PageContextProvider from "./page.provider";
 
 import pageTabs from "./page.tabs";
 import useTabController from "@/hooks/useTabController";
 import DefaultTabSidebar from "@/component/tabs/DefaultTabSidebar";
 import DefaultTabPageContainer from "@/component/tabs/DefaultTabPageContainer";
+import { PageContext } from "./page.context";
+import Link from "next/link";
+
+function AdminLink() {
+  const { user } = useContext(PageContext);
+  if (!user || user.permissionLevel !== "3") return null;
+
+  return (
+    <Link
+      href="/admin"
+      className="block w-full text-left px-4 py-3 rounded-2xl transition text-blue-600 font-semibold hover:bg-blue-50 border border-blue-200 mt-2"
+    >
+      🛠 Painel Administrativo
+    </Link>
+  );
+}
 
 export default function PageComponent() {
   const [isEditing, setIsEditing] = useState(false);
@@ -29,11 +45,14 @@ export default function PageComponent() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              <DefaultTabSidebar
-                tabs={pageTabs}
-                activeTab={activeTab}
-                activeTabSetter={setActiveTab}
-              />
+              <div className="flex flex-col gap-0">
+                <DefaultTabSidebar
+                  tabs={pageTabs}
+                  activeTab={activeTab}
+                  activeTabSetter={setActiveTab}
+                />
+                <AdminLink />
+              </div>
 
               <DefaultTabPageContainer activeTab={activeTab} />
             </div>
