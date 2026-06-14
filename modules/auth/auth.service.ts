@@ -6,7 +6,20 @@ import { AccessTokenClassInterface } from "@interfaces";
 export async function login(email: string, password: string) {}
 
 // POST /auth/register/resend
-export async function resendConfirmationCode(email: string) {}
+export async function resendConfirmationCode(email: string) {
+  try {
+    const res = await APIService.request("auth/register/resend", {
+      body: JSON.stringify({ email }),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 // POST /auth/register/confirm
 export async function confirmRegistration(email: string, code: string) {
@@ -41,4 +54,13 @@ export async function confirmForgotPassword(email: string, code: string) {}
 export async function resetPassword(resetToken: string, password: string) {}
 
 // POST /auth/logout
-export async function logout(token: AccessTokenClassInterface) {}
+export async function logout(token: AccessTokenClassInterface) {
+  try {
+    const res = await APIService.request("auth/logout", token, {
+      method: "POST",
+    });
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
