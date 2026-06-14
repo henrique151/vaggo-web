@@ -1,39 +1,84 @@
 "use server";
-import * as APIService from "@/modules/api/api.service";
 import { AccessTokenClassInterface, ReportClassInterface } from "@interfaces";
+import { APIService } from "@services";
 import map from "./mappers/report.service.interface.mapper";
 
 export async function register(
   token: AccessTokenClassInterface,
   form: FormData,
 ): Promise<boolean> {
-  const res = await APIService.request("reports", token, {
-    method: "POST",
-    body: form,
-  });
+  try {
+    const res = await APIService.request("reports", token, {
+      method: "POST",
+      body: form,
+    });
 
-  return res.ok;
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      console.error("[ReportService] Erro ao registrar denúncia:", body);
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    console.error("[ReportService] Exceção ao registrar denúncia:", e);
+    return false;
+  }
 }
 
 export async function get(
   token: AccessTokenClassInterface,
 ): Promise<ReportClassInterface[]> {
-  const res = await APIService.request("reports/my", token);
+  try {
+    const res = await APIService.request("reports/my", token);
 
-  const { data } = await res.json();
+    if (!res.ok) {
+      console.error("[ReportService] Erro ao buscar denúncias:", res.status);
+      return [];
+    }
 
-  return data.map(map);
+    const { data } = await res.json();
+    return data.map(map);
+  } catch (e) {
+    console.error("[ReportService] Exceção ao buscar denúncias:", e);
+    return [];
+  }
 }
 
 export async function getAll(
   token: AccessTokenClassInterface,
 ): Promise<ReportClassInterface[]> {
-  const data: any = await APIService.genericGetRequest(
-    token,
-    "admin/reports",
-    map,
-  );
-  console.log("data");
-  console.log(data);
-  return data;
+  try {
+    const res = await APIService.genericGetRequest(
+      token,
+      "admin/reports",
+      map,
+    );
+    return res ?? [];
+  } catch (e) {
+    console.error("[ReportService] Exceção ao buscar todas as denúncias:", e);
+    return [];
+  }
+}
+
+export async function requestReanalysis(
+  token: AccessTokenClassInterface,
+  id: number,
+): Promise<boolean> {
+  try {
+    const res = await APIService.request(`reports/${id}/reanalysis`, token, {
+      method: "PATCH",
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      console.error("[ReportService] Erro ao solicitar reanálise:", body);
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    console.error("[ReportService] Exceção ao solicitar reanálise:", e);
+    return false;
+  }
 }

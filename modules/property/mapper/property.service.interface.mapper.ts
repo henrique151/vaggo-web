@@ -38,5 +38,6 @@ export default function map(d: any): PropertyClassInterface {
         },
       },
     },
+    user: d.userId ? { id: d.userId } : undefined,
   };
 }

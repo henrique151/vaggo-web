@@ -4,6 +4,15 @@ import * as APIService from "../api/api.service";
 import map from "./mappers/review.service.interface.mapper";
 import { FormUtils } from "@utils";
 
+export async function register(token: AccessTokenClassInterface, form: FormData) {
+  try {
+    const res = await APIService.genericRegisterRequest(token, "reviews", form, "json");
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 export async function get(token: AccessTokenClassInterface): Promise<any>;
 export async function get(
   token: AccessTokenClassInterface,

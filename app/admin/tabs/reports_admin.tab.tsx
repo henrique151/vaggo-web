@@ -101,6 +101,19 @@ const Page = () => {
               //   // TODO: wire to delete report action
               //   console.log("delete report", report.id);
               // }}
+              onSuspendSpot={
+                report.target.type === "SPOT" && ["RESOLVIDA", "APROVADA"].includes(report.info.status)
+                  ? async () => {
+                      const res = await APIService.request(
+                        `admin/spots/${report.target.id}/suspend`,
+                        BrowserService.getToken(),
+                        { method: "PATCH" }
+                      );
+                      if (res.ok) alert("Vaga suspensa com sucesso!");
+                      else alert("Erro ao suspender vaga.");
+                    }
+                  : undefined
+              }
             >
               <DefaultEntityFrame
                 title={`Denúncia #${report.id.toString().padStart(2, "0")}`}
