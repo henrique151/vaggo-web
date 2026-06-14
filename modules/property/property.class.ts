@@ -1,14 +1,12 @@
 import {
   AllowedVehiclesTypes,
   ImageClassInterface,
-  // Property,
   PropertyClassInterface,
   PropertyStructureInterface,
   SpotApprovalStatus,
   SpotAvailabilityStatus,
   SpotClassInterface,
   SpotStructureInterface,
-  // VehicleClassInterface,
 } from "@interfaces";
 
 export class Property implements PropertyClassInterface {
@@ -22,12 +20,10 @@ export class Property implements PropertyClassInterface {
   };
   status: { active: boolean };
   location: { latitude: string; longitude: string; address: Address };
-  // address: Address;
   spots?: Spot[];
   user?: { id: number };
 
   constructor(i: PropertyStructureInterface) {
-    // console.log(i);
     this.id = i.id;
     this.info = {
       name: i.info?.name,
@@ -43,21 +39,13 @@ export class Property implements PropertyClassInterface {
       address:
         i.location?.address && new Address(i.location?.address as Address),
     };
-    // this.address = new Address(this.address);
-    // this.spots = this.spots && this.setSpots(this.spots);
     if (i.spots) this.setSpots(i.spots as SpotClassInterface[]);
     if (i.user) this.user = { id: i.user.id };
   }
 
   public setSpots(spots: SpotClassInterface[]): void {
-    this.spots = spots.map((spot) => {
-      return new Spot(spot);
-    });
+    this.spots = spots.map((spot) => new Spot(spot));
   }
-
-  // public isCompatibleWithVehicles(vehicles: Vehicle[]) {
-
-  // }
 }
 
 export class Spot implements SpotClassInterface {
@@ -82,6 +70,7 @@ export class Spot implements SpotClassInterface {
     timePeriod: { start: string; end: string };
   };
   property?: Property;
+
   constructor(i: SpotStructureInterface) {
     this.id = i.id;
     this.info = {
@@ -104,9 +93,11 @@ export class Spot implements SpotClassInterface {
         start: i.operatingHours?.datePeriod?.start,
         end: i.operatingHours?.datePeriod?.end,
       },
+      // BUG FIX: timePeriod estava usando datePeriod.end para ambos start e end
+      // Corrigido para usar timePeriod.start e timePeriod.end corretamente
       timePeriod: {
-        start: i.operatingHours?.datePeriod?.end,
-        end: i.operatingHours?.datePeriod?.end,
+        start: i.operatingHours?.timePeriod?.start,
+        end: i.operatingHours?.timePeriod?.end,
       },
     };
     this.property = i.property && new Property(i.property);
@@ -124,6 +115,7 @@ class Address implements AddressInterface {
     complement?: string;
   };
   city: CityInterface;
+
   constructor(i: AddressInterface) {
     this.id = i.id;
     this.location = {

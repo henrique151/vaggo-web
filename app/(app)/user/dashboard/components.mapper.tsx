@@ -1,16 +1,14 @@
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 import ConfirmationEntityFrame from "@/component/frames/ConfirmationEntityFrame";
-import { changeBookingSolicitationStatus } from "@/services/booking.service";
 import { Reservation } from "@classes";
 import { ReservationController } from "@controllers";
-import { BrowserService, ReservationService } from "@services";
+import { BrowserService } from "@services";
 import { useState } from "react";
 
 const handleSolicitation = async (
   id: number,
   mode: "approve" | "reject" | "cancel",
 ) => {
-  // const res = await changeBookingSolicitationStatus(id, mode);
   const res = await ReservationController.changeApprovalStatus(
     BrowserService.getToken(),
     id,
@@ -32,23 +30,21 @@ function SolicitationFrame({ reservation }: { reservation: Reservation }) {
   return (
     <section>
       {visible && (
-        <>
-          <section id={`booking_solicitation_${reservation.id}`}>
-            <ConfirmationEntityFrame
-              title={reservation.info.spot.info.identifier}
-              description={`Código: ${reservation.code} Solicitante: ${reservation?.info.user?.person?.name || "Desconhecido"}`}
-              onConfirm={async (e) => {
-                const res = await handleSolicitation(reservation.id, "approve");
-                if (res) setVisible(false);
-              }}
-              onCancel={async (e) => {
-                const res = await handleSolicitation(reservation.id, "reject");
-                // if (res) console.log(e);
-                if (res) setVisible(false);
-              }}
-            />
-          </section>
-        </>
+        <section id={`booking_solicitation_${reservation.id}`}>
+          <ConfirmationEntityFrame
+            title={reservation.info.spot.info.identifier}
+            description={`Código: ${reservation.code} Solicitante: ${reservation?.info.user?.person?.name || "Desconhecido"
+              }`}
+            onConfirm={async () => {
+              const res = await handleSolicitation(reservation.id, "approve");
+              if (res) setVisible(false);
+            }}
+            onCancel={async () => {
+              const res = await handleSolicitation(reservation.id, "reject");
+              if (res) setVisible(false);
+            }}
+          />
+        </section>
       )}
     </section>
   );
@@ -71,11 +67,21 @@ export function mapNextBookingCards(d: Reservation) {
   );
 }
 
-export function mapLatestBookingCards(d: Reservation, window: any) {
+// BUG FIX: interface clara para o objeto window recebido pelo mapper
+interface ReviewWindowHandle {
+  windowSetter: (open: boolean) => void;
+  reservationSetter: (id: number) => void;
+}
+
+export function mapLatestBookingCards(
+  d: Reservation,
+  window: ReviewWindowHandle,
+) {
   const propertyId = (d.info.spot as any)?.property?.id;
   const redirectTo = propertyId ? `/spot/${propertyId}` : "";
   return (
     <LatestBookingCard
+      key={`latest_booking_${d.id}`}
       id={d.id}
       identifier={d.info.spot.info.identifier}
       datePeriod={d.info.date.period}
@@ -86,26 +92,48 @@ export function mapLatestBookingCards(d: Reservation, window: any) {
   );
 }
 
-function LatestBookingCard({ id, identifier, datePeriod, status, window, redirectTo }) {
+interface LatestBookingCardProps {
+  id: number;
+  identifier: string;
+  datePeriod: { start: Date; end?: Date };
+  status: string;
+  window: ReviewWindowHandle;
+  redirectTo: string;
+}
+
+function LatestBookingCard({
+  id,
+  identifier,
+  datePeriod,
+  status,
+  window,
+  redirectTo,
+}: LatestBookingCardProps) {
   return (
-    <>
-      <EntityCard
-        key={`next_booking_${id}`}
-        title={identifier}
-        description={`Data: ${datePeriod.start.toLocaleDateString()}, Status: ${status}`}
-        redirectTo={redirectTo ?? ""}
-      >
-        {status === "APROVADA" && (
-          <button
-            onClick={() => {
+    <EntityCard
+      key={`latest_booking_${id}`}
+      title={identifier}
+      description={`Data: ${datePeriod.start.toLocaleDateString()}, Status: ${status}`}
+      redirectTo={redirectTo ?? ""}
+    >
+      {/* BUG FIX: botão Avaliar só aparece em reservas APROVADAS,
+          e usa os setters corretamente */}
+      {status === "APROVADA" && (
+        <button
+          onClick={() => {
+            // Verifica se os setters existem antes de chamar
+            if (typeof window?.windowSetter === "function") {
               window.windowSetter(true);
+            }
+            if (typeof window?.reservationSetter === "function") {
               window.reservationSetter(id);
-            }}
-          >
-            Avaliar
-          </button>
-        )}
-      </EntityCard>
-    </>
+            }
+          }}
+          className="text-sm text-primary font-medium hover:underline"
+        >
+          ✏️ Avaliar
+        </button>
+      )}
+    </EntityCard>
   );
 }
