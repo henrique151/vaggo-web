@@ -1,20 +1,40 @@
+"use client";
 import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
 import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
-// TODO: replace with real Booking type from context when available
-type Booking = {
-  id: number;
-  spotName: string;
-  property: string;
-  startDate: string;
-  endDate: string;
-  status: string;
-};
+import useGetReservations from "@/modules/reservation/hooks/useGetReservations";
+import { ReservationController } from "@controllers";
+import { BrowserService } from "@services";
+
+function formatDate(value: Date | string | undefined): string {
+  if (!value) return "—";
+  const d = value instanceof Date ? value : new Date(value as string);
+  if (isNaN(d.getTime())) return String(value);
+  return d.toLocaleDateString("pt-BR");
+}
+
+function statusLabel(status: string): string {
+  const map: Record<string, string> = {
+    PENDENTE: "Pendente",
+    APROVADA: "Aprovada",
+    RECUSADA: "Recusada",
+    CANCELADA: "Cancelada",
+  };
+  return map[status] ?? status;
+}
 
 const Page = () => {
-  // const { bookings } = usePageContext(); // TODO: uncomment when bookings are added to context
-  const bookings: Booking[] = []; // placeholder
+  const [reservations] = useGetReservations();
+
+  const handleCancel = async (id: number) => {
+    await ReservationController.changeApprovalStatus(
+      BrowserService.getToken(),
+      id,
+      "cancel",
+    );
+    window.location.reload();
+  };
 
   return (
     <TabPage label="Reservas">
@@ -23,39 +43,54 @@ const Page = () => {
       </div>
 
       <div className="space-y-4">
-        {bookings.length > 0
-          ? bookings.map((booking) => (
+        {!reservations ? (
+          <p className="text-muted">Carregando reservas...</p>
+        ) : reservations.length > 0 ? (
+          reservations.map((reservation) => {
+            const spot = reservation.info?.spot;
+            const vehicle = reservation.info?.vehicle;
+            const period = reservation.info?.date?.period;
+
+            const spotName =
+              spot?.info?.identifier ?? `Vaga #${spot?.id ?? "?"}`;
+            const propertyName =
+              (spot as any)?.property?.info?.name ?? "";
+            const vehicleLabel = vehicle
+              ? `${vehicle.brand ?? ""} ${vehicle.model ?? ""}`.trim()
+              : "";
+            const startDate = formatDate(period?.start);
+            const endDate = formatDate(period?.end);
+            const status = statusLabel(reservation.status);
+            const canCancel =
+              reservation.status === "PENDENTE" ||
+              reservation.status === "APROVADA";
+
+            return (
               <EntityFrame
-                key={booking.id}
-                editTitle={`Editar Reserva #${booking.id.toString().padStart(2, "0")}`}
-                editFields={[
-                  { label: "Data de início", name: "startDate", type: "date", defaultValue: booking.startDate, required: true },
-                  { label: "Data de término", name: "endDate", type: "date", defaultValue: booking.endDate, required: true },
-                ]}
-                onEdit={(formData) => {
-                  // TODO: wire to update booking action
-                  console.log("edit booking", booking.id, Object.fromEntries(formData));
-                }}
-                onCancelReservation={() => {}}
-                deleteTitle="Cancelar reserva"
-                deleteDescription={`Deseja cancelar a reserva de "${booking.spotName}" em ${booking.property}?`}
-                onDelete={() => {
-                  // TODO: wire to cancel/delete booking action
-                  console.log("delete booking", booking.id);
-                }}
+                key={reservation.id}
+                onCancelReservation={
+                  canCancel
+                    ? () => handleCancel(reservation.id)
+                    : undefined
+                }
               >
                 <DefaultEntityFrame
-                  title={booking.spotName}
-                  description={booking.property}
+                  title={spotName}
+                  description={[propertyName, vehicleLabel ? `Veículo: ${vehicleLabel}` : ""]
+                    .filter(Boolean)
+                    .join(" · ")}
                   tagList={[
-                    `Início: ${booking.startDate}`,
-                    `Término: ${booking.endDate}`,
-                    `Status: ${booking.status}`,
+                    `Entrada: ${startDate}`,
+                    `Saída: ${endDate}`,
+                    `Status: ${status}`,
                   ]}
                 />
               </EntityFrame>
-            ))
-          : <p className="text-muted">Nenhuma reserva registrada no momento.</p>}
+            );
+          })
+        ) : (
+          <p className="text-muted">Nenhuma reserva registrada no momento.</p>
+        )}
       </div>
     </TabPage>
   );

@@ -17,22 +17,20 @@ export function useSearchProperties({
   datePeriod,
   cep,
 }: stateProps): stateReturnProps {
-  let uri = `reservations/search/address`;
-
-  uri = uri.concat(`?address=${address}`);
-
-  // console.log(uri);
+  const params = new URLSearchParams();
+  if (address) params.set("address", address);
 
   if (datePeriod) {
     const dateString = datePeriod.toString();
-    uri = uri.concat(
-      `&startDate=${dateString.start}&endDate=${dateString.end}`,
-    );
+    params.set("startDate", dateString.start);
+    params.set("endDate", dateString.end);
   }
 
-  if (cep) {
-    uri = uri.concat(`&cep=${cep}`);
-  }
+  if (cep) params.set("cep", cep);
+
+  const queryString = params.toString();
+  let uri = `reservations/search/address${queryString ? `?${queryString}` : ""}`;
+
 
   const [data, dataLoading] = useApi({
     uri: uri,

@@ -1,13 +1,7 @@
 "use client";
-import DatePeriod from "@/classes/data/DatePeriod";
 import CarouselContainer from "@/component/container/CarouselContainer";
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
-// import Header from "@/component/header";
-// import SpotCard from "@/component/spot_card";
-// import SpotCarousel from "@/component/spot_carousel";
-// import { PropertyDAO, useSearchProperties } from "@/entity/property";
 import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
-// import { useSearchParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +17,6 @@ export default function Home({
 
   const [foundPropertiesData, foundPropertiesLoading] = useSearchProperties({
     address: params.address ?? "",
-    datePeriod: new DatePeriod(new Date(2026, 4, 10), new Date(2026, 4, 10)),
   });
 
   const [foundPropertiesCards, setFoundPropertiesCards] = useState<
