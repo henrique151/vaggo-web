@@ -1,0 +1,18 @@
+fix(vagas): correcao de bugs no cadastro de vagas e auth
+
+Bugs Arrumados:
+1. Erro de redirecionamento no popup de verificacao (Register).
+2. Erro 400 'Unrecognized keys' no cadastro de vagas (Admin).
+3. Redirecionamento silenciosamente falhando ao salvar uma vaga.
+4. Erro de compilacao/montagem do ControllerStatus.
+
+Qual era o erro:
+1. O uso de redirect() no React Client Component estava causando travamentos no modal de confirmacao de cadastro.
+2. A API retornava 'Unrecognized keys: startDate, endDate, startTime, endTime' e 'Unrecognized key: complement' pois a validacao do Zod no backend e .strict() e esperava um objeto availability serializado. O campo complement sequer existe no DTO.
+3. Apos criar a vaga, o sistema nao ia para /user/property/ID pois PropertyService.generateSpots retornava undefined (tinha apenas console.log).
+
+Como foi arrumado:
+1. Trocado redirect() por useRouter().push('/login') para redirecionamento suave em CSR e implementadas chamadas logout.
+2. Alterado o FormData no new-spot/page.tsx para nao enviar complement e agrupar dados temporais num objeto JSON availability.
+3. Adicionado o return data no generateSpots do arquivo property.service.ts e inserida uma box de erro dinamica.
+4. Tratado erro de instanciamento no ControllerStatus.ts protegendo contra estados nulos.

@@ -13,6 +13,7 @@ import {
   ReviewController,
   UserController,
   VehicleController,
+  SpotAdminController,
 } from "@controllers";
 import { BrowserService } from "@services";
 import reportMapper from "@/modules/report/mappers/report.class.mapper";
@@ -21,6 +22,7 @@ import { map as vehicleMapper } from "@/modules/vehicle/mappers/vehicle.class.ma
 import propertyMapper from "@/modules/property/mapper/property.class.mapper";
 import reservationMapper from "@/modules/reservation/mappers/reservation.class.mapper";
 import reviewMapper from "@/modules/review/mappers/review.class.mapper";
+import { map as spotMapper } from "@/mappers/spot.mapper";
 
 export const Context = createContext<any>({
   users: undefined,
@@ -75,6 +77,12 @@ export default function PageContextProvider({
     reviewMapper,
   );
 
+  const [adminSpots, loadedAdminSpots, refreshAdminSpots] =
+    useGenericDataFetch<any>(async () => {
+      // Return raw items or mapped ones
+      return await SpotAdminController.getAllAdmin(BrowserService.getToken());
+    }, (item: any) => item);
+
   return (
     <>
       <Context.Provider
@@ -96,6 +104,9 @@ export default function PageContextProvider({
 
           reviews,
           refreshReviews,
+
+          adminSpots,
+          refreshAdminSpots,
         }}
       >
         {children}
