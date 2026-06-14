@@ -1,65 +1,97 @@
-feat/fix: Painel Administrativo de Vagas + Correcoes Gerais de Bugs
+fix/feat: Correcao da Pesquisa de Propriedades + Sistema de Reservas
 
-## Funcionalidades Implementadas
+## Causa Raiz dos Problemas
 
-### Painel Administrativo de Vagas
-- Criado modules/spot/spot.admin.controller.ts com endpoints admin:
-  - GET /admin/spots - listar todas as vagas
-  - GET /admin/spots/search - busca com filtros (id, email, status)
-  - PATCH /admin/spots/:id/evaluate - aprovar/recusar vaga
-  - PATCH /admin/spots/:id - ativar/desativar vaga
-  - DELETE /admin/spots/:id - excluir vaga
-- Reescrito app/admin/tabs/spots.tab.tsx com:
-  - Listagem de vagas via EntityFrame
-  - Filtros de busca por ID, e-mail e status
-  - Avaliacao (PENDENTE/APROVADA/RECUSADA) com motivo obrigatorio para recusa
-  - Toggle de ativacao/desativacao
-  - Exclusao com confirmacao nativa
-  - Recarregamento automatico apos acoes
-- Adicionado adminSpots e refreshAdminSpots no contexto global do admin
-- Exportado SpotAdminController no controllers-barrel.ts
+### Problema 1: Propriedades nao aparecendo na tela inicial e pesquisa
+- CAUSA: Os hooks useSearchProperties chamavam a API com datas fixas no passado
+  (new Date(2026, 4, 10) = 10/Maio/2026), filtrando apenas vagas disponiveis
+  NAQUELE periodo especifico.
+- IDENTIFICACAO: Analise do codigo em hooks/api/property/useSearchProperties.ts
+  e app/page.tsx mostrou que datePeriod era passado com valores hardcoded.
+- CORRECAO: Removidas as datas hardcoded. A busca agora retorna todas as
+  propriedades com vagas aprovadas sem filtrar por periodo de data.
+- IMPACTO: Propriedades com vagas APROVADAS agora aparecem corretamente
+  na tela inicial e na pagina de pesquisa.
 
-### Link de Acesso ao Painel Administrativo
-- Adicionado botao Painel Administrativo no sidebar de /account
-- Visivel SOMENTE para usuarios com permissionLevel === 3 (ADMIN)
+### Problema 2: Tab de Reservas na conta exibia sempre vazio
+- CAUSA: bookings.tab.tsx usava apenas um array estatico vazio como placeholder.
+  Nenhuma chamada de API era feita.
+- IDENTIFICACAO: Comentario no codigo "TODO: replace with real Booking type".
+- CORRECAO: Implementado uso do hook useGetReservations() para buscar reservas
+  reais do usuario autenticado via GET /reservations.
+- IMPACTO: Tab "Reservas" na conta agora exibe reservas reais com status,
+  datas, nome da vaga, propriedade e veiculo. Permite cancelar reservas
+  PENDENTES e APROVADAS via PATCH /reservations/{id}/cancel.
 
-## Bugs Corrigidos
+### Problema 3: Datas de reserva hardcoded no fluxo de criacao
+- CAUSA: handleReserve em spot/[id]/page.tsx usava datas fixas ("2026-01-01"
+  e "2026-05-10") independente da disponibilidade real da vaga.
+- IDENTIFICACAO: Analise direta do codigo de handleReserve.
+- CORRECAO: O sistema agora le spot.operatingHours.datePeriod.start/end
+  e usa essas datas ao criar a reserva via POST /reservations.
+- IMPACTO: A reserva e criada com o periodo correto da vaga. Inputs de data
+  editaveis foram substituidos por exibicao somente leitura do periodo e
+  horario da vaga (startDate, endDate, timePeriod).
 
-### Erro Classes not supported in Client Components
-- Problema: Server Actions retornavam instancias de classes que nao podem
-  ser serializadas pelo Next.js para Client Components
-- Identificado via erro no browser: Only plain objects can be passed
-- Solucao: Controllers admin retornam dados crus (plain objects) da API
-- Impacto: Vagas carregam corretamente no painel admin
+### Problema 4: Dashboard nao exibia reservas do locatario
+- CAUSA: Dashboard so chamava useGetReservations(true) - apenas reservas
+  recebidas como proprietario.
+- CORRECAO: Adicionado segundo hook useGetReservations() (sem argumento)
+  para buscar tambem as reservas feitas pelo proprio usuario como locatario.
+- IMPACTO: Dashboard agora exibe secoes separadas: "Minhas Reservas"
+  (como locatario) e secoes do proprietario (proximas reservas recebidas,
+  historico, solicitacoes para aprovar/rejeitar).
 
-### Busca travando em loop infinito
-- Problema: handleSearch sem try/finally, setLoadingSearch(false) nunca
-  chamado em erro, travando o botao em loading
-- Solucao: Adicionado try/catch/finally + verificacao de filtros vazios
-- Impacto: Busca funciona e retorna resultados corretamente
+### Correcao menor: loaded nunca retornava true em useGetReservations
+- CAUSA: setLoaded(true) nunca era chamado apos carregar os dados.
+- CORRECAO: Adicionado setLoaded(true) apos setReservations(data).
 
-### Campo complement rejeitado pelo backend
-- Problema: Backend usa Zod .strict(), campo complement nao existe no schema
-- Identificado via API: Unrecognized key: complement
-- Solucao: Removido campo complement do payload de criacao de vagas
-- Impacto: Cadastro de vagas funciona corretamente
+## Arquivos Modificados
 
-### Redirecionamento apos cadastro de vaga
-- Problema: Apos criar vaga, usuario nao era redirecionado
-- Solucao: Adicionado router.push para /user/property/:id apos sucesso
-- Impacto: Fluxo de criacao de vaga completo
+### hooks/api/property/useSearchProperties.ts
+- Refatorado para usar URLSearchParams corretamente
+- datePeriod agora e verdadeiramente opcional (nao enviado na URL se ausente)
+- Remove duplicata de parametro cep
 
-### Erro configuracao next.config.ts
-- Problema: serverActions no nivel raiz do NextConfig (invalido)
-- Solucao: Movido para experimental: { serverActions: {...} }
-- Impacto: Build passa sem warnings de configuracao invalida
+### app/page.tsx
+- Removidas datas hardcoded das chamadas de useSearchProperties
+- Removido import inutilizado de DatePeriod
 
-### Registro - syntax error no modal de confirmacao
-- Problema: Dois blocos else consecutivos causavam erro de compilacao
-- Solucao: Unificado o fluxo de erro
-- Impacto: Build compila e fluxo de confirmacao de email funciona
+### app/(app)/search/page.tsx
+- Removida data hardcoded da chamada de useSearchProperties
+- Limpeza de imports inutilizados
 
-## Integracao Frontend/Backend
-- Todos os endpoints administrativos integrados com autenticacao via token
-- Dados de vagas carregados diretamente da API sem transformacao de classe
-- Controle de acesso por permissionLevel mantido em todas as rotas /admin
+### app/(app)/user/account/_tabs/bookings.tab.tsx
+- Implementacao completa substituindo o placeholder
+- Usa useGetReservations() para dados reais
+- Exibe: vaga, propriedade, veiculo, datas, status
+- Botao de cancelar via PATCH /reservations/{id}/cancel
+
+### app/(app)/spot/[id]/page.tsx
+- handleReserve agora usa spot.operatingHours.datePeriod.start/end
+- VehicleAvailabilityWindow: inputs de data removidos, exibe periodo e
+  horario da vaga como somente leitura
+- Removidos imports inutilizados (DatePeriod, da from zod)
+- Removidos estados inutilizados (selectedStartDate, selectedEndDate)
+
+### app/(app)/user/dashboard/page.tsx
+- Adicionado useGetReservations() para reservas do locatario
+- Nova secao "Minhas Reservas" exibindo as reservas do usuario logado
+- Secoes do proprietario renomeadas para clareza
+
+### modules/reservation/hooks/useGetReservations.ts
+- Corrigido bug: setLoaded(true) agora e chamado apos carregar dados
+
+## Endpoints Utilizados
+- GET /reservations - reservas do usuario autenticado (locatario)
+- GET /reservations/owner - reservas recebidas pelo proprietario
+- POST /reservations - criar nova reserva
+- PATCH /reservations/{id}/cancel - cancelar reserva
+- PATCH /reservations/{id}/approve - aprovar reserva (proprietario)
+- PATCH /reservations/{id}/reject - rejeitar reserva (proprietario)
+- GET /reservations/search/address - pesquisa de propriedades
+
+## Verificacao
+- Build Next.js passou sem erros: npm run build
+- TypeScript sem erros de tipo
+- 21 rotas compiladas com sucesso
