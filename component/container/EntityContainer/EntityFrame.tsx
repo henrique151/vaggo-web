@@ -60,17 +60,35 @@ export default function EntityFrame({
       undefined,
     );
 
+    const [error, setError] = useState<string | null>(null);
+
     const handleReport = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       const formData = new FormData(e.currentTarget);
+      const description = formData.get("description") as string;
 
+      if (!description || description.trim() === "") {
+        setError("Este campo é obrigatório responder.");
+        return;
+      }
+
+      if (description.trim().length <= 5) {
+        setError("O campo deve ter no mínimo mais de 5 caracteres.");
+        return;
+      }
+
+      setError(null);
       try {
-        // TODO:
-        // const res = await ReportController.register(...);
-
+        if (onReanalise) {
+          const success = await onReanalise(description);
+          // Define o estado baseado no retorno da API (se for false, joga pro bloco de erro)
+          if (success === false) {
+            setMessageState(false);
+            return;
+          }
+        }
         setMessageState(true);
-        onReanalise?.();
       } catch {
         setMessageState(false);
       }
@@ -90,18 +108,31 @@ export default function EntityFrame({
         </p>
       ),
       undefined: (
-        
+
         <form onSubmit={handleReport}>
           <FormItem
             type="text"
             label="Faça uma descrição do problema"
             name="description"
           />
+
+          {error && (
+            <p className="text-rose-500 text-sm font-medium mt-1 animate-pulse">
+              {error}
+            </p>
+          )}
+
           <FormItem
             type="text"
             label="Qual motivo para a reanálise?"
             name="reason"
           />
+
+          {error && (
+            <p className="text-rose-500 text-sm font-medium mt-1 animate-pulse">
+              {error}
+            </p>
+          )}
 
           <div className="h-4" />
 
@@ -115,19 +146,19 @@ export default function EntityFrame({
       ),
     };
 
-     return (
-    <>
-      <BlurOverlay show={true} onClick={() => {}} />
+    return (
+      <>
+        <BlurOverlay show={true} onClick={() => { }} />
 
-      <GenericWindow
-        title="Reanálise"
-        exitButton={true}
-        onExit={reanaliseWindow.hide}
-      >
-        {messages[String(messageState)]}
-      </GenericWindow>
-    </>
-  );
+        <GenericWindow
+          title="Reanálise"
+          exitButton={true}
+          onExit={reanaliseWindow.hide}
+        >
+          {messages[String(messageState)]}
+        </GenericWindow>
+      </>
+    );
   }
 
   function CancelReservationWindow({ onExit }: { onExit: MouseEventHandler }) {
@@ -181,7 +212,7 @@ export default function EntityFrame({
 
     return (
       <>
-        <BlurOverlay show={true} onClick={() => {}} />
+        <BlurOverlay show={true} onClick={() => { }} />
 
         <GenericWindow
           title="Cancelar Reserva"
@@ -420,7 +451,7 @@ export default function EntityFrame({
         </>
       )}
 
-            {/* Delete Confirm Window */}
+      {/* Delete Confirm Window */}
       {canDelete && showDeleteConfirm && (
         <>
           <BlurOverlay

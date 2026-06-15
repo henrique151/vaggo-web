@@ -83,15 +83,20 @@ const Page = () => {
             return (
               <EntityFrame
                 key={report.id}
-                // Se for recusada, passa a função, senão passa undefined para ocultar o botão
-                onReanalise={isRecusada ? async () => {
-                  const res = await ReportController.requestReanalysis(BrowserService.getToken(), report.id);
+                onReanalise={isRecusada ? async (description: string) => {
+                  // Agora enviamos a descrição capturada diretamente pelo formulário e validada!
+                  const res = await ReportController.requestReanalysis(
+                    BrowserService.getToken(),
+                    report.id,
+                    description
+                  );
+
                   if (res) {
-                    alert("Reanálise solicitada com sucesso!");
-                    if (refresh) refresh(); // Atualiza a lista com o novo status
-                  } else {
-                    alert("Erro ao solicitar reanálise.");
+                    if (refresh) refresh(); // Atualiza a listagem na tela
+                    return true; // Informa o modal que deu sucesso
                   }
+
+                  return false; // Informa o modal que deu erro na API
                 } : undefined}
               >
                 <DefaultEntityFrame

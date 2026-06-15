@@ -64,10 +64,15 @@ export async function getAll(
 export async function requestReanalysis(
   token: AccessTokenClassInterface,
   id: number,
+  description: string
 ): Promise<boolean> {
   try {
     const res = await APIService.request(`reports/${id}/reanalysis`, token, {
       method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ description }),
     });
 
     if (!res.ok) {
