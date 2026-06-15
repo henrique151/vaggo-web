@@ -18,7 +18,7 @@ function AdminLink() {
   return (
     <Link
       href="/admin"
-      className="block w-full text-left px-4 py-3 rounded-2xl transition text-blue-600 font-semibold hover:bg-blue-50 border border-blue-200 mt-2"
+      className="app-menu-item border border-soft rounded-xl mt-2 font-semibold text-sky-600 dark:text-sky-400"
     >
       🛠 Painel Administrativo
     </Link>

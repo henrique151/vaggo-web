@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
@@ -5,6 +6,7 @@ import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
 import { usePageContext } from "../_context/page.context";
 import { Property } from "@classes";
 import { APIService, BrowserService } from "@services";
+import FilterBar, { FilterField, FilterValues } from "@/component/filter/FilterBar";
 
 // TODO: substituir pelo tipo real de Property e pelo hook de dados
 type AdminProperty = {
@@ -16,19 +18,48 @@ type AdminProperty = {
   address?: string;
 };
 
+const FILTER_FIELDS: FilterField[] = [
+  { key: "name",         label: "Nome",   type: "text", placeholder: "Nome da propriedade" },
+];
+
 const Page = () => {
   const { properties, refreshProperties } = usePageContext();
+  const [displayProperties, setDisplayProperties] = useState<Property[] | undefined>(undefined);
 
   console.log(properties);
+
+  const filtered = displayProperties ?? properties;
+
+  const handleSearch = (values: FilterValues) => {
+    const { name, neighborhood } = values;
+    const hasFilter = name || neighborhood;
+    if (!hasFilter) { setDisplayProperties(undefined); return; }
+
+    setDisplayProperties(
+      (properties ?? []).filter((p: Property) => {
+        if (name         && !p.info?.name?.toLowerCase().includes(name.toLowerCase()))                                        return false;
+        if (neighborhood && !p.location?.address?.location?.neighborhood?.toLowerCase().includes(neighborhood.toLowerCase())) return false;
+        return true;
+      }),
+    );
+  };
+
   return (
     <TabPage label="Propriedades">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold">Propriedades</h2>
       </div>
 
+      <FilterBar
+        title="Filtrar Propriedades"
+        fields={FILTER_FIELDS}
+        onSearch={handleSearch}
+        onClear={() => setDisplayProperties(undefined)}
+      />
+
       <div className="space-y-4">
-        {properties.length > 0 ? (
-          properties.map((property?: Property) => (
+        {filtered?.length > 0 ? (
+          filtered.map((property?: Property) => (
             <EntityFrame
               key={property?.id}
               editTitle={`Editar ${property?.info?.name}`}

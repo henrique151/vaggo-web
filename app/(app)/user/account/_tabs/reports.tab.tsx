@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import Tab from "@/classes/TabContainer/Tab";
 import TabPage from "@/component/container/TabContainer/TabPage";
 import EntityFrame from "@/component/container/EntityContainer/EntityFrame";
@@ -5,10 +7,50 @@ import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
 import { usePageContext } from "../page.context";
 import { ReportController } from "@controllers";
 import { BrowserService } from "@services";
+import FilterBar, { FilterField, FilterValues } from "@/component/filter/FilterBar";
+
+const FILTER_FIELDS: FilterField[] = [
+  { key: "reason", label: "Motivo", type: "text", placeholder: "Palavra-chave" },
+  {
+    key: "status", label: "Status", type: "select",
+    options: [
+      { value: "PENDENTE",   label: "Pendente" },
+      { value: "EM ANALISE", label: "Em Análise" },
+      { value: "RESOLVIDA",  label: "Resolvida" },
+      { value: "RECUSADA",   label: "Recusada" },
+      { value: "REANALISE",  label: "Reanálise" },
+    ],
+  },
+  {
+    key: "targetType", label: "Tipo", type: "select",
+    options: [{ value: "SPOT", label: "Vaga" }, { value: "CHAT", label: "Conversa" }],
+  },
+];
 
 const Page = () => {
-  // BUG FIX: renomeado de "reports" para contexto correto do usuário
   const { reports } = usePageContext();
+  const [displayReports, setDisplayReports] = useState<typeof reports | undefined>(undefined);
+
+  const filtered = displayReports ?? reports ?? [];
+
+  function handleSearch(values: FilterValues) {
+    if (!reports) return;
+    const { reason, status, targetType } = values;
+    const hasFilter = reason || status || targetType;
+    if (!hasFilter) { setDisplayReports(undefined); return; }
+
+    setDisplayReports(
+      reports.filter((r) => {
+        const rawStatus  = r?.info?.status  ?? r?.status     ?? "";
+        const rawReason  = r?.info?.reason  ?? r?.reason     ?? "";
+        const rawType    = r?.target?.type  ?? r?.targetType ?? "";
+        if (reason     && !rawReason.toLowerCase().includes(reason.toLowerCase())) return false;
+        if (status     && rawStatus !== status)                                     return false;
+        if (targetType && rawType   !== targetType)                                 return false;
+        return true;
+      }),
+    );
+  }
 
   return (
     <TabPage label="Denúncias">
@@ -16,41 +58,30 @@ const Page = () => {
         <h2 className="text-2xl font-semibold">Minhas Denúncias</h2>
       </div>
 
-      <div className="space-y-4">
-        {reports?.length > 0 ? (
-          reports.map((report) => {
-            // BUG FIX: capitalização segura do status
-            const rawStatus = report?.info?.status ?? report?.status ?? "";
-            const statusLabel =
-              rawStatus.charAt(0).toUpperCase() +
-              rawStatus.slice(1).toLowerCase();
+      <FilterBar
+        title="Filtrar Denúncias"
+        fields={FILTER_FIELDS}
+        onSearch={handleSearch}
+        onClear={() => setDisplayReports(undefined)}
+      />
 
-            // BUG FIX: acessa campos de forma segura, compatível com ReportData
-            const reason = report?.info?.reason ?? report?.reason ?? "—";
-            const targetType: "SPOT" | "CHAT" =
-              report?.target?.type ?? report?.targetType ?? "SPOT";
-            const createdAt: Date | undefined =
-              report?.date?.created ?? report?.createdAt;
-            const spotName =
-              report?.spot?.property?.info?.name ??
-              report?.spot?.info?.identifier ??
-              "—";
-            const spotIdentifier = report?.spot?.info?.identifier ?? "—";
+      <div className="space-y-4">
+        {filtered.length > 0 ? (
+          filtered.map((report) => {
+            const rawStatus     = report?.info?.status ?? report?.status ?? "";
+            const statusLabel   = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1).toLowerCase();
+            const reason        = report?.info?.reason  ?? report?.reason     ?? "—";
+            const targetType: "SPOT" | "CHAT" = report?.target?.type ?? report?.targetType ?? "SPOT";
+            const createdAt     = report?.date?.created ?? report?.createdAt;
+            const spotName      = report?.spot?.property?.info?.name ?? report?.spot?.info?.identifier ?? "—";
+            const spotIdentifier= report?.spot?.info?.identifier ?? "—";
 
             return (
               <EntityFrame
                 key={report.id}
-                // BUG FIX: onReanalise agora funciona corretamente
                 onReanalise={async () => {
-                  const res = await ReportController.requestReanalysis(
-                    BrowserService.getToken(),
-                    report.id,
-                  );
-                  if (res) {
-                    alert("Reanálise solicitada com sucesso!");
-                  } else {
-                    alert("Erro ao solicitar reanálise.");
-                  }
+                  const res = await ReportController.requestReanalysis(BrowserService.getToken(), report.id);
+                  alert(res ? "Reanálise solicitada com sucesso!" : "Erro ao solicitar reanálise.");
                 }}
               >
                 <DefaultEntityFrame
@@ -59,12 +90,8 @@ const Page = () => {
                   tagList={[
                     `Status: ${statusLabel}`,
                     `Tipo: ${{ SPOT: "Vaga", CHAT: "Conversa" }[targetType]}`,
-                    `Registrado em: ${createdAt
-                      ? createdAt.toLocaleDateString("pt-BR")
-                      : "—"
-                    }`,
-                    `Relacionado: ${spotName}${spotIdentifier !== spotName ? ` - ${spotIdentifier}` : ""
-                    }`,
+                    `Registrado em: ${createdAt ? createdAt.toLocaleDateString("pt-BR") : "—"}`,
+                    `Relacionado: ${spotName}${spotIdentifier !== spotName ? ` - ${spotIdentifier}` : ""}`,
                   ]}
                 />
               </EntityFrame>
@@ -78,9 +105,5 @@ const Page = () => {
   );
 };
 
-const ReportsTab = new Tab(
-  { default: "Denúncias", page: "Minhas Denúncias" },
-  Page,
-);
-
+const ReportsTab = new Tab({ default: "Denúncias", page: "Minhas Denúncias" }, Page);
 export default ReportsTab;

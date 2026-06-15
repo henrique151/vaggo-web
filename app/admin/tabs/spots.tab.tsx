@@ -8,6 +8,7 @@ import DefaultEntityFrame from "@/component/frames/DefaultEntityFrame";
 import { usePageContext } from "../_context/page.context";
 import { SpotAdminController } from "@controllers";
 import { BrowserService } from "@services";
+import FilterBar, { FilterField, FilterValues } from "@/component/filter/FilterBar";
 
 // The raw API shape for a spot (admin endpoint)
 type RawSpot = {
@@ -29,11 +30,22 @@ type RawSpot = {
   [key: string]: any;
 };
 
+const FILTER_FIELDS: FilterField[] = [
+  { key: "id",    label: "ID",                     type: "text",  placeholder: "Ex: 10" },
+  { key: "email", label: "E-mail do Proprietário", type: "email", placeholder: "email@exemplo.com" },
+  {
+    key: "status", label: "Status", type: "select",
+    options: [
+      { value: "PENDENTE", label: "Pendente" },
+      { value: "APROVADA", label: "Aprovada" },
+      { value: "RECUSADA", label: "Recusada" },
+    ],
+  },
+];
+
 const Page = () => {
   const { adminSpots, refreshAdminSpots } = usePageContext();
   const [displaySpots, setDisplaySpots] = useState<RawSpot[]>([]);
-  const [filters, setFilters] = useState({ id: "", email: "", status: "" });
-  const [loadingSearch, setLoadingSearch] = useState(false);
 
   useEffect(() => {
     if (adminSpots) {
@@ -41,28 +53,21 @@ const Page = () => {
     }
   }, [adminSpots]);
 
-  const handleSearch = async () => {
-    const hasFilters = filters.id || filters.email || filters.status;
+  const handleSearch = async (values: FilterValues) => {
+    const { id, email, status } = values;
+    const hasFilters = id || email || status;
     if (!hasFilters) {
       setDisplaySpots(adminSpots || []);
       return;
     }
 
-    setLoadingSearch(true);
     try {
       const token = BrowserService.getToken();
-      const results = await SpotAdminController.search(token, filters);
+      const results = await SpotAdminController.search(token, { id, email, status });
       setDisplaySpots(results || []);
     } catch (err) {
       console.error("Erro na busca:", err);
-    } finally {
-      setLoadingSearch(false);
     }
-  };
-
-  const clearFilters = () => {
-    setFilters({ id: "", email: "", status: "" });
-    setDisplaySpots(adminSpots || []);
   };
 
   // Helper to get spot identifier
@@ -83,60 +88,12 @@ const Page = () => {
         <h2 className="text-2xl font-semibold">Vagas (Spots)</h2>
       </div>
 
-      {/* Filtros */}
-      <div className="bg-white p-4 rounded-xl border border-base mb-6 shadow-sm">
-        <h3 className="text-sm font-medium mb-3 text-muted">Filtrar Vagas</h3>
-        <div className="flex flex-wrap gap-4 items-end">
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-muted">ID</label>
-            <input
-              type="text"
-              className="app-input text-sm px-3 py-2 rounded-lg border-base"
-              placeholder="Ex: 10"
-              value={filters.id}
-              onChange={(e) => setFilters((f) => ({ ...f, id: e.target.value }))}
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-muted">E-mail do Proprietário</label>
-            <input
-              type="email"
-              className="app-input text-sm px-3 py-2 rounded-lg border-base"
-              placeholder="email@exemplo.com"
-              value={filters.email}
-              onChange={(e) => setFilters((f) => ({ ...f, email: e.target.value }))}
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-muted">Status</label>
-            <select
-              className="app-input text-sm px-3 py-2 rounded-lg border-base"
-              value={filters.status}
-              onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
-            >
-              <option value="">Todos</option>
-              <option value="PENDENTE">Pendente</option>
-              <option value="APROVADA">Aprovada</option>
-              <option value="RECUSADA">Recusada</option>
-            </select>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={handleSearch}
-              disabled={loadingSearch}
-              className="btn-primary px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
-            >
-              {loadingSearch ? "Buscando..." : "Buscar"}
-            </button>
-            <button
-              onClick={clearFilters}
-              className="bg-gray-100 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 transition hover:bg-gray-200"
-            >
-              Limpar
-            </button>
-          </div>
-        </div>
-      </div>
+      <FilterBar
+        title="Filtrar Vagas"
+        fields={FILTER_FIELDS}
+        onSearch={handleSearch}
+        onClear={() => setDisplaySpots(adminSpots || [])}
+      />
 
       {/* Lista */}
       <div className="space-y-4">
