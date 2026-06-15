@@ -1,9 +1,18 @@
-import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
-import ConfirmationEntityFrame from "@/component/frames/ConfirmationEntityFrame";
+"use client";
+
+import { useState } from "react";
 import { Reservation } from "@classes";
 import { ReservationController } from "@controllers";
 import { BrowserService } from "@services";
-import { useState } from "react";
+
+// ── helper ────────────────────────────────────────────────────────────────────
+
+function fmt(d: Date | undefined) {
+  if (!d) return "—";
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+}
+
+// ── SolicitationCard ──────────────────────────────────────────────────────────
 
 const handleSolicitation = async (
   id: number,
@@ -25,115 +34,84 @@ const handleSolicitation = async (
   return false;
 };
 
-function SolicitationFrame({ reservation }: { reservation: Reservation }) {
+function SolicitationCard({ reservation }: { reservation: Reservation }) {
   const [visible, setVisible] = useState(true);
+  const [loading, setLoading] = useState<"approve" | "reject" | null>(null);
+
+  if (!visible) return null;
+
+  const spot    = reservation.info?.spot;
+  const user    = reservation.info?.user;
+  const vehicle = reservation.info?.vehicle;
+  const period  = reservation.info?.date?.period;
+  const identifier   = spot?.info?.identifier ?? `Vaga #${spot?.id ?? "?"}`;
+  const propertyName = (spot as any)?.property?.info?.name ?? "";
+  const solicitante  = user?.person?.name || "Desconhecido";
+  const vehicleLabel = vehicle ? `${vehicle.brand ?? ""} ${vehicle.model ?? ""}`.trim() : null;
+  async function handleConfirm() {
+    setLoading("approve");
+    const res = await handleSolicitation(reservation.id, "approve");
+    if (res) setVisible(false);
+    else setLoading(null);
+  }
+
+  async function handleReject() {
+    setLoading("reject");
+    const res = await handleSolicitation(reservation.id, "reject");
+    if (res) setVisible(false);
+    else setLoading(null);
+  }
+
   return (
-    <section>
-      {visible && (
-        <section id={`booking_solicitation_${reservation.id}`}>
-          <ConfirmationEntityFrame
-            title={reservation.info.spot.info.identifier}
-            description={`Código: ${reservation.code} Solicitante: ${reservation?.info.user?.person?.name || "Desconhecido"
-              }`}
-            onConfirm={async () => {
-              const res = await handleSolicitation(reservation.id, "approve");
-              if (res) setVisible(false);
-            }}
-            onCancel={async () => {
-              const res = await handleSolicitation(reservation.id, "reject");
-              if (res) setVisible(false);
-            }}
-          />
-        </section>
-      )}
-    </section>
+    <div
+      id={`booking_solicitation_${reservation.id}`}
+      className="flex items-stretch gap-0 bg-card border border-soft rounded-xl overflow-hidden hover:shadow-sm transition-shadow"
+    >
+      {/* barra lateral âmbar — pendente */}
+      <div className="w-1 shrink-0 bg-amber-400" />
+
+      <div className="flex flex-1 items-center justify-between gap-4 px-4 py-3 flex-wrap">
+
+        {/* info */}
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-primary truncate">{identifier}</span>
+            {propertyName && (
+              <span className="text-xs text-subtle truncate hidden sm:inline">{propertyName}</span>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted">
+           {/* <span>👤 {solicitante}</span> */}
+            {vehicleLabel && <span>🚗 {vehicleLabel}</span>}
+            <span>📅 {fmt(period?.start)}{period?.end ? ` → ${fmt(period.end)}` : ""}</span>
+            <span className="text-subtle">#{reservation.code}</span>
+          </div>
+        </div>
+
+        {/* botões */}
+        <div className="flex gap-2 shrink-0">
+          <button
+            onClick={handleConfirm}
+            disabled={!!loading}
+            className="px-4 py-1.5 rounded-lg text-xs font-medium text-white btn-primary transition disabled:opacity-50"
+          >
+            {loading === "approve" ? "…" : "Aceitar"}
+          </button>
+          <button
+            onClick={handleReject}
+            disabled={!!loading}
+            className="px-4 py-1.5 rounded-lg text-xs font-medium text-white bg-rose-500 hover:bg-rose-600 transition disabled:opacity-50"
+          >
+            {loading === "reject" ? "…" : "Recusar"}
+          </button>
+        </div>
+
+      </div>
+    </div>
   );
 }
 
 export function mapSolicitationFrames(d: Reservation) {
-  return <SolicitationFrame reservation={d} />;
-}
-
-export function mapNextBookingCards(d: Reservation) {
-  const propertyId = (d.info.spot as any)?.property?.id;
-  const redirectTo = propertyId ? `/spot/${propertyId}` : "";
-  return (
-    <EntityCard
-      key={`next_booking_${d.id}`}
-      title={d.info.spot.info.identifier}
-      description={`Data: ${d.info.date.period.start.toLocaleDateString()}, Status: ${d.status}`}
-      redirectTo={redirectTo}
-    />
-  );
-}
-
-// BUG FIX: interface clara para o objeto window recebido pelo mapper
-interface ReviewWindowHandle {
-  windowSetter: (open: boolean) => void;
-  reservationSetter: (id: number) => void;
-}
-
-export function mapLatestBookingCards(
-  d: Reservation,
-  window: ReviewWindowHandle,
-) {
-  const propertyId = (d.info.spot as any)?.property?.id;
-  const redirectTo = propertyId ? `/spot/${propertyId}` : "";
-  return (
-    <LatestBookingCard
-      key={`latest_booking_${d.id}`}
-      id={d.id}
-      identifier={d.info.spot.info.identifier}
-      datePeriod={d.info.date.period}
-      status={d.status}
-      redirectTo={redirectTo}
-      window={window}
-    />
-  );
-}
-
-interface LatestBookingCardProps {
-  id: number;
-  identifier: string;
-  datePeriod: { start: Date; end?: Date };
-  status: string;
-  window: ReviewWindowHandle;
-  redirectTo: string;
-}
-
-function LatestBookingCard({
-  id,
-  identifier,
-  datePeriod,
-  status,
-  window,
-  redirectTo,
-}: LatestBookingCardProps) {
-  return (
-    <EntityCard
-      key={`latest_booking_${id}`}
-      title={identifier}
-      description={`Data: ${datePeriod.start.toLocaleDateString()}, Status: ${status}`}
-      redirectTo={redirectTo ?? ""}
-    >
-      {/* BUG FIX: botão Avaliar só aparece em reservas APROVADAS,
-          e usa os setters corretamente */}
-      {status === "APROVADA" && (
-        <button
-          onClick={() => {
-            // Verifica se os setters existem antes de chamar
-            if (typeof window?.windowSetter === "function") {
-              window.windowSetter(true);
-            }
-            if (typeof window?.reservationSetter === "function") {
-              window.reservationSetter(id);
-            }
-          }}
-          className="text-sm text-primary font-medium hover:underline"
-        >
-          ✏️ Avaliar
-        </button>
-      )}
-    </EntityCard>
-  );
+  return <SolicitationCard key={d.id} reservation={d} />;
 }
