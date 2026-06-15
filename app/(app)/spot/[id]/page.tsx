@@ -35,7 +35,7 @@ export default function Page({ params }: any) {
     params.id,
     true,
   );
-  const [reviews, , refreshReviews] = useGetReviews("property", params.id);
+  const [reviews, loadedReviews] = useGetReviews("property", params.id);
   const [vehicles] = useGetVehicleDetails();
   // Reservas do usuário — usadas para escolher o reservationId ao avaliar
   const [myReservations] = useGetReservations();
@@ -358,42 +358,22 @@ export default function Page({ params }: any) {
 
       // Busca o dono da vaga selecionada
       const selectedSpot = property?.spots?.find((s) => s.id === targetId);
-      const spotOwner = selectedSpot?.property?.user?.id ?? property?.user?.id;
+      const spotOwner = selectedSpot?.property?.user?.id ?? property?.user?.id ?? 0;
 
-      if (!spotOwner || spotOwner <= 0) {
-        alert("Não foi possível identificar o proprietário desta vaga.");
-        console.error("[ReportWindow] property.user:", property?.user, "selectedSpot.property.user:", selectedSpot?.property?.user);
-        return;
-      }
-
-      const description = (formData.get("description") as string) || undefined;
-
-      const payload: Record<string, any> = {
-        reportedUserId: Number(spotOwner),
-        targetType: "SPOT",
-        targetId: targetId,
-        reason: reason,
-      };
-      if (description) payload.description = description;
-
-      console.log("[ReportWindow] Enviando payload:", payload);
+      console.log("[ReportWindow] Enviando payload:", formData, "spotOwner:", spotOwner);
 
       try {
-        const token = BrowserService.getToken();
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000"}/reports`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token?.token}`,
-          },
-          body: JSON.stringify(payload),
-        });
+        const res = await ReportController.register(
+          BrowserService.getToken(),
+          "SPOT",
+          spotOwner,
+          formData,
+        );
 
-        if (res.ok) {
+        if (res) {
           setMessageState(true);
         } else {
-          const text = await res.text();
-          console.error("[ReportWindow] Status:", res.status, "Body:", text);
+          console.error("[ReportWindow] Erro ao registrar denúncia");
           setMessageState(false);
         }
       } catch (err) {
@@ -537,7 +517,7 @@ export default function Page({ params }: any) {
 
         if (res.ok) {
           setMessageState(true);
-          refreshReviews?.();
+          window.location.reload();
         } else {
           const body = await res.json().catch(() => ({}));
           console.error("[ReviewWindow] Erro da API:", body);
