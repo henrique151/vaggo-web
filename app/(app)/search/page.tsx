@@ -15,7 +15,7 @@ export default function Home({
   console.log("params");
   console.log(params);
 
-  const [foundPropertiesData, foundPropertiesLoading] = useSearchProperties({
+  const [foundPropertiesData, foundPropertiesLoading, searchSuccess] = useSearchProperties({
     address: params.address ?? "",
   });
 
@@ -27,7 +27,7 @@ export default function Home({
     // console.log("foundPropertiesData");
     // console.log(foundPropertiesData);
     // if (foundPropertiesData && foundPropertiesCards.length < 0) {
-    if (foundPropertiesData && !foundPropertiesLoading) {
+    if (foundPropertiesData && !foundPropertiesLoading && searchSuccess) {
       const spotCards = [];
 
       for (const property of foundPropertiesData.results) {
@@ -35,6 +35,7 @@ export default function Home({
         console.log(property);
         spotCards.push(
           <EntityCard
+            key={property.property.id}
             title={`${property.property.name}`}
             description={`Distância: ${property.route.distance}`}
             redirectTo={`/spot/${property.property.id}`}
@@ -43,10 +44,9 @@ export default function Home({
         );
       }
       console.log(spotCards);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFoundPropertiesCards(spotCards);
     }
-  }, [foundPropertiesData]);
+  }, [foundPropertiesData, foundPropertiesLoading, searchSuccess]);
 
   // get spots nearby search with PropertyDAO.search(query.search)
   // list result in container
@@ -64,10 +64,20 @@ export default function Home({
               title="Pontos mais próximos ao endereço"
               spotCards={foundPropertiesData}
             />*/}
-            <CarouselContainer
-              title={"Pontos mais próximos ao endereço"}
-              cards={foundPropertiesCards}
-            />
+            {!foundPropertiesLoading && !searchSuccess ? (
+              <div className="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200 mt-4 text-center">
+                Não encontramos essa cidade ou CEP. Verifique o número/nome digitado e tente novamente.
+              </div>
+            ) : !foundPropertiesLoading && foundPropertiesCards.length === 0 ? (
+              <div className="p-4 text-muted text-center mt-4">
+                Nenhuma vaga encontrada para esta localização.
+              </div>
+            ) : (
+              <CarouselContainer
+                title={"Pontos mais próximos ao endereço"}
+                cards={foundPropertiesCards}
+              />
+            )}
             {/*<SpotCard spot={spot} />*/}
 
             {/*{spots.map((spot:any) => (

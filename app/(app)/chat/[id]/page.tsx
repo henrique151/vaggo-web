@@ -6,7 +6,8 @@ import PanelLayout from "@/component/layout/PanelLayout";
 import FormItem from "@/component/ui/form/FormItem";
 import { useGetChat } from "@/hooks/api/chat/useGetChat";
 import { getChat, sendMessage } from "@/services/chat.service";
-import { sendReport } from "@/services/report.service";
+import { ReportController } from "@controllers";
+import { BrowserService } from "@services";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { MouseEventHandler, useEffect, useRef, useState } from "react";
@@ -80,10 +81,28 @@ export default function Page() {
       const currentTarget = e.currentTarget;
       const formData = new FormData(currentTarget);
 
-      formData.set("targetId", String(params.id));
+      const targetId = Number(params.id);
+      formData.set("targetId", String(targetId));
 
-      // TODO get owner's user.id
-      const res = await sendReport("CHAT", 2, formData);
+      const reason = (formData.get("reason") as string)?.trim() ?? "";
+      if (reason.length < 5) {
+        alert("Por favor, selecione um motivo válido para a denúncia.");
+        return;
+      }
+
+      // O dono do spot em um chat é a pessoa do outro lado, ou o property owner
+      const reportedUserId = chat?.property?.user?.id ?? chat?.user?.id ?? chat?.guest?.id ?? 0;
+      if (!reportedUserId || reportedUserId <= 0) {
+        alert("Não foi possível identificar o usuário para denunciar.");
+        return;
+      }
+
+      const res = await ReportController.register(
+        BrowserService.getToken(),
+        "CHAT",
+        reportedUserId,
+        formData
+      );
       setMessageState(res);
     };
     const messages = {
@@ -102,9 +121,24 @@ export default function Page() {
       undefined: (
         <form onSubmit={handleReport}>
           <FormItem
-            type="text"
+            type="select"
             label="Qual motivo para a denúncia?"
-            name={"reason"}
+            name="reason"
+            items={[
+              { value: "", label: "Selecione um motivo" },
+              { value: "Conteúdo Inadequado", label: "Conteúdo Inadequado" },
+              { value: "Fraude/Golpe", label: "Fraude/Golpe" },
+              { value: "Comportamento Ofensivo", label: "Comportamento Ofensivo" },
+              { value: "Outro", label: "Outro" },
+            ]}
+          />
+
+          <div className="h-4" />
+
+          <FormItem
+            type="text"
+            label="Descrição (opcional)"
+            name="description"
           />
 
           <div className="h-4" />

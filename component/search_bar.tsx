@@ -11,17 +11,31 @@ export default function SearchBar() {
 
   const search = () => {
     const params = new URLSearchParams(searchParams);
-    const address = (
-      document.getElementById("search_bar_address") as HTMLInputElement
-    ).value;
+    const inputElement = document.getElementById(
+      "search_bar_address"
+    ) as HTMLInputElement;
+    const inputValue = inputElement.value.trim();
 
-    if (address) params.set("address", address);
+    if (!inputValue) return;
 
-    // router.push("/search");
+    // Função utilitária local para checar se parece CEP
+    // Só contém números, hifens, pontos e espaços
+    const isCepFormat = /^[\d\s.-]+$/.test(inputValue);
+
+    if (isCepFormat) {
+      const numericValue = inputValue.replace(/\D/g, "");
+      if (numericValue.length !== 8) {
+        alert("CEP inválido. Verifique o número digitado.");
+        return;
+      }
+      // Se for válido, passa o valor sanitizado
+      params.set("address", numericValue);
+    } else {
+      params.set("address", inputValue);
+    }
+
     router.push(`/search?${params.toString()}`);
     router.refresh();
-    // const address = document.getElementById('seach_bar_address')!.innerText
-    // const address = document.getElementById('seach_bar_address')!.innerText
   };
 
   return (

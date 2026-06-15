@@ -10,7 +10,7 @@ type stateProps = {
   cep?: string;
 };
 
-type stateReturnProps = [result: SearchResult | undefined, loading: boolean];
+type stateReturnProps = [result: SearchResult | undefined, loading: boolean, success: boolean];
 
 export function useSearchProperties({
   address,
@@ -32,7 +32,7 @@ export function useSearchProperties({
   let uri = `reservations/search/address${queryString ? `?${queryString}` : ""}`;
 
 
-  const [data, dataLoading] = useApi({
+  const [data, dataLoading, success] = useApi({
     uri: uri,
     dataOnly: false,
     useToken: true,
@@ -44,15 +44,17 @@ export function useSearchProperties({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // console.log("result from search: ");
-    // console.log(data, stateData);
+    // Se dataLoading terminou mas success = false (erro da API) ou não há data
+    if (!dataLoading && !success) {
+      setLoading(false);
+      return;
+    }
     if (data && stateData) {
       console.log("hello! inserting data");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setResult(new SearchResult(data));
       setLoading(false);
     }
-  }, [data, stateData]);
+  }, [data, stateData, dataLoading, success]);
 
-  return [result, loading];
+  return [result, loading, success];
 }
