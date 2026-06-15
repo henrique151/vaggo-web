@@ -47,86 +47,57 @@ export class SearchResult {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(data: any) {
+    // Proteção: se o backend não encontrou o endereço, searchOrigin vem undefined
+    if (!data || !data.searchOrigin) {
+      this.origin = { latitude: "", longitude: "", query: "", source: "" };
+      this.results = [];
+      return;
+    }
+
     this.origin = {
-      latitude: data.searchOrigin.lat,
-      longitude: data.searchOrigin.lng,
-      query: data.searchOrigin.query,
-      source: data.searchOrigin.source,
+      latitude: data.searchOrigin?.lat ?? data.searchOrigin?.latitude ?? "",
+      longitude: data.searchOrigin?.lng ?? data.searchOrigin?.longitude ?? "",
+      query: data.searchOrigin?.query ?? "",
+      source: data.searchOrigin?.source ?? "",
     };
 
     // TODO convert to mapper
-    for (const result of data.data) {
+    const dataArray = Array.isArray(data.data) ? data.data : [];
+    for (const result of dataArray) {
       console.log(result);
 
-      const newResult = {
-        property: {
-          id: result.property.id,
-          name: result.property.name,
-          image: new Image(result.property.image),
-          owner: {
-            id: result.owner.id,
-            name: result.owner.name,
-            phone: result.owner.phone,
-            avatar: new Image(result.owner.avatarUrl),
+      try {
+        const newResult = {
+          property: {
+            id: result.property?.id,
+            name: result.property?.name,
+            image: new Image(result.property?.image),
+            owner: {
+              id: result.owner?.id,
+              name: result.owner?.name,
+              phone: result.owner?.phone,
+              avatar: new Image(result.owner?.avatarUrl),
+            },
           },
-        },
-        spot: {
-          id: result.spot.id,
-          price: result.spot.price,
-          size: result.spot.size,
-          allowedVehicles: result.spot.allowedVehicles,
-          status: result.spot.currentStatus,
-        },
-        // latitude: result.propertyLat,
-        // longitude: result.propertyLng,
-        route: {
-          duration: result.route?.durationText ?? "N/A",
-          distance: result.route?.distanceText ?? "N/A",
-          durationNum: result.route?.durationMinutes ?? 0,
-          distanceMeters: result.route?.distanceMeters ?? 0,
-        },
-      };
+          spot: {
+            id: result.spot?.id,
+            price: result.spot?.price,
+            size: result.spot?.size,
+            allowedVehicles: result.spot?.allowedVehicles,
+            status: result.spot?.currentStatus,
+          },
+          route: {
+            duration: result.route?.durationText ?? "N/A",
+            distance: result.route?.distanceText ?? "N/A",
+            durationNum: result.route?.durationMinutes ?? 0,
+            distanceMeters: result.route?.distanceMeters ?? 0,
+          },
+        };
 
-      this.results.push(newResult);
-
-      // const newResult = {
-      //   propertyId: result.propertyId,
-      //   spots: [],
-      //   latitude: result.propertyLat,
-      //   longitude: result.propertyLng,
-      //   route: {
-      //     duration: result.route.durationText,
-      //     distance: result.route.distanceText,
-      //     durationNum: result.route.durationMinutes,
-      //     distanceMeters: result.route.distanceMeters,
-      //   },
-      // };
-
-      // if (
-      //   !this.results.find(
-      //     (element) => element.propertyId == newResult.propertyId,
-      //   )
-      // ) {
-      //   this.results.push(newResult);
-      // }
+        this.results.push(newResult);
+      } catch (err) {
+        console.warn("[SearchResult] Erro ao mapear resultado:", err, result);
+      }
     }
-
-    // TODO POSSIBLY convert to mapper
-    // for (const property of this.results) {
-    //   for (const result of data.results) {
-    //     const spotObj = {
-    //       id: result.spotId,
-    //       identifier: result.identifier,
-    //       covered: result.isCovered,
-    //       price: result.price,
-    //       allowedVehicles: result.allowedVehicles,
-    //       status: result.currentStatus,
-    //     };
-
-    //     if (result.propertyId == property.propertyId) {
-    //       property.spots.push(spotObj);
-    //     }
-    //   }
-    // }
   }
 }

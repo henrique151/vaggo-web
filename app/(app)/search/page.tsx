@@ -3,6 +3,7 @@ import CarouselContainer from "@/component/container/CarouselContainer";
 import { EntityCard } from "@/component/container/EntityContainer/EntityCard";
 import { useSearchProperties } from "@/hooks/api/property/useSearchProperties";
 import { use, useEffect, useState } from "react";
+import React from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -12,27 +13,27 @@ export default function Home({
   searchParams: Promise<{ address?: string }>;
 }) {
   const params = use(searchParams);
-  console.log("params");
-  console.log(params);
+  const address = params.address ?? "";
 
-  const [foundPropertiesData, foundPropertiesLoading, searchSuccess] = useSearchProperties({
-    address: params.address ?? "",
-  });
+  const [foundPropertiesData, foundPropertiesLoading, searchSuccess] =
+    useSearchProperties({ address });
 
   const [foundPropertiesCards, setFoundPropertiesCards] = useState<
     React.ReactNode[]
   >([]);
 
+  // Reseta cards quando uma nova busca começa
   useEffect(() => {
-    // console.log("foundPropertiesData");
-    // console.log(foundPropertiesData);
-    // if (foundPropertiesData && foundPropertiesCards.length < 0) {
+    if (foundPropertiesLoading) {
+      setFoundPropertiesCards([]);
+    }
+  }, [foundPropertiesLoading]);
+
+  useEffect(() => {
     if (foundPropertiesData && !foundPropertiesLoading && searchSuccess) {
-      const spotCards = [];
+      const spotCards: React.ReactNode[] = [];
 
       for (const property of foundPropertiesData.results) {
-        console.log("property");
-        console.log(property);
         spotCards.push(
           <EntityCard
             key={property.property.id}
@@ -40,35 +41,33 @@ export default function Home({
             description={`Distância: ${property.route.distance}`}
             redirectTo={`/spot/${property.property.id}`}
             image={property.property.image}
-          ></EntityCard>,
+          />,
         );
       }
-      console.log(spotCards);
       setFoundPropertiesCards(spotCards);
     }
   }, [foundPropertiesData, foundPropertiesLoading, searchSuccess]);
 
-  // get spots nearby search with PropertyDAO.search(query.search)
-  // list result in container
-  // create generic container for storing those data efficiently?
-  //
+  const hasNoAddress = !address;
 
   return (
     <main className="bg-base min-h-screen">
-      {/*<Header showSearch />*/}
-
       <section className="section-default">
         <div className="container-default mt-6">
           <div className="rounded-2xl shadow-sm p-6">
-            {/*<SpotCarousel
-              title="Pontos mais próximos ao endereço"
-              spotCards={foundPropertiesData}
-            />*/}
-            {!foundPropertiesLoading && !searchSuccess ? (
-              <div className="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200 mt-4 text-center">
-                Não encontramos essa cidade ou CEP. Verifique o número/nome digitado e tente novamente.
+            {hasNoAddress ? (
+              <div className="p-4 text-muted text-center mt-4">
+                Digite um endereço ou CEP na barra de busca para encontrar vagas próximas.
               </div>
-            ) : !foundPropertiesLoading && foundPropertiesCards.length === 0 ? (
+            ) : foundPropertiesLoading ? (
+              <div className="p-4 text-muted text-center mt-4">
+                Buscando vagas próximas...
+              </div>
+            ) : !searchSuccess ? (
+              <div className="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200 mt-4 text-center">
+                Endereço não localizado. Verifique o nome da cidade ou CEP digitado e tente novamente.
+              </div>
+            ) : foundPropertiesCards.length === 0 ? (
               <div className="p-4 text-muted text-center mt-4">
                 Nenhuma vaga encontrada para esta localização.
               </div>
@@ -78,19 +77,6 @@ export default function Home({
                 cards={foundPropertiesCards}
               />
             )}
-            {/*<SpotCard spot={spot} />*/}
-
-            {/*{spots.map((spot:any) => (
-              <div key={spot.id} className="min-w-[260px]">
-                <SpotCard spot={spot} />
-              </div>
-            ))}*/}
-
-            {/*<div className="h-16"></div>*/}
-
-            {/*<SpotCarousel title="Pontos de interesse com reservas anteriores" />*/}
-
-            {/*<div className="h-12"></div>*/}
           </div>
         </div>
       </section>

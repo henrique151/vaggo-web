@@ -1,6 +1,19 @@
 import { PropertyClassInterface } from "@interfaces";
 
 export default function map(d: any): PropertyClassInterface {
+  // Encontra o dono da propriedade: prioriza quem tem role=DONO na junction table,
+  // ou pega o primeiro da lista, ou fallback para campos diretos
+  const ownerFromResidents = Array.isArray(d.residentsAndOwners)
+    ? (d.residentsAndOwners.find((u: any) => u?.PropertyUser?.role === "DONO") ??
+       d.residentsAndOwners[0])
+    : undefined;
+  const ownerId =
+    ownerFromResidents?.id ??
+    d.userId ??
+    d.ownerId ??
+    d.owner?.id ??
+    d.user?.id;
+
   return {
     id: d.id,
     info: {
@@ -38,6 +51,6 @@ export default function map(d: any): PropertyClassInterface {
         },
       },
     },
-    user: (d.userId || d.ownerId || d.owner?.id || d.user?.id) ? { id: d.userId || d.ownerId || d.owner?.id || d.user?.id } : undefined,
+    user: ownerId ? { id: ownerId } : undefined,
   };
 }
