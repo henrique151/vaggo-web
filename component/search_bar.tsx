@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 // TODO allow search bar to redirect user on the search page
 // TODO implement searching parameters on search's url
@@ -8,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 export default function SearchBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [error, setError] = useState<string | null>(null);
 
   const search = () => {
     const params = new URLSearchParams(searchParams);
@@ -15,6 +17,8 @@ export default function SearchBar() {
       "search_bar_address"
     ) as HTMLInputElement;
     const inputValue = inputElement.value.trim();
+
+    setError(null);
 
     if (!inputValue) return;
 
@@ -25,7 +29,7 @@ export default function SearchBar() {
     if (isCepFormat) {
       const numericValue = inputValue.replace(/\D/g, "");
       if (numericValue.length !== 8) {
-        alert("CEP inválido. Verifique o número digitado.");
+        setError("CEP inválido. Verifique o número digitado.");
         return;
       }
       // Se for válido, passa o valor sanitizado
@@ -154,6 +158,11 @@ export default function SearchBar() {
           🔍
         </button>
       </div>
+      {error && (
+        <div className="mt-2 text-xs text-red-500 font-medium px-4">
+          {error}
+        </div>
+      )}
     </div>
   );
 }

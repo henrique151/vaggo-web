@@ -80,10 +80,10 @@ export class SearchResult {
         // latitude: result.propertyLat,
         // longitude: result.propertyLng,
         route: {
-          duration: result.route.durationText,
-          distance: result.route.distanceText,
-          durationNum: result.route.durationMinutes,
-          distanceMeters: result.route.distanceMeters,
+          duration: result.route?.durationText ?? "N/A",
+          distance: result.route?.distanceText ?? "N/A",
+          durationNum: result.route?.durationMinutes ?? 0,
+          distanceMeters: result.route?.distanceMeters ?? 0,
         },
       };
 

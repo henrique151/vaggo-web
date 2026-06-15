@@ -92,10 +92,6 @@ export default function Page() {
 
       // O dono do spot em um chat é a pessoa do outro lado, ou o property owner
       const reportedUserId = chat?.property?.user?.id ?? chat?.user?.id ?? chat?.guest?.id ?? 0;
-      if (!reportedUserId || reportedUserId <= 0) {
-        alert("Não foi possível identificar o usuário para denunciar.");
-        return;
-      }
 
       const res = await ReportController.register(
         BrowserService.getToken(),

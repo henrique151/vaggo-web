@@ -358,15 +358,9 @@ export default function Page({ params }: any) {
 
       // Busca o dono da vaga selecionada
       const selectedSpot = property?.spots?.find((s) => s.id === targetId);
-      const spotOwner = selectedSpot?.property?.user?.id ?? property?.user?.id;
+      const spotOwner = selectedSpot?.property?.user?.id ?? property?.user?.id ?? 0;
 
-      if (!spotOwner || spotOwner <= 0) {
-        alert("Não foi possível identificar o proprietário desta vaga.");
-        console.error("[ReportWindow] property.user:", property?.user, "selectedSpot.property.user:", selectedSpot?.property?.user);
-        return;
-      }
-
-      console.log("[ReportWindow] Enviando payload:", formData);
+      console.log("[ReportWindow] Enviando payload:", formData, "spotOwner:", spotOwner);
 
       try {
         const res = await ReportController.register(
