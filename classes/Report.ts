@@ -49,29 +49,30 @@ export class Report {
     };
     this.images = Image.createFromList(data.images);
     this.date = {
-      created: new Date(data.createdAt),
-      updated: new Date(data.updatedAt),
+      created: data.createdAt ? new Date(data.createdAt) : new Date(),
+      updated: data.updatedAt ? new Date(data.updatedAt) : new Date(),
       reviewed: new Date(data.reviewedAt) ?? null,
     };
     this.user = {
-      reporter: {
+      reporter: data.reporter ? {
         id: data.reporter.id,
         email: data.reporter.email,
-        avatar: new Image(data.reporter.avatarUrl),
-      },
+        avatar: data.reporter.avatarUrl ? new Image(data.reporter.avatarUrl) : undefined,
+      } : undefined,
       reported: {
         id: data.reportedUserId,
       },
     };
-    this.spot = {
+
+    this.spot = data.spot ? {
       id: data.spot.id,
       identifier: data.spot.identifier,
       status: data.spot.status,
       active: data.spot.isActive,
-      property: {
+      property: data.spot.property ? {
         id: data.spot.property.id,
         name: data.spot.property.name,
-      },
-    };
+      } : undefined,
+    } : undefined;
   }
 }

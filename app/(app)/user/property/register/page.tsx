@@ -59,9 +59,12 @@ export default function Page() {
     if (!formData.type)
       newErrors.type = "Tipo de propriedade é obrigatório.";
 
+
     // Descrição
     if (!formData.description.trim())
       newErrors.description = "Descrição da propriedade é obrigatória.";
+    else if (formData.description.length > 50)
+      newErrors.description = "Descrição deve possuir no máximo 50 caracteres."
 
     // Capacidade
     const capacity = parseInt(formData.totalCapacity);

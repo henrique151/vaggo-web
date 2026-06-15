@@ -14,11 +14,11 @@ const FILTER_FIELDS: FilterField[] = [
   {
     key: "status", label: "Status", type: "select",
     options: [
-      { value: "PENDENTE",   label: "Pendente" },
+      { value: "PENDENTE", label: "Pendente" },
       { value: "EM ANALISE", label: "Em Análise" },
-      { value: "RESOLVIDA",  label: "Resolvida" },
-      { value: "RECUSADA",   label: "Recusada" },
-      { value: "REANALISE",  label: "Reanálise" },
+      { value: "RESOLVIDA", label: "Resolvida" },
+      { value: "RECUSADA", label: "Recusada" },
+      { value: "REANALISE", label: "Reanálise" },
     ],
   },
   {
@@ -28,7 +28,7 @@ const FILTER_FIELDS: FilterField[] = [
 ];
 
 const Page = () => {
-  const { reports } = usePageContext();
+  const { reports, refresh } = usePageContext();
   const [displayReports, setDisplayReports] = useState<typeof reports | undefined>(undefined);
 
   const filtered = displayReports ?? reports ?? [];
@@ -41,12 +41,12 @@ const Page = () => {
 
     setDisplayReports(
       reports.filter((r) => {
-        const rawStatus  = r?.info?.status  ?? r?.status     ?? "";
-        const rawReason  = r?.info?.reason  ?? r?.reason     ?? "";
-        const rawType    = r?.target?.type  ?? r?.targetType ?? "";
-        if (reason     && !rawReason.toLowerCase().includes(reason.toLowerCase())) return false;
-        if (status     && rawStatus !== status)                                     return false;
-        if (targetType && rawType   !== targetType)                                 return false;
+        const rawStatus = r?.info?.status ?? r?.status ?? "";
+        const rawReason = r?.info?.reason ?? r?.reason ?? "";
+        const rawType = r?.target?.type ?? r?.targetType ?? "";
+        if (reason && !rawReason.toLowerCase().includes(reason.toLowerCase())) return false;
+        if (status && rawStatus !== status) return false;
+        if (targetType && rawType !== targetType) return false;
         return true;
       }),
     );
@@ -68,21 +68,31 @@ const Page = () => {
       <div className="space-y-4">
         {filtered.length > 0 ? (
           filtered.map((report) => {
-            const rawStatus     = report?.info?.status ?? report?.status ?? "";
-            const statusLabel   = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1).toLowerCase();
-            const reason        = report?.info?.reason  ?? report?.reason     ?? "—";
+            // Normalizamos o status para maiúsculo para garantir a validação exata
+            const rawStatus = (report?.info?.status ?? report?.status ?? "").toUpperCase();
+            const statusLabel = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1).toLowerCase();
+            const reason = report?.info?.reason ?? report?.reason ?? "—";
             const targetType: "SPOT" | "CHAT" = report?.target?.type ?? report?.targetType ?? "SPOT";
-            const createdAt     = report?.date?.created ?? report?.createdAt;
-            const spotName      = report?.spot?.property?.info?.name ?? report?.spot?.info?.identifier ?? "—";
-            const spotIdentifier= report?.spot?.info?.identifier ?? "—";
+            const createdAt = report?.date?.created ?? report?.createdAt;
+            const spotName = report?.spot?.property?.info?.name ?? report?.spot?.info?.identifier ?? "—";
+            const spotIdentifier = report?.spot?.info?.identifier ?? "—";
+
+            // Verifica se o status é RECUSADA para exibir o botão
+            const isRecusada = rawStatus === "RECUSADA";
 
             return (
               <EntityFrame
                 key={report.id}
-                onReanalise={async () => {
+                // Se for recusada, passa a função, senão passa undefined para ocultar o botão
+                onReanalise={isRecusada ? async () => {
                   const res = await ReportController.requestReanalysis(BrowserService.getToken(), report.id);
-                  alert(res ? "Reanálise solicitada com sucesso!" : "Erro ao solicitar reanálise.");
-                }}
+                  if (res) {
+                    alert("Reanálise solicitada com sucesso!");
+                    if (refresh) refresh(); // Atualiza a lista com o novo status
+                  } else {
+                    alert("Erro ao solicitar reanálise.");
+                  }
+                } : undefined}
               >
                 <DefaultEntityFrame
                   title={`Denúncia #${report.id.toString().padStart(2, "0")}`}
@@ -91,7 +101,6 @@ const Page = () => {
                     `Status: ${statusLabel}`,
                     `Tipo: ${{ SPOT: "Vaga", CHAT: "Conversa" }[targetType]}`,
                     `Registrado em: ${createdAt ? createdAt.toLocaleDateString("pt-BR") : "—"}`,
-                    `Relacionado: ${spotName}${spotIdentifier !== spotName ? ` - ${spotIdentifier}` : ""}`,
                   ]}
                 />
               </EntityFrame>
